@@ -6,6 +6,7 @@ proc circle(gl_FragColor: var Color, uv: Vec2) =
   else:
     gl_FragColor = color(0, 0, 0, 1)
 
+# both CPU and GPU code:
 proc circleSmooth(gl_FragColor: var Color, uv: Vec2) =
   var a = 0.0
   for x in 0 ..< 8:
@@ -20,7 +21,7 @@ var testColor: Color
 circleSmooth(testColor, vec2(100, 100))
 echo testColor
 
-
+# compile to a GPU shader:
 var shader = toShader(circleSmooth)
 echo shader
 
