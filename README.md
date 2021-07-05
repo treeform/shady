@@ -1,12 +1,14 @@
 # Nim to GPU shader language compiler and supporting utilities.
 
+Shady can compile a subset of nim into `OpenGL Shader Language` used by the GPU. This allows you to test your shader code with `echo` statements on the CPU, and then run the exact same code on the GPU.
+
 Shady has two main goals:
 
 * Write vertex and fragment/pixel shaders for games and 3d applications.
 * Write compute shaders for offline processing and number crunching.
 
 Shady uses:
-* `pixie` library for images operations.
+* `pixie` library for image operations.
 * `vmath` library for vector and matrix operations.
 * `chroma` library for color conversions and operations.
 * `bumpy` library for collisions and intersections.
@@ -14,6 +16,27 @@ Shady uses:
 # Using Shady shader toy playground:
 
 ![triangle example](docs/circle.png)
+
+```nim
+# both CPU and GPU code:
+proc circleSmooth(gl_FragColor: var Color, uv: Vec2) =
+  var a = 0.0
+  for x in 0 ..< 8:
+    for y in 0 ..< 8:
+      if (uv + vec2(x.float32 - 4.0, y.float32 - 4.0) / 8.0).length < 400.0:
+        a += 1
+  a = a / (8 * 8)
+  gl_FragColor = color(a, a, a, 1)
+
+# test on the CPU:
+var testColor: Color
+circleSmooth(testColor, vec2(100, 100))
+echo testColor
+
+# compile to a GPU shader:
+var shader = toShader(circleSmooth)
+echo shader
+```
 
 [See the Source](examples/circle.nim)
 
