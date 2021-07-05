@@ -62,3 +62,9 @@ void main() {
   gl_FragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 1.0);
 }
 ```
+
+# Using Shady shader toy playgournd:
+
+![triangle example](docs/mandelbrot.png)
+
+[See the Source](examples/mandelbrot.nim)

@@ -24,8 +24,9 @@ proc show(n: NimNode): string =
 proc typeRename(t: string): string =
   ## Some GLSL type names don't match nim names, rename here.
   case t
-  of "Mat4": "mat4"
+  of "Mat2": "mat2"
   of "Mat3": "mat3"
+  of "Mat4": "mat4"
   of "Color": "vec4"
   of "Vec4": "vec4"
   of "Vec3": "vec3"
@@ -53,10 +54,11 @@ proc typeRename(t: string): string =
 ## Default constructor for different GLSL types.
 proc typeDefault(t: string): string =
   case t
+  of "mat2": "mat2(0.0)"
+  of "mat3": "mat3(0.0)"
   of "mat4": "mat4(0.0)"
-  of "mat3": "mat4(0.0)"
   of "vec4": "vec4(0.0)"
-  of "vec3": "vec4(0.0)"
+  of "vec3": "vec3(0.0)"
   of "vec2": "vec2(0.0)"
 
   of "uvec2": "uvec2(0)"
@@ -78,8 +80,8 @@ const glslGlobals = [
 const glslFunctions = [
   "rgb=", "rgb", "xyz", "xyz=", "xy", "xy=",
   "bool", "array",
-  "vec2", "vec3", "vec4", "mat3", "mat4", "color",
-  "Vec2", "Vec3", "Vec4", "Mat3", "Mat4", "Color",
+  "vec2", "vec3", "vec4", "mat2", "mat3", "mat4", "color",
+  "Vec2", "Vec3", "Vec4", "mat2", "Mat3", "Mat4", "Color",
   "uvec2", "uvec3", "uvec4",
   "UVec2", "UVec3", "UVec4",
   "ivec2", "ivec3", "ivec4",
@@ -477,7 +479,6 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         else:
           res.add "}; break;\n"
       else:
-        echo n.treeRepr
         quit "^ can't compile branch"
     res.addIndent level
     res.add "}"
@@ -661,6 +662,7 @@ proc gatherFunction(
 
     if n.kind == nnkCall:
       # Looking for functions.
+      echo n[0].treeRepr
       let procName = n[0].strVal()
       if procName in ignoreFunctions:
         continue
