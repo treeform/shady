@@ -11,10 +11,21 @@ Shady uses:
 * `chroma` library for color conversions and operations.
 * `bumpy` library for collisions and intersections.
 
+# Using Shady shader toy playground:
+
+![triangle example](docs/circle.png)
+
+[See the Source](examples/circle.nim)
+
+![triangle example](docs/mandelbrot.png)
+
+[See the Source](examples/mandelbrot.nim)
 
 # Using Shady as a shader generator:
 
 ![triangle example](docs/triangle.png)
+
+[See the Source](examples/triangle.nim)
 
 Nim vertex shader:
 ```nim
@@ -62,9 +73,3 @@ void main() {
   gl_FragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 1.0);
 }
 ```
-
-# Using Shady shader toy playgournd:
-
-![triangle example](docs/mandelbrot.png)
-
-[See the Source](examples/mandelbrot.nim)
