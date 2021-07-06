@@ -1,4 +1,4 @@
-import shady, strutils, vmath, chroma, pixie
+import chroma, pixie, shady, strutils, vmath
 
 block:
   echo "--------------------------------------------------"
@@ -7,7 +7,7 @@ block:
   proc basicFrag(fragColor: var Color) =
     fragColor = color(1.0, 0.0, 0.0, 1.0)
 
-  echo toShader(basicFrag)
+  echo toGLSL(basicFrag)
 
   var c: Color
   basicFrag(c)
@@ -27,7 +27,7 @@ block:
     fragColor.g = v.y
     fragColor.b = v.z
 
-  echo toShader(functionFrag)
+  echo toGLSL(functionFrag)
 
   var c: Color
   functionFrag(c)
@@ -51,10 +51,10 @@ block:
       c = vec3(1, 1, 1)
       d = vec3(1, 0, 1)
       e = vec3(1, 0, 0)
-    fragColor.rgb = color.rgb * dot(normal, normalize(vec3(1.0, 1.0, 1.0)))
+    fragColor.rgb3 = color.rgb3 * dot(normal, normalize(vec3(1.0, 1.0, 1.0)))
     fragColor.a = 1.0
 
-  echo toShader(mathFrag)
+  echo toGLSL(mathFrag)
 
   var c: Color
   mathFrag(vec2(0, 0), color(1, 0, 0, 1), vec3(0, 1, 0), 1, c)
@@ -72,7 +72,7 @@ block:
     else:
       fragColor = color(0, 0, 0, 1)
 
-  echo toShader(bufferFrag)
+  echo toGLSL(bufferFrag)
 
   dataBuffer.data = @[0.float32]
   var c: Color
@@ -96,7 +96,7 @@ block:
   proc textureFrag(fragColor: var Color) =
     fragColor = texture(textureAtlasSampler, uv)
 
-  echo toShader(textureFrag)
+  echo toGLSL(textureFrag)
 
   var c: Color
   textureFrag(c)

@@ -1,4 +1,4 @@
-import shady, shady/demo, chroma, vmath
+import chroma, shady, shady/demo, vmath
 
 ## From: https://www.shadertoy.com/view/sllXRM
 
@@ -13,24 +13,24 @@ proc to_rgb(ycbcr: Vec3): Vec3 =
 
 proc rot(uv: Vec2, r: float): Vec2 =
   var
-    s=sin(r)
-    c=cos(r)
-  return vec2(uv.x*c-uv.y*s,uv.x*s+uv.y*c)
+    s = sin(r)
+    c = cos(r)
+  return vec2(uv.x*c-uv.y*s, uv.x*s+uv.y*c)
 
 proc vsphere(x: float): Vec2 =
-  return vec2(sin(x*PI),cos(x*PI))
+  return vec2(sin(x*PI), cos(x*PI))
 
 proc colors(gl_FragColor: var Color, uv: Vec2, time: Uniform[float32]) =
 
   var pos: Vec2 = (uv) / 300.0
 
-  pos=rot(pos,time*PI*0.5)
+  pos = rot(pos, time*PI*0.5)
   var inv = 1.0/length(pos)
   pos*=inv
 
-  var cbcr: Vec2=vsphere(pos.x+time)*sin(time*0.5)*0.5
+  var cbcr: Vec2 = vsphere(pos.x+time)*sin(time*0.5)*0.5
 
-  var col: Vec3 = to_rgb(vec3(inv*0.3.float32,cbcr.x, cbcr.y))*inv*0.5
+  var col: Vec3 = to_rgb(vec3(inv*0.3.float32, cbcr.x, cbcr.y))*inv*0.5
   gl_FragColor = color(col.x, col.y, col.z, 1.0)
 
 # test on the CPU:

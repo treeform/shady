@@ -1,6 +1,6 @@
 ## Inspired by https://www.shadertoy.com/
 
-import shady, chroma, vmath, opengl, staticglfw, times
+import chroma, opengl, shady, staticglfw, times, vmath
 
 var
   vertices: seq[float32] = @[
@@ -33,7 +33,7 @@ proc checkError*(shader: GLuint) =
     var length: GLint = 0
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, addr length)
     var log = newString(length.int)
-    glGetShaderInfoLog(shader, length, nil, log);
+    glGetShaderInfoLog(shader, length, nil, log)
     echo log
 
 proc start(title, vertexShaderText, fragmentShaderText: string) =
@@ -61,9 +61,9 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   glCompileShader(vertex_shader)
   checkError(vertexShader)
 
-  var fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  var fragmentShader = glCreateShader(GL_FRAGMENT_SHADER)
   var fragmentShaderTextArr = allocCStringArray([fragmentShaderText])
-  glShaderSource(fragmentShader, 1.GLsizei, fragmentShaderTextArr, nil);
+  glShaderSource(fragmentShader, 1.GLsizei, fragmentShaderTextArr, nil)
   glCompileShader(fragmentShader)
   checkError(fragment_shader)
 
@@ -75,7 +75,7 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
 
   timeLocation = glGetUniformLocation(program, "time")
 
-  glEnableVertexAttribArray(vposLocation);
+  glEnableVertexAttribArray(vposLocation)
   glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
 
   startTime = epochTime()
@@ -94,7 +94,7 @@ proc draw() {.cdecl.} =
   let now = epochTime() - startTime
   glUniform1f(timeLocation, now.float32)
 
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glDrawArrays(GL_TRIANGLES, 0, 6)
 
   # Swap buffers (this will display the red color)
   window.swapBuffers()

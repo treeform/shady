@@ -1,4 +1,4 @@
-import shady, shady/demo, chroma, vmath
+import chroma, shady, shady/demo, vmath
 
 proc circle(gl_FragColor: var Color, uv: Vec2, time: Uniform[float32]) =
   var radius = 300.0 + 100 * sin(time)

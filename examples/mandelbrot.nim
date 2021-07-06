@@ -1,4 +1,4 @@
-import shady, shady/demo, chroma, vmath
+import chroma, shady, shady/demo, vmath
 
 proc mandelbrot(gl_FragColor: var Color, uv: Vec2, time: Uniform[float32]) =
   var o = vec4(0, 0, 0, 0)

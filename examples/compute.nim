@@ -1,8 +1,7 @@
-import opengl, fidget2/buffers, fidget2/shaders, fidget2/textures, pixie/demo,
-  print, benchy, shady
+import benchy, fidget2/buffers, fidget2/shaders, fidget2/textures, opengl, pixie/demo, print, shady
 
-var commandBuf*: Uniform[SamplerBuffer];
-var valuesBuf*: UniformWriteOnly[UImageBuffer];
+var commandBuf*: Uniform[SamplerBuffer]
+var valuesBuf*: UniformWriteOnly[UImageBuffer]
 var dimens*: Uniform[IVec4]; # ivec4(width, height, 0, 0)
 
 var gl_GlobalInvocationID*: UVec3
@@ -57,7 +56,6 @@ proc main() =
 
   var shader = newShader("examples/compute_sh.comp")
   glUseProgram(shader.programId)
-
 
   var commands: seq[float32]
   for i in 0 ..< 512:
@@ -132,6 +130,5 @@ proc main() =
   discard glUnmapNamedBuffer(outputBuffer.bufferId)
 
   outputImage.writeFile("examples/compute_sh.png")
-
 
 main()

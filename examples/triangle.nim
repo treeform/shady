@@ -1,4 +1,4 @@
-import shady, chroma, vmath, opengl, staticglfw
+import chroma, opengl, shady, staticglfw, vmath
 
 var
   # vertices: seq[float32] = @[
@@ -40,7 +40,7 @@ proc checkError*(shader: GLuint) =
     var length: GLint = 0
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, addr length)
     var log = newString(length.int)
-    glGetShaderInfoLog(shader, length, nil, log);
+    glGetShaderInfoLog(shader, length, nil, log)
     echo log
 
 # Init GLFW
@@ -67,9 +67,9 @@ glShaderSource(vertexShader, 1.GLsizei, vertexShaderTextArr, nil)
 glCompileShader(vertex_shader)
 checkError(vertexShader)
 
-var fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+var fragmentShader = glCreateShader(GL_FRAGMENT_SHADER)
 var fragmentShaderTextArr = allocCStringArray([fragmentShaderText])
-glShaderSource(fragmentShader, 1.GLsizei, fragmentShaderTextArr, nil);
+glShaderSource(fragmentShader, 1.GLsizei, fragmentShaderTextArr, nil)
 glCompileShader(fragmentShader)
 checkError(fragment_shader)
 
@@ -82,10 +82,12 @@ var
   vposLocation = glGetAttribLocation(program, "vPos").GLuint
   vcolLocation = glGetAttribLocation(program, "vCol").GLuint
 
-glEnableVertexAttribArray(vposLocation);
-glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, (5 * 4).GLsizei, nil)
-glEnableVertexAttribArray(vcolLocation.GLuint);
-glVertexAttribPointer(vcolLocation, 3.GLint, cGL_FLOAT, GL_FALSE, (5 * 4).GLsizei, cast[pointer](4*2))
+glEnableVertexAttribArray(vposLocation)
+glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, (5 *
+    4).GLsizei, nil)
+glEnableVertexAttribArray(vcolLocation.GLuint)
+glVertexAttribPointer(vcolLocation, 3.GLint, cGL_FLOAT, GL_FALSE, (5 *
+    4).GLsizei, cast[pointer](4*2))
 
 var colorFade = 1.0
 
@@ -104,11 +106,12 @@ proc draw() {.cdecl.} =
   m = rotateZ(getTime().float32)
   v = scale(vec3(1, ratio, 1))
   p = ortho[float32](-1, 1, 1, -1, -1000, 1000)
-  mvp = m * v * p;
+  mvp = m * v * p
 
   glUseProgram(program)
-  glUniformMatrix4fv(mvpLocation.GLint, 1, GL_FALSE, cast[ptr float32](mvp.unsafeAddr))
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glUniformMatrix4fv(mvpLocation.GLint, 1, GL_FALSE, cast[ptr float32](
+      mvp.unsafeAddr))
+  glDrawArrays(GL_TRIANGLES, 0, 3)
 
   # Swap buffers (this will display the red color)
   window.swapBuffers()
