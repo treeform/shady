@@ -44,6 +44,10 @@ echo shader
 
 [See the Source](examples/mandelbrot.nim)
 
+![colors example](docs/colors.png)
+
+[See the Source](examples/colors.nim)
+
 # Using Shady as a shader generator:
 
 ![triangle example](docs/triangle.png)

@@ -1,6 +1,6 @@
 ## Inspired by https://www.shadertoy.com/
 
-import shady, chroma, vmath, opengl, staticglfw
+import shady, chroma, vmath, opengl, staticglfw, times
 
 var
   vertices: seq[float32] = @[
@@ -18,13 +18,13 @@ var
   #   -sin(240.toRadians), -cos(240.toRadians), 0.0f, 0.0f, 1.0f
   # ]
 
-
-
 var
   program: GLuint
   mvpLocation: GLuint
   vposLocation: GLuint
+  timeLocation: GLint
   window: Window
+  startTime: float64
 
 proc checkError*(shader: GLuint) =
   var code: GLint
@@ -73,8 +73,12 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   glLinkProgram(program)
   vposLocation = glGetAttribLocation(program, "vPos").GLuint
 
+  timeLocation = glGetUniformLocation(program, "time")
+
   glEnableVertexAttribArray(vposLocation);
   glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
+
+  startTime = epochTime()
 
 proc draw() {.cdecl.} =
   var ratio: float32
@@ -86,6 +90,10 @@ proc draw() {.cdecl.} =
   glClear(GL_COLOR_BUFFER_BIT)
 
   glUseProgram(program)
+
+  let now = epochTime() - startTime
+  glUniform1f(timeLocation, now.float32)
+
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
   # Swap buffers (this will display the red color)
@@ -104,7 +112,7 @@ proc run*(title, shader: string) =
     uv.y = gl_Position.y * 500
 
   const
-    vertexShaderText = toShader(basicVert)
+    vertexShaderText = toGLSL(basicVert)
 
   start(title, vertexShaderText, shader)
 

@@ -674,7 +674,7 @@ proc gatherFunction(
 
     gatherFunction(n, functions, globals)
 
-macro toShader*(s: typed, version = "410", extra = "precision highp float;\n"): string =
+macro toGLSL*(s: typed, version = "410", extra = "precision highp float;\n"): string =
   ## Converts proc to a glsl string.
   var code: string
 
@@ -782,13 +782,13 @@ type
 # proc uvec3*(x, y, z: uint32): UVec3 =
 #   UVec3(x:x, y:y, z:z)
 
-proc rgb*(c: Color): Vec3 =
-  vec3(c.r, c.g, c.b)
+# proc rgb*(c: Color): Vec3 =
+#   vec3(c.r, c.g, c.b)
 
-proc `rgb=`*(c: var Color, v: Vec3) =
-  c.r = v.x
-  c.g = v.y
-  c.b = v.z
+# proc `rgb=`*(c: var Color, v: Vec3) =
+#   c.r = v.x
+#   c.g = v.y
+#   c.b = v.z
 
 # proc vec4*(v: Vec3, w: float32): Vec4 =
 #   vec4(v.x, v.y, v.z, w)

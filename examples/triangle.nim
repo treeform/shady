@@ -27,8 +27,8 @@ proc basicFrag(gl_FragColor: var Color, fragColor: Vec3) =
   gl_FragColor = color(fragColor.x, fragColor.y, fragColor.z, 1.0)
 
 const
-  vertexShaderText = toShader(basicVert)
-  fragmentShaderText = toShader(basicFrag)
+  vertexShaderText = toGLSL(basicVert)
+  fragmentShaderText = toGLSL(basicFrag)
 
 echo vertexShaderText
 echo fragmentShaderText
