@@ -2,6 +2,8 @@
 
 Shady can compile a subset of Nim into `OpenGL Shader Language` used by the GPU. This allows you to test your shader code with `echo` statements on the CPU and then run the exact same code on the GPU.
 
+![Github Actions](https://github.com/treeform/shady/workflows/Github%20Actions/badge.svg)
+
 Shady has two main goals:
 
 * Write vertex and fragment/pixel shaders for games and 3d applications.
@@ -12,6 +14,10 @@ Shady uses:
 * `vmath` library for vector and matrix operations.
 * `chroma` library for color conversions and operations.
 * `bumpy` library for collisions and intersections.
+
+# Documentation
+
+API reference: https://nimdocs.com/treeform/shady/shady.html
 
 # Using Shady shader toy playground:
 
