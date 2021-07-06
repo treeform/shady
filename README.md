@@ -1,6 +1,8 @@
 # Nim to GPU shader language compiler and supporting utilities.
 
-Shady can compile a subset of nim into `OpenGL Shader Language` used by the GPU. This allows you to test your shader code with `echo` statements on the CPU, and then run the exact same code on the GPU.
+Shady can compile a subset of Nim into `OpenGL Shader Language` used by the GPU. This allows you to test your shader code with `echo` statements on the CPU and then run the exact same code on the GPU.
+
+![Github Actions](https://github.com/treeform/shady/workflows/Github%20Actions/badge.svg)
 
 Shady has two main goals:
 
@@ -13,9 +15,13 @@ Shady uses:
 * `chroma` library for color conversions and operations.
 * `bumpy` library for collisions and intersections.
 
+# Documentation
+
+API reference: https://nimdocs.com/treeform/shady/shady.html
+
 # Using Shady shader toy playground:
 
-![triangle example](docs/circle.png)
+![circle example](docs/circle.png)
 
 ```nim
 # both CPU and GPU code:
@@ -38,11 +44,11 @@ var shader = toShader(circleSmooth)
 echo shader
 ```
 
-[See the Source](examples/circle.nim)
+[See the source](examples/circle.nim)
 
-![triangle example](docs/mandelbrot.png)
+![mandlebrot example](docs/mandelbrot.png)
 
-[See the Source](examples/mandelbrot.nim)
+[See the source](examples/mandelbrot.nim)
 
 ![colors example](docs/colors.png)
 
@@ -52,7 +58,7 @@ echo shader
 
 ![triangle example](docs/triangle.png)
 
-[See the Source](examples/triangle.nim)
+[See the source](examples/triangle.nim)
 
 Nim vertex shader:
 ```nim

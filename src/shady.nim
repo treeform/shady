@@ -1,4 +1,4 @@
-## Shader macro, converts nim code into GLSL
+## Shader macro, converts Nim code into GLSL
 
 import chroma, macros, pixie, strutils, tables, vmath, chroma
 
@@ -22,7 +22,7 @@ proc show(n: NimNode): string =
   result.add ")"
 
 proc typeRename(t: string): string =
-  ## Some GLSL type names don't match nim names, rename here.
+  ## Some GLSL type names don't match Nim names, rename here.
   case t
   of "Mat2": "mat2"
   of "Mat3": "mat3"
@@ -76,7 +76,7 @@ const glslGlobals = [
   "gl_Position", "gl_FragCoord", "gl_GlobalInvocationID",
 ]
 
-## List of function that GLSL provides, don't include their NIM src.
+## List of function that GLSL provides, don't include their Nim src.
 const glslFunctions = [
   "rgb=", "rgb", "xyz", "xyz=", "xy", "xy=",
   "bool", "array",
@@ -101,7 +101,7 @@ const ignoreFunctions = [
 ]
 
 proc procRename(t: string): string =
-  ## Some GLSL proc names don't match nim names, rename here.
+  ## Some GLSL proc names don't match Nim names, rename here.
   case t
   of "color": "vec4"
   of "not": "!"
@@ -170,7 +170,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
 
   of nnkInfix:
     if n[0].repr in ["mod"] and n[1].getType().repr != "int":
-      # In nim float mod and integer made are same thing.
+      # In Nim float mod and integer made are same thing.
       # In GLSL mod(float, float) is a function while % is for integers.
       res.add n[0].repr
       res.add "("
