@@ -74,8 +74,11 @@ proc typeString(n: NimNode): string =
     of "GVec2[int32]": "ivec2"
     of "GVec3[int32]": "ivec3"
     of "GVec4[int32]": "ivec4"
+    of "Uniform[float32]": "float"
+    of "Uniform[int]": "int"
     else:
-      "??"
+      echo n.repr
+      quit("^invalid")
 
 
 ## Default constructor for different GLSL types.
@@ -288,13 +291,12 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       # Fastest vmath translates `obj.x` to `obj.arr[x]` for speed.
       # Translate expanded the `obj.arr[x]` back to `.x` for shader.
       let field = case n[1].repr:
-        of "0": "x"
-        of "1": "y"
-        of "2": "z"
-        of "3": "w"
-        else: quit("invalid")
+        of "0": ".x"
+        of "1": ".y"
+        of "2": ".z"
+        of "3": ".w"
+        else: "[" & n[1].repr & "]"
       n[0][0].toCode(res)
-      res.add "."
       res.add field
     else:
       n[0].toCode(res)

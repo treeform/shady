@@ -54,6 +54,11 @@ echo shader
 
 [See the Source](examples/colors.nim)
 
+![flare example](docs/flare.png)
+
+[See the Source](examples/flare.nim)
+
+
 # Using Shady as a shader generator:
 
 ![triangle example](docs/triangle.png)
