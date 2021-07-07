@@ -4,7 +4,7 @@ import chroma, shady, shady/demo, vmath
 
 proc to_rgb(ycbcr: Vec3): Vec3 =
   # full range bt709 matrix
-  let c709: Mat3 = mat3(
+  let c709 = mat3(
     1.0000000000, 1.0000000000, 1.0000000000,
     0.0000000000, -0.1873242729, 1.8556000000,
     1.5748000000, -0.4681242729, 0.0000000000,
@@ -22,15 +22,15 @@ proc vsphere(x: float): Vec2 =
 
 proc colors(gl_FragColor: var Color, uv: Vec2, time: Uniform[float32]) =
 
-  var pos: Vec2 = (uv) / 300.0
+  var pos = (uv) / 300.0
 
   pos = rot(pos, time*PI*0.5)
   var inv = 1.0/length(pos)
-  pos*=inv
+  pos *= inv
 
-  var cbcr: Vec2 = vsphere(pos.x+time)*sin(time*0.5)*0.5
+  var cbcr = vsphere(pos.x+time)*sin(time*0.5)*0.5
 
-  var col: Vec3 = to_rgb(vec3(inv*0.3.float32, cbcr.x, cbcr.y))*inv*0.5
+  var col = to_rgb(vec3(inv*0.3.float32, cbcr.x, cbcr.y))*inv*0.5
   gl_FragColor = color(col.x, col.y, col.z, 1.0)
 
 # test on the CPU:

@@ -51,6 +51,33 @@ proc typeRename(t: string): string =
   of "UImageBuffer": "uimageBuffer"
   else: t
 
+proc typeString(n: NimNode): string =
+  if n.kind != nnkBracketExpr:
+    typeRename(n.strVal)
+  else:
+    case n.repr:
+    of "GMat2[float32]": "mat2"
+    of "GMat3[float32]": "mat3"
+    of "GMat4[float32]": "mat4"
+    of "GVec2[float32]": "vec2"
+    of "GVec3[float32]": "vec3"
+    of "GVec4[float32]": "vec4"
+    of "GMat2[float64]": "dmat2"
+    of "GMat3[float64]": "dmat3"
+    of "GMat4[float64]": "dmat4"
+    of "GVec2[float64]": "dvec2"
+    of "GVec3[float64]": "dvec3"
+    of "GVec4[float64]": "dvec4"
+    of "GVec2[uint32]": "uvec2"
+    of "GVec3[uint32]": "uvec3"
+    of "GVec4[uint32]": "uvec4"
+    of "GVec2[int32]": "ivec2"
+    of "GVec3[int32]": "ivec3"
+    of "GVec4[int32]": "ivec4"
+    else:
+      "??"
+
+
 ## Default constructor for different GLSL types.
 proc typeDefault(t: string): string =
   case t
@@ -257,10 +284,23 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     n[1].toCode(res)
 
   of nnkBracketExpr:
-    n[0].toCode(res)
-    res.add "["
-    n[1].toCode(res)
-    res.add "]"
+    if n[0].len == 2 and n[0][1].repr == "arr":
+      # Fastest vmath translates `obj.x` to `obj.arr[x]` for speed.
+      # Translate expanded the `obj.arr[x]` back to `.x` for shader.
+      let field = case n[1].repr:
+        of "0": "x"
+        of "1": "y"
+        of "2": "z"
+        of "3": "w"
+        else: quit("invalid")
+      n[0][0].toCode(res)
+      res.add "."
+      res.add field
+    else:
+      n[0].toCode(res)
+      res.add "["
+      n[1].toCode(res)
+      res.add "]"
 
   of nnkIdent, nnkSym:
     res.add procRename(n.strVal)
@@ -381,7 +421,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         res.add " "
         n[0].toCode(res)
       else:
-        typeStr = typeRename(n[j].getTypeInst().strVal)
+        typeStr = typeString(n[j].getTypeInst())
         res.add typeStr
         res.add " "
         n[j].toCode(res)
@@ -483,8 +523,8 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.addIndent level
     res.add "}"
 
-  of nnkBracket:
-    echo "here?"
+  # of nnkBracket:
+  #   echo "here?"
 
   else:
     echo n.treeRepr
@@ -663,7 +703,6 @@ proc gatherFunction(
 
     if n.kind == nnkCall:
       # Looking for functions.
-      echo n[0].treeRepr
       let procName = n[0].strVal()
       if procName in ignoreFunctions:
         continue
