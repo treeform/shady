@@ -16,7 +16,7 @@ proc flare(gl_FragColor: var Color, uv: Vec2, time: Uniform[float32]) =
     pos += p/l * (sin(z)+1.0) * abs(sin(l*9.0 - z*2.0))
     c[i] = 0.01 / length(abs(vec2(pos) mod vec2(1.0)) - 0.5)
   let v = c/l
-  gl_FragColor=color(v.x, v.y, v.z, time)
+  gl_FragColor = color(v.x, v.y, v.z, time)
 
 # test on the CPU:
 var testColor: Color

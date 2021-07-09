@@ -1,0 +1,19 @@
+#version 430
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+// from commandsToImage
+
+uniform samplerBuffer inputCommandBuffer;
+uniform ivec4 dimensions;
+writeonly uniform uimageBuffer outputImageBuffer;
+
+
+
+void main() {
+  uvec3 pos = gl_GlobalInvocationID;
+  for(int x = int(0); x < dimensions.x; x++) {
+    pos.x = uint(x);
+    uint value = uint(texelFetch(inputCommandBuffer, int(pos.x)).x);
+    uvec4 colorValue = uvec4(uint(128), uint(0), value, uint(255));
+    imageStore(outputImageBuffer, int(pos.y * uint(dimensions.x) + pos.x), colorValue);
+  }
+}

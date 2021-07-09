@@ -528,6 +528,14 @@ proc toCode(n: NimNode, res: var string, level = 0) =
   # of nnkBracket:
   #   echo "here?"
 
+  of nnkChckRange:
+    # skip check range and treat it as a hidden cast instead
+    var typeStr = typeRename(n.getType.repr)
+    res.add typeStr
+    res.add "("
+    n[0].toCode(res)
+    res.add ")"
+
   else:
     echo n.treeRepr
     quit "^ can't compile"
@@ -549,7 +557,9 @@ proc toCodeStmts(n: NimNode, res: var string, level = 0) =
 proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
   ## Top level block such as in and out params.
   ## Generates the main function (which is not like all the other functions)
+
   assert topLevelNode.kind == nnkProcDef
+
   for n in topLevelNode:
     case n.kind
     of nnkEmpty:
@@ -565,7 +575,11 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
           if param[1].kind == nnkVarTy:
             #if param[0].strVal == "fragColor":
             #  res.add "layout(location = 0) "
-            if param[1][0].strVal == "int":
+            if param[1][0][0].strVal == "seq":
+              res.add "buffer?"
+              res.add param[1].repr
+              continue
+            elif param[1][0].strVal == "int":
               res.add "flat "
             res.add "out "
             res.add typeRename(param[1][0].strVal)
@@ -716,17 +730,13 @@ proc gatherFunction(
 
     gatherFunction(n, functions, globals)
 
-macro toGLSL*(
-  s: typed,
-  version = "410",
-  extra = "precision highp float;\n"
-): string =
-  ## Converts proc to a glsl string.
+proc toGLSLInner*(s: NimNode, version, extra: string): string =
+
   var code: string
 
   # Add GLS header stuff.
-  code.add "#version " & version.strVal & "\n"
-  code.add extra.strVal
+  code.add "#version " & version & "\n"
+  code.add extra
   code.add "// from " & s.strVal & "\n\n"
 
   var n = getImpl(s)
@@ -763,7 +773,15 @@ macro toGLSL*(
   # Put the main function last.
   toCodeTopLevel(n, code)
 
-  result = newLit(code)
+  return code
+
+macro toGLSL*(
+  s: typed,
+  version = "410",
+  extra = "precision highp float;\n"
+): string =
+  ## Converts proc to a glsl string.
+  newLit(toGLSLInner(s, version.strVal, extra.strVal))
 
 ## GLSL helper functions
 
@@ -778,7 +796,7 @@ type
     data*: seq[float32]
 
   UImageBuffer* = object
-    data*: seq[uint8]
+    image*: Image
 
   Sampler2d* = object
     image*: Image
@@ -912,15 +930,16 @@ proc `zmod`*(a, b: Vec4): Vec4 =
 # proc `xyz`*(a: Vec4): Vec3 =
 #   vec3(a.x, a.y, a.z)
 
-proc texelFetch*(buffer: Uniform[SamplerBuffer], index: int): Vec4 =
-  vec4(buffer.data[index], 0, 0, 0)
-
-proc texelFetch*(buffer: Uniform[SamplerBuffer], index: int32): Vec4 =
-  vec4(buffer.data[index], 0, 0, 0)
+proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
+  vec4(buffer.data[index.int], 0, 0, 0)
 
 proc imageStore*(buffer: var UniformWriteOnly[UImageBuffer], index: int32,
     color: UVec4) =
-  buffer.data[index.int] = color.x.uint8
+  #buffer.data[index.int] = color.x.uint8
+  buffer.image.data[index.int].r = clamp(color.x, 0, 255).uint8
+  buffer.image.data[index.int].g = clamp(color.y, 0, 255).uint8
+  buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
+  buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
 
 proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Color =
   let pos = pos - vec2(0.5 / buffer.image.width.float32, 0.5 /
