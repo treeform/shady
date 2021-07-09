@@ -1,4 +1,4 @@
-version     = "0.0.0"
+version     = "0.0.1"
 author      = "treeform"
 description = "Nim to GPU shader language compiler and supporting utilities."
 license     = "MIT"

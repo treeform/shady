@@ -142,7 +142,7 @@ proc commandsToImage() =
 
 ![flare example](examples/compute1_output_gpu.png)
 
-### CPU:
+#### CPU:
 
 ![flare example](examples/compute1_output_cpu.png)
 
