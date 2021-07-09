@@ -111,3 +111,39 @@ void main() {
   gl_FragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 1.0);
 }
 ```
+
+# Using Shady to write compute shaders:
+
+Shady can be used to write compute shaders. Compute shaders allow more general purpose code execution work in parallel and hence faster then the CPU.
+
+```nim
+# Setup the uniforms.
+var inputCommandBuffer*: Uniform[SamplerBuffer]
+var outputImageBuffer*: UniformWriteOnly[UImageBuffer]
+var dimensions*: Uniform[IVec4] # ivec4(width, height, 0, 0)
+
+# The shader itself.
+proc commandsToImage() =
+  var pos = gl_GlobalInvocationID
+  for x in 0 ..< dimensions.x:
+    pos.x = x.uint32
+    let value = uint32(texelFetch(inputCommandBuffer, int32(pos.x)).x)
+    #echo pos.x, " ", value
+    let colorValue = uvec4(
+      128,
+      0,
+      value,
+      255
+    )
+    imageStore(outputImageBuffer, int32(pos.y * uint32(dimensions.x) + pos.x), colorValue)
+```
+
+#### GPU:
+
+![flare example](examples/compute1_output_gpu.png)
+
+### CPU:
+
+![flare example](examples/compute1_output_cpu.png)
+
+[See the Source](examples/compute1.nim)

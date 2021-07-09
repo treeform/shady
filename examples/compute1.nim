@@ -116,4 +116,4 @@ outputImageBuffer.image.fill(rgbx(0, 0, 0, 0))
 
 # Run it on the GPU.
 runComputeOnGpu(commandsToImage, uvec3(1, outputImageBuffer.image.height.uint32, 1))
-outputImageBuffer.image.writeFile("examples/compute_output_gpu.png")
+outputImageBuffer.image.writeFile("examples/compute1_output_gpu.png")
