@@ -575,11 +575,11 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
           if param[1].kind == nnkVarTy:
             #if param[0].strVal == "fragColor":
             #  res.add "layout(location = 0) "
-            if param[1][0][0].strVal == "seq":
+            if param[1][0].repr == "seq":
               res.add "buffer?"
               res.add param[1].repr
               continue
-            elif param[1][0].strVal == "int":
+            elif param[1][0].repr == "int":
               res.add "flat "
             res.add "out "
             res.add typeRename(param[1][0].strVal)
