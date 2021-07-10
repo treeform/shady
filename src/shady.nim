@@ -1,6 +1,8 @@
 ## Shader macro, converts Nim code into GLSL
 
-import chroma, macros, pixie, strutils, tables, vmath
+import macros, pixie, strutils, tables, vmath
+
+from chroma import ColorRGBX
 
 var useResult {.compiletime.}: bool
 
@@ -27,7 +29,6 @@ proc typeRename(t: string): string =
   of "Mat2": "mat2"
   of "Mat3": "mat3"
   of "Mat4": "mat4"
-  of "Color": "vec4"
   of "Vec4": "vec4"
   of "Vec3": "vec3"
   of "Vec2": "vec2"
@@ -110,8 +111,8 @@ const glslGlobals = [
 const glslFunctions = [
   "rgb=", "rgb", "xyz", "xyz=", "xy", "xy=",
   "bool", "array",
-  "vec2", "vec3", "vec4", "mat2", "mat3", "mat4", "color",
-  "Vec2", "Vec3", "Vec4", "mat2", "Mat3", "Mat4", "Color",
+  "vec2", "vec3", "vec4", "mat2", "mat3", "mat4",
+  "Vec2", "Vec3", "Vec4", "mat2", "Mat3", "Mat4",
   "uvec2", "uvec3", "uvec4",
   "UVec2", "UVec3", "UVec4",
   "ivec2", "ivec3", "ivec4",
@@ -133,7 +134,6 @@ const ignoreFunctions = [
 proc procRename(t: string): string =
   ## Some GLSL proc names don't match Nim names, rename here.
   case t
-  of "color": "vec4"
   of "not": "!"
   of "and": "&&"
   of "or": "||"
@@ -845,24 +845,24 @@ type
 # proc uvec3*(x, y, z: uint32): UVec3 =
 #   UVec3(x:x, y:y, z:z)
 
-proc rgb3*(c: Color): Vec3 =
-  vec3(c.r, c.g, c.b)
+# proc rgb3*(c: Color): Vec3 =
+#   vec3(c.r, c.g, c.b)
 
-proc `rgb3=`*(c: var Color, v: Vec3) =
-  c.r = v.x
-  c.g = v.y
-  c.b = v.z
+# proc `rgb3=`*(c: var Color, v: Vec3) =
+#   c.r = v.x
+#   c.g = v.y
+#   c.b = v.z
 
 # proc vec4*(v: Vec3, w: float32): Vec4 =
 #   vec4(v.x, v.y, v.z, w)
 
-proc vec4*(c: chroma.ColorRGBA): Vec4 =
-  vec4(
-    c.r.float32/255,
-    c.g.float32/255,
-    c.b.float32/255,
-    c.a.float32/255
-  )
+# proc vec4*(c: chroma.ColorRGBA): Vec4 =
+#   vec4(
+#     c.r.float32/255,
+#     c.g.float32/255,
+#     c.b.float32/255,
+#     c.a.float32/255
+#   )
 
 # proc xyz*(v: Vec4): Vec3 =
 #   vec3(v.x, v.y, v.z)
@@ -941,13 +941,21 @@ proc imageStore*(buffer: var UniformWriteOnly[UImageBuffer], index: int32,
   buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
   buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
 
-proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Color =
+proc vec4*(c: ColorRGBX): Vec4 =
+  vec4(
+    c.r.float32/255,
+    c.g.float32/255,
+    c.b.float32/255,
+    c.a.float32/255
+  )
+
+proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
   let pos = pos - vec2(0.5 / buffer.image.width.float32, 0.5 /
       buffer.image.height.float32)
   buffer.image.getRgbaSmooth(
     ((pos.x mod 1.0) * buffer.image.width.float32),
     ((pos.y mod 1.0) * buffer.image.height.float32)
-  ).color
+  ).vec4()
 
 # proc floor*(a: Vec2): Vec2 =
 #   result.x = a.x.floor

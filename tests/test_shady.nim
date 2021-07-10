@@ -1,17 +1,17 @@
-import chroma, pixie, shady, strutils, vmath
+import pixie, shady, strutils, vmath
 
 block:
   echo "--------------------------------------------------"
   echo "Basic fragment shader:"
 
-  proc basicFrag(fragColor: var Color) =
-    fragColor = color(1.0, 0.0, 0.0, 1.0)
+  proc basicFrag(fragColor: var Vec4) =
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0)
 
   echo toGLSL(basicFrag)
 
-  var c: Color
+  var c: Vec4
   basicFrag(c)
-  assert c == color(1.0, 0.0, 0.0, 1.0)
+  assert c == vec4(1.0, 0.0, 0.0, 1.0)
 
 block:
   echo "--------------------------------------------------"
@@ -20,18 +20,18 @@ block:
   proc vec3Fun(output: var Vec3) =
     output = vec3(0.5, 0.3, 0.1)
 
-  proc functionFrag(fragColor: var Color) =
+  proc functionFrag(fragColor: var Vec4) =
     var v: Vec3
     vec3Fun(v)
-    fragColor.r = v.x
-    fragColor.g = v.y
-    fragColor.b = v.z
+    fragColor.x = v.x
+    fragColor.y = v.y
+    fragColor.z = v.z
 
   echo toGLSL(functionFrag)
 
-  var c: Color
+  var c: Vec4
   functionFrag(c)
-  assert c == color(0.5, 0.3, 0.1, 0.0)
+  assert c == vec4(0.5, 0.3, 0.1, 0.0)
 
 block:
   echo "--------------------------------------------------"
@@ -39,10 +39,10 @@ block:
 
   proc mathFrag(
     uv: Vec2,
-    color: Color,
+    color: Vec4,
     normal: Vec3,
     texelOffset: int,
-    fragColor: var Color
+    fragColor: var Vec4
   ) =
     let
       a = vec3(0.5, 0.5, 0.5)
@@ -51,14 +51,17 @@ block:
       c = vec3(1, 1, 1)
       d = vec3(1, 0, 1)
       e = vec3(1, 0, 0)
-    fragColor.rgb3 = color.rgb3 * dot(normal, normalize(vec3(1.0, 1.0, 1.0)))
-    fragColor.a = 1.0
+    let f = color.xyz * dot(normal, normalize(vec3(1.0, 1.0, 1.0)))
+    fragColor.x = f.x
+    fragColor.y = f.y
+    fragColor.z = f.z
+    fragColor.w = 1.0
 
   echo toGLSL(mathFrag)
 
-  var c: Color
-  mathFrag(vec2(0, 0), color(1, 0, 0, 1), vec3(0, 1, 0), 1, c)
-  assert c == color(0.5773502588272095, 0.0, 0.0, 1.0)
+  var c: Vec4
+  mathFrag(vec2(0, 0), vec4(1, 0, 0, 1), vec3(0, 1, 0), 1, c)
+  assert c == vec4(0.5773502588272095, 0.0, 0.0, 1.0)
 
 block:
   echo "--------------------------------------------------"
@@ -66,22 +69,22 @@ block:
 
   var dataBuffer: Uniform[SamplerBuffer]
 
-  proc bufferFrag(fragColor: var Color) =
+  proc bufferFrag(fragColor: var Vec4) =
     if texelFetch(dataBuffer, 0).x == 0:
-      fragColor = color(1, 0, 0, 1)
+      fragColor = vec4(1, 0, 0, 1)
     else:
-      fragColor = color(0, 0, 0, 1)
+      fragColor = vec4(0, 0, 0, 1)
 
   echo toGLSL(bufferFrag)
 
   dataBuffer.data = @[0.float32]
-  var c: Color
+  var c: Vec4
   bufferFrag(c)
-  assert c == color(1.0, 0.0, 0.0, 1.0)
+  assert c == vec4(1.0, 0.0, 0.0, 1.0)
 
   dataBuffer.data = @[1.float32]
   bufferFrag(c)
-  assert c == color(0.0, 0.0, 0.0, 1.0)
+  assert c == vec4(0.0, 0.0, 0.0, 1.0)
 
 block:
   echo "--------------------------------------------------"
@@ -93,11 +96,11 @@ block:
   textureAtlasSampler.image = newImage(100, 100)
   textureAtlasSampler.image.fill(color(1, 0.5, 0, 1))
 
-  proc textureFrag(fragColor: var Color) =
+  proc textureFrag(fragColor: var Vec4) =
     fragColor = texture(textureAtlasSampler, uv)
 
   echo toGLSL(textureFrag)
 
-  var c: Color
+  var c: Vec4
   textureFrag(c)
-  assert c == color(1.0, 0.4980392158031464, 0.0, 1.0)
+  assert c == vec4(1.0, 0.4980392158031464, 0.0, 1.0)

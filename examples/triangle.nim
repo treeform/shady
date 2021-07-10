@@ -23,8 +23,8 @@ proc basicVert(
   gl_Position = MVP * vec4(vPos.x, vPos.y, 0.0, 1.0)
   fragColor = vCol
 
-proc basicFrag(gl_FragColor: var Color, fragColor: Vec3) =
-  gl_FragColor = color(fragColor.x, fragColor.y, fragColor.z, 1.0)
+proc basicFrag(gl_FragColor: var Vec4, fragColor: Vec3) =
+  gl_FragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 1.0)
 
 const
   vertexShaderText = toGLSL(basicVert)

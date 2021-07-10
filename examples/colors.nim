@@ -20,7 +20,7 @@ proc rot(uv: Vec2, r: float): Vec2 =
 proc vsphere(x: float): Vec2 =
   return vec2(sin(x*PI), cos(x*PI))
 
-proc colors(gl_FragColor: var Color, uv: Vec2, time: Uniform[float32]) =
+proc colors(gl_FragColor: var Vec4, uv: Vec2, time: Uniform[float32]) =
 
   var pos = (uv) / 300.0
 
@@ -31,10 +31,10 @@ proc colors(gl_FragColor: var Color, uv: Vec2, time: Uniform[float32]) =
   var cbcr = vsphere(pos.x+time)*sin(time*0.5)*0.5
 
   var col = to_rgb(vec3(inv*0.3.float32, cbcr.x, cbcr.y))*inv*0.5
-  gl_FragColor = color(col.x, col.y, col.z, 1.0)
+  gl_FragColor = vec4(col.x, col.y, col.z, 1.0)
 
 # test on the CPU:
-var testColor: Color
+var testColor: Vec4
 colors(testColor, vec2(100, 100), 0.0)
 echo testColor
 
