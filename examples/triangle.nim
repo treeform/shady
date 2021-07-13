@@ -24,7 +24,7 @@ proc basicVert(
   vertColor = vCol
 
 proc basicFrag(fragColor: var Vec4, vertColor: Vec3) =
-  fragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 1.0)
+  fragColor = vec4(vertColor.x, vertColor.y, vertColor.z, 1.0)
 
 var
   vertexShaderText = toGLSL(basicVert)
@@ -32,11 +32,6 @@ var
 
 echo vertexShaderText
 echo fragmentShaderText
-# writeFile("basic.vert", vertexShaderText)
-# writeFile("basic.frag", fragmentShaderText)
-
-vertexShaderText = readFile("basic.vert")
-fragmentShaderText = readFile("basic.frag")
 
 proc checkError*(shader: GLuint) =
   var code: GLint
