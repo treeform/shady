@@ -12,19 +12,12 @@ var
     -1f, -1f, #0.0f, 0.0f, 1.0f
   ]
 
-  # vertices: seq[float32] = @[
-  #   -sin(0.toRadians), -cos(0.toRadians), 1.0f, 0.0f, 0.0f,
-  #   -sin(120.toRadians), -cos(120.toRadians), 0.0f, 1.0f, 0.0f,
-  #   -sin(240.toRadians), -cos(240.toRadians), 0.0f, 0.0f, 1.0f
-  # ]
-
 var
   program: GLuint
-  vposLocation: GLint
+  vPosLocation: GLint
   timeLocation: GLint
   window: Window
   startTime: float64
-
   vertexArrayId: GLuint
 
 proc checkError*(shader: GLuint) =
@@ -50,9 +43,9 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   # Connect the GL context.
   window.makeContextCurrent()
 
-  #when not defined(emscripten):
-  # This must be called to make any GL function work
-  loadExtensions()
+  when not defined(emscripten):
+    # This must be called to make any GL function work
+    loadExtensions()
 
   var vertexShader = glCreateShader(GL_VERTEX_SHADER)
   var vertexShaderTextArr = allocCStringArray([vertexShaderText])
@@ -71,7 +64,7 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   glAttachShader(program, fragmentShader)
   glLinkProgram(program)
 
-  vposLocation = glGetAttribLocation(program, "vPos")
+  vPosLocation = glGetAttribLocation(program, "vPos")
   timeLocation = glGetUniformLocation(program, "time")
 
   glGenVertexArrays(1, vertexArrayId.addr)
@@ -81,10 +74,10 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   glGenBuffers(1, addr vertexBuffer)
   glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer)
   glBufferData(GL_ARRAY_BUFFER, vertices.len * 5 * 4, addr vertices[0], GL_STATIC_DRAW)
-  glVertexAttribPointer(vposLocation.GLuint, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
+  glVertexAttribPointer(vPosLocation.GLuint, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
 
-  print vposLocation.int
-  glEnableVertexAttribArray(vposLocation.GLuint)
+  print vPosLocation.int
+  glEnableVertexAttribArray(vPosLocation.GLuint)
 
   startTime = epochTime()
 
@@ -98,10 +91,8 @@ proc draw() {.cdecl.} =
   glClear(GL_COLOR_BUFFER_BIT)
 
   glUseProgram(program)
-
   let now = epochTime() - startTime
   glUniform1f(timeLocation, now.float32)
-
   glDrawArrays(GL_TRIANGLES, 0, 6)
 
   # Swap buffers (this will display the red color)
