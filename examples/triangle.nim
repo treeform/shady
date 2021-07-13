@@ -86,7 +86,9 @@ glAttachShader(program, vertexShader)
 glAttachShader(program, fragmentShader)
 glLinkProgram(program)
 
-glUseProgram(program)
+var vertexArrayId: GLuint
+glGenVertexArrays(1, vertexArrayId.addr)
+glBindVertexArray(vertexArrayId)
 
 var
   mvpLocation = glGetUniformLocation(program, "MVP").GLuint
