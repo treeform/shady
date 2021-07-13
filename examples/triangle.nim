@@ -1,12 +1,6 @@
-import chroma, opengl, shady, staticglfw, vmath, print
+import opengl, shady, staticglfw, vmath
 
 var
-  # vertices: seq[float32] = @[
-  #   -0.6f, -0.4f, 1.0f, 0.0f, 0.0f,
-  #   +0.6f, -0.4f, 0.0f, 1.0f, 0.0f,
-  #   +0.0f, +0.6f, 0.0f, 0.0f, 1.0f
-  # ]
-
   vertices: seq[float32] = @[
     -sin(0.toRadians), -cos(0.toRadians), 1.0f, 0.0f, 0.0f,
     -sin(120.toRadians), -cos(120.toRadians), 0.0f, 1.0f, 0.0f,
@@ -61,7 +55,7 @@ when not defined(emscripten):
 
 var vertexBuffer: GLuint
 glGenBuffers(1, addr vertexBuffer)
-glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer)
 glBufferData(GL_ARRAY_BUFFER, vertices.len * 5 * 4, addr vertices[0], GL_STATIC_DRAW)
 
 var vertexShader = glCreateShader(GL_VERTEX_SHADER)
@@ -89,8 +83,6 @@ var
   mvpLocation = glGetUniformLocation(program, "MVP").GLuint
   vposLocation = glGetAttribLocation(program, "vPos").GLuint
   vcolLocation = glGetAttribLocation(program, "vCol").GLuint
-
-print mvpLocation, vposLocation, vcolLocation
 
 glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, (5 *
     4).GLsizei, nil)
