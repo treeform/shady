@@ -1,6 +1,6 @@
 ## Inspired by https://www.shadertoy.com/
 
-import chroma, opengl, shady, staticglfw, times, vmath
+import chroma, opengl, shady, staticglfw, times, vmath, print
 
 var
   vertices: seq[float32] = @[
@@ -20,11 +20,12 @@ var
 
 var
   program: GLuint
-  mvpLocation: GLuint
-  vposLocation: GLuint
+  vposLocation: GLint
   timeLocation: GLint
   window: Window
   startTime: float64
+
+  vertexArrayId: GLuint
 
 proc checkError*(shader: GLuint) =
   var code: GLint
@@ -42,18 +43,16 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
     raise newException(Exception, "Failed to Initialize GLFW")
 
   # Open window.
+  windowHint(SAMPLES, 0)
+  windowHint(CONTEXT_VERSION_MAJOR, 4)
+  windowHint(CONTEXT_VERSION_MINOR, 1)
   window = createWindow(500, 500, title, nil, nil)
   # Connect the GL context.
   window.makeContextCurrent()
 
-  when not defined(emscripten):
-    # This must be called to make any GL function work
-    loadExtensions()
-
-  var vertexBuffer: GLuint
-  glGenBuffers(1, addr vertexBuffer)
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-  glBufferData(GL_ARRAY_BUFFER, vertices.len * 5 * 4, addr vertices[0], GL_STATIC_DRAW)
+  #when not defined(emscripten):
+  # This must be called to make any GL function work
+  loadExtensions()
 
   var vertexShader = glCreateShader(GL_VERTEX_SHADER)
   var vertexShaderTextArr = allocCStringArray([vertexShaderText])
@@ -71,12 +70,21 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   glAttachShader(program, vertexShader)
   glAttachShader(program, fragmentShader)
   glLinkProgram(program)
-  vposLocation = glGetAttribLocation(program, "vPos").GLuint
 
+  vposLocation = glGetAttribLocation(program, "vPos")
   timeLocation = glGetUniformLocation(program, "time")
 
-  glEnableVertexAttribArray(vposLocation)
-  glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
+  glGenVertexArrays(1, vertexArrayId.addr)
+  glBindVertexArray(vertexArrayId)
+
+  var vertexBuffer: GLuint
+  glGenBuffers(1, addr vertexBuffer)
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer)
+  glBufferData(GL_ARRAY_BUFFER, vertices.len * 5 * 4, addr vertices[0], GL_STATIC_DRAW)
+  glVertexAttribPointer(vposLocation.GLuint, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
+
+  print vposLocation.int
+  glEnableVertexAttribArray(vposLocation.GLuint)
 
   startTime = epochTime()
 
@@ -104,8 +112,7 @@ proc run*(title, shader: string) =
   proc basicVert(
     gl_Position: var Vec4,
     uv: var Vec2,
-    vPos: Attribute[Vec3],
-    fragColor: var Vec3
+    vPos: Vec3
   ) =
     gl_Position = vec4(vPos.x, vPos.y, 0.0, 1.0)
     uv.x = gl_Position.x * 500

@@ -123,7 +123,8 @@ const glslFunctions = [
   "normalize",
   "floor", "ceil", "round", "exp",
   "[]", "[]=",
-  "inverse"
+  "inverse",
+  "sin"
 ]
 
 ## Simply SKIP these functions.
@@ -620,7 +621,7 @@ proc procDef(topLevelNode: NimNode): string =
   var paramsStr = ""
   var returnType = "void"
 
-  assert topLevelNode.kind == nnkProcDef
+  assert topLevelNode.kind in {nnkFuncDef, nnkProcDef}
   for n in topLevelNode:
     case n.kind
     of nnkEmpty, nnkPragma:

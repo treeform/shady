@@ -1,4 +1,4 @@
-import chroma, opengl, shady, staticglfw, vmath
+import chroma, opengl, shady, staticglfw, vmath, print
 
 var
   # vertices: seq[float32] = @[
@@ -16,22 +16,27 @@ var
 proc basicVert(
   gl_Position: var Vec4,
   MVP: Uniform[Mat4],
-  vCol: Attribute[Vec3],
-  vPos: Attribute[Vec3],
-  fragColor: var Vec3
+  vCol: Vec3,
+  vPos: Vec3,
+  vertColor: var Vec3
 ) =
   gl_Position = MVP * vec4(vPos.x, vPos.y, 0.0, 1.0)
-  fragColor = vCol
+  vertColor = vCol
 
-proc basicFrag(gl_FragColor: var Vec4, fragColor: Vec3) =
-  gl_FragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 1.0)
+proc basicFrag(fragColor: var Vec4, vertColor: Vec3) =
+  fragColor = vec4(fragColor.x, fragColor.y, fragColor.z, 1.0)
 
-const
+var
   vertexShaderText = toGLSL(basicVert)
   fragmentShaderText = toGLSL(basicFrag)
 
 echo vertexShaderText
 echo fragmentShaderText
+# writeFile("basic.vert", vertexShaderText)
+# writeFile("basic.frag", fragmentShaderText)
+
+vertexShaderText = readFile("basic.vert")
+fragmentShaderText = readFile("basic.frag")
 
 proc checkError*(shader: GLuint) =
   var code: GLint
@@ -48,6 +53,9 @@ if init() == 0:
   raise newException(Exception, "Failed to Initialize GLFW")
 
 # Open window.
+windowHint(SAMPLES, 0)
+windowHint(CONTEXT_VERSION_MAJOR, 4)
+windowHint(CONTEXT_VERSION_MINOR, 1)
 var window = createWindow(500, 500, "GLFW3 WINDOW", nil, nil)
 # Connect the GL context.
 window.makeContextCurrent()
@@ -77,17 +85,24 @@ var program = glCreateProgram()
 glAttachShader(program, vertexShader)
 glAttachShader(program, fragmentShader)
 glLinkProgram(program)
+
+glUseProgram(program)
+
 var
   mvpLocation = glGetUniformLocation(program, "MVP").GLuint
   vposLocation = glGetAttribLocation(program, "vPos").GLuint
   vcolLocation = glGetAttribLocation(program, "vCol").GLuint
 
-glEnableVertexAttribArray(vposLocation)
+print mvpLocation, vposLocation, vcolLocation
+
 glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, (5 *
     4).GLsizei, nil)
-glEnableVertexAttribArray(vcolLocation.GLuint)
+glEnableVertexAttribArray(vposLocation)
+
 glVertexAttribPointer(vcolLocation, 3.GLint, cGL_FLOAT, GL_FALSE, (5 *
     4).GLsizei, cast[pointer](4*2))
+glEnableVertexAttribArray(vcolLocation.GLuint)
+
 
 var colorFade = 1.0
 
