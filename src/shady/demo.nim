@@ -1,7 +1,6 @@
 ## Inspired by https://www.shadertoy.com/
 
 import opengl, shady, staticglfw, times, vmath
-
 let
   vertices: seq[float32] = @[
     -1f, -1f, #1.0f, 0.0f, 0.0f,
