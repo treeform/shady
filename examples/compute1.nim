@@ -26,19 +26,27 @@ proc commandsToImage() =
 for i in 0 ..< 256:
   inputCommandBuffer.data.add(i.float32)
 outputImageBuffer.image = newImage(256, 256)
-dimensions = ivec4(outputImageBuffer.image.width.int32, outputImageBuffer.image.height.int32, 0, 0)
+dimensions = ivec4(
+  outputImageBuffer.image.width.int32,
+  outputImageBuffer.image.height.int32,
+  0,
+  0
+)
 
 template runComputeOnGpu(computeShader: proc(), invocationSize: UVec3) =
 
   let computeShaderSrc = toGLSL(
     computeShader,
     "430",
-    extra="layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;\n"
+    extra = "layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;\n"
   )
 
   writeFile("examples/compute1_sh.comp", computeShaderSrc)
 
-  var shaderId = compileComputeShader(("examples/compute1_sh.comp", computeShaderSrc))
+  var shaderId = compileComputeShader((
+    "examples/compute1_sh.comp",
+    computeShaderSrc
+  ))
   glUseProgram(shaderId)
 
   # Setup outputImageBuffer.
@@ -96,7 +104,9 @@ template runComputeOnGpu(computeShader: proc(), invocationSize: UVec3) =
 
   # Run the shader.
   glDispatchCompute(
-    invocationSize.x.GLuint, invocationSize.y.GLuint, invocationSize.z.GLuint # outputImageBuffer.image.width.GLuint, outputImageBuffer.image.height.GLuint, 1
+    invocationSize.x.GLuint,
+    invocationSize.y.GLuint,
+    invocationSize.z.GLuint
   )
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
 
@@ -104,7 +114,11 @@ template runComputeOnGpu(computeShader: proc(), invocationSize: UVec3) =
   let p = cast[ptr UncheckedArray[uint8]](
     glMapNamedBuffer(outputBufferId, GL_READ_ONLY)
   )
-  copyMem(outputImageBuffer.image.data[0].addr, p, outputImageBuffer.image.data.len * 4)
+  copyMem(
+    outputImageBuffer.image.data[0].addr,
+    p,
+    outputImageBuffer.image.data.len * 4
+  )
   discard glUnmapNamedBuffer(outputBufferId)
 
 # Run it on CPU.

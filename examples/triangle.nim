@@ -92,7 +92,6 @@ glVertexAttribPointer(vcolLocation, 3.GLint, cGL_FLOAT, GL_FALSE, (5 *
     4).GLsizei, cast[pointer](4*2))
 glEnableVertexAttribArray(vcolLocation.GLuint)
 
-
 var colorFade = 1.0
 
 proc draw() {.cdecl.} =

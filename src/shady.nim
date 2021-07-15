@@ -1,7 +1,6 @@
 ## Shader macro, converts Nim code into GLSL
 
 import macros, pixie, strutils, tables, vmath
-
 from chroma import ColorRGBX
 
 var useResult {.compiletime.}: bool
@@ -80,7 +79,6 @@ proc typeString(n: NimNode): string =
     else:
       echo n.repr
       quit("^invalid")
-
 
 ## Default constructor for different GLSL types.
 proc typeDefault(t: string): string =

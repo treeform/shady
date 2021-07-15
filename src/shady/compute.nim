@@ -1,4 +1,4 @@
-import macros, shady, staticglfw, opengl, vmath, strformat, strutils
+import macros, opengl, shady, staticglfw, strformat, strutils, vmath
 
 macro compute*(n: typed) =
   echo n.repr

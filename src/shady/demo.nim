@@ -2,7 +2,7 @@
 
 import opengl, shady, staticglfw, times, vmath
 
-var
+let
   vertices: seq[float32] = @[
     -1f, -1f, #1.0f, 0.0f, 0.0f,
     +1f, -1f, #0.0f, 1.0f, 0.0f,
