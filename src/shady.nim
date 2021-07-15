@@ -124,7 +124,7 @@ const glslFunctions = [
   "floor", "ceil", "round", "exp",
   "[]", "[]=",
   "inverse",
-  "sin"
+  "sin", "cos", "tan", "pow"
 ]
 
 ## Simply SKIP these functions.

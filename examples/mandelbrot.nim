@@ -20,7 +20,7 @@ proc mandelbrotInner(zoom: Vec2): Vec2 =
     o.y = v.y
   return o
 
-proc mandelbrotSmooth(gl_FragColor: var Vec4, uv: Vec2, time: Uniform[float32]) =
+proc mandelbrotSmooth(fragColor: var Vec4, uv: Vec2, time: Uniform[float32]) =
   var a: Vec2
   var samples = 8
   for x in 0 ..< samples:
@@ -32,7 +32,7 @@ proc mandelbrotSmooth(gl_FragColor: var Vec4, uv: Vec2, time: Uniform[float32]) 
   var b = 0.0
   if a.x < 0 and a.y < 0:
     b = - a.x - a.y
-  gl_FragColor = vec4(a.x + 1f, a.y, b, 1)
+  fragColor = vec4(a.x + 1f, a.y, b, 1)
 
 var shader = toGLSL(mandelbrotSmooth)
 echo shader
