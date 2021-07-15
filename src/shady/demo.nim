@@ -1,6 +1,6 @@
 ## Inspired by https://www.shadertoy.com/
 
-import chroma, opengl, shady, staticglfw, times, vmath, print
+import opengl, shady, staticglfw, times, vmath
 
 var
   vertices: seq[float32] = @[
@@ -73,10 +73,21 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   var vertexBuffer: GLuint
   glGenBuffers(1, addr vertexBuffer)
   glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer)
-  glBufferData(GL_ARRAY_BUFFER, vertices.len * 5 * 4, addr vertices[0], GL_STATIC_DRAW)
-  glVertexAttribPointer(vPosLocation.GLuint, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    vertices.len * 5 * 4,
+    addr vertices[0],
+    GL_STATIC_DRAW
+  )
+  glVertexAttribPointer(
+    vPosLocation.GLuint,
+    2.GLint,
+    cGL_FLOAT,
+    GL_FALSE,
+    0.GLsizei,
+    nil
+  )
 
-  print vPosLocation.int
   glEnableVertexAttribArray(vPosLocation.GLuint)
 
   startTime = epochTime()
