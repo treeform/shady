@@ -5,6 +5,9 @@ from chroma import ColorRGBX
 
 var useResult {.compiletime.}: bool
 
+proc err(msg: string, n: NimNode) {.noreturn.} =
+  error("[GLSL] " & msg, n)
+
 proc typeRename(t: string): string =
   ## Some GLSL type names don't match Nim names, rename here.
   case t
@@ -60,8 +63,7 @@ proc typeString(n: NimNode): string =
     of "Uniform[float32]": "float"
     of "Uniform[int]": "int"
     else:
-      error "can't figure out type", n
-      quit()
+      err "can't figure out type", n
 
 ## Default constructor for different GLSL types.
 proc typeDefault(t: string, n: NimNode): string =
@@ -83,8 +85,7 @@ proc typeDefault(t: string, n: NimNode): string =
   of "float": "0.0"
   of "int": "0"
   else:
-    error "no typeDefault " & t, n
-    quit()
+    err "no typeDefault " & t, n
 
 const glslGlobals = [
   "gl_Position", "gl_FragCoord", "gl_GlobalInvocationID",
@@ -327,7 +328,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         res.addIndent level
         res.add "}"
       else:
-        error "Not supported if branch", n
+        err "Not supported if branch", n
       inc i
 
   # of nnkIfExpr:
@@ -463,7 +464,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     elif n[1][0].strVal == "..":
       res.add " <= "
     else:
-      error "For loop only supports integer .. or ..<.", n
+      err "For loop only supports integer .. or ..<.", n
     n[1][2].toCode(res)
     res.add "; "
     res.add n[0].strVal
@@ -478,7 +479,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.add "break"
 
   of nnkProcDef:
-    error "Nested proc definitions are not allowed.", n
+    err "Nested proc definitions are not allowed.", n
 
   of nnkCaseStmt:
     res.addIndent level
@@ -507,7 +508,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         else:
           res.add "}; break;\n"
       else:
-        error "Can't compile branch", n
+        err "Can't compile branch", n
     res.addIndent level
     res.add "}"
 
@@ -521,7 +522,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
 
   else:
     echo n.treeRepr
-    error "Can't compile", n
+    err "Can't compile", n
 
 proc toCodeStmts(n: NimNode, res: var string, level = 0) =
   if n.kind != nnkStmtList:
@@ -684,7 +685,7 @@ proc gatherFunction(
                 defStr.add typeRename(typeInst[1][2].repr)
                 defStr.add "]"
               else:
-                error "Invalid x[y].", n
+                err "Invalid x[y].", n
             else:
               defStr.add typeRename(typeInst.repr)
             defStr.add " " & name
