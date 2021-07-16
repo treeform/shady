@@ -5,23 +5,6 @@ from chroma import ColorRGBX
 
 var useResult {.compiletime.}: bool
 
-proc show(n: NimNode): string =
-  result.add $n.kind
-  case n.kind
-  of nnkStrLit..nnkTripleStrLit, nnkCommentStmt, nnkSym, nnkIdent:
-    result.add "\""
-    result.add n.strVal
-    result.add "\""
-  else:
-    discard
-  result.add "("
-  for i, c in n:
-    if i > 0: result.add ","
-    result.add $i
-    result.add ":"
-    result.add show(c)
-  result.add ")"
-
 proc typeRename(t: string): string =
   ## Some GLSL type names don't match Nim names, rename here.
   case t
@@ -77,11 +60,11 @@ proc typeString(n: NimNode): string =
     of "Uniform[float32]": "float"
     of "Uniform[int]": "int"
     else:
-      echo n.repr
-      quit("^invalid")
+      error "can't figure out type", n
+      quit()
 
 ## Default constructor for different GLSL types.
-proc typeDefault(t: string): string =
+proc typeDefault(t: string, n: NimNode): string =
   case t
   of "mat2": "mat2(0.0)"
   of "mat3": "mat3(0.0)"
@@ -99,7 +82,9 @@ proc typeDefault(t: string): string =
 
   of "float": "0.0"
   of "int": "0"
-  else: quit("no typeDefault " & t)
+  else:
+    error "no typeDefault " & t, n
+    quit()
 
 const glslGlobals = [
   "gl_Position", "gl_FragCoord", "gl_GlobalInvocationID",
@@ -342,7 +327,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         res.addIndent level
         res.add "}"
       else:
-        quit("Not supported if branch")
+        error "Not supported if branch", n
       inc i
 
   # of nnkIfExpr:
@@ -394,6 +379,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.add $n.strVal.newLit.repr
 
   of nnkCommentStmt:
+    # preserve comments
     for line in n.strVal.split("\n"):
       res.addIndent level
       res.add "// "
@@ -401,6 +387,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       res.add "\n"
 
   of nnkVarSection, nnkLetSection:
+    ## var and let ares the same in GLSL
     for j in 0 ..< n.len:
       res.addIndent level
       n[j].toCode(res, level)
@@ -431,7 +418,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
           n[j + 2].toCode(res)
         else:
           res.add " = "
-          res.add typeDefault(typeStr)
+          res.add typeDefault(typeStr, n[j])
 
   of nnkReturnStmt:
     res.addIndent level
@@ -476,7 +463,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     elif n[1][0].strVal == "..":
       res.add " <= "
     else:
-      quit "For loop only supports integer .. or ..<."
+      error "For loop only supports integer .. or ..<.", n
     n[1][2].toCode(res)
     res.add "; "
     res.add n[0].strVal
@@ -491,7 +478,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.add "break"
 
   of nnkProcDef:
-    quit "Nested proc definitions are not allowed."
+    error "Nested proc definitions are not allowed.", n
 
   of nnkCaseStmt:
     res.addIndent level
@@ -520,12 +507,9 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         else:
           res.add "}; break;\n"
       else:
-        quit "^ can't compile branch"
+        error "Can't compile branch", n
     res.addIndent level
     res.add "}"
-
-  # of nnkBracket:
-  #   echo "here?"
 
   of nnkChckRange:
     # skip check range and treat it as a hidden cast instead
@@ -537,12 +521,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
 
   else:
     echo n.treeRepr
-    quit "^ can't compile"
-    # res.add ($n.kind)
-    # res.add "{{"
-    # for j in 0 .. n.len-1:
-    #   n[j].toCode(res)
-    # res.add "}}"
+    error "Can't compile", n
 
 proc toCodeStmts(n: NimNode, res: var string, level = 0) =
   if n.kind != nnkStmtList:
@@ -705,7 +684,7 @@ proc gatherFunction(
                 defStr.add typeRename(typeInst[1][2].repr)
                 defStr.add "]"
               else:
-                quit("Invalid x[y].")
+                error "Invalid x[y].", n
             else:
               defStr.add typeRename(typeInst.repr)
             defStr.add " " & name
@@ -784,8 +763,6 @@ macro toGLSL*(
 
 ## GLSL helper functions
 
-# proc get[T](v: Uniform[T]): T = v
-
 type
   Uniform*[T] = T
   UniformWriteOnly*[T] = T
@@ -799,135 +776,6 @@ type
 
   Sampler2d* = object
     image*: Image
-
-#   Color* = object
-#     r*: float32
-#     g*: float32
-#     b*: float32
-#     a*: float32
-
-#   IVec4* = object
-#     x*: int32
-#     y*: int32
-#     z*: int32
-#     w*: int32
-
-#   IVec3* = object
-#     x*: int32
-#     y*: int32
-#     z*: int32
-#     w*: int32
-
-#   UVec4* = object
-#     x*: uint32
-#     y*: uint32
-#     z*: uint32
-#     w*: uint32
-
-#   UVec3* = object
-#     x*: uint32
-#     y*: uint32
-#     z*: uint32
-
-# proc color*(r, g, b: float32, a: float32 = 1.0): Color {.inline.} =
-#   Color(r: r, g: g, b: b, a: a)
-
-# proc ivec4*(x, y, z, w: int32): IVec4 =
-#   IVec4(x:x, y:y, z:z, w:w)
-
-# proc ivec3*(x, y, z: int32): IVec3 =
-#   IVec3(x:x, y:y, z:z)
-
-# proc uvec4*(x, y, z, w: uint32): UVec4 =
-#   UVec4(x:x, y:y, z:z, w:w)
-
-# proc uvec3*(x, y, z: uint32): UVec3 =
-#   UVec3(x:x, y:y, z:z)
-
-# proc rgb3*(c: Color): Vec3 =
-#   vec3(c.r, c.g, c.b)
-
-# proc `rgb3=`*(c: var Color, v: Vec3) =
-#   c.r = v.x
-#   c.g = v.y
-#   c.b = v.z
-
-# proc vec4*(v: Vec3, w: float32): Vec4 =
-#   vec4(v.x, v.y, v.z, w)
-
-# proc vec4*(c: chroma.ColorRGBA): Vec4 =
-#   vec4(
-#     c.r.float32/255,
-#     c.g.float32/255,
-#     c.b.float32/255,
-#     c.a.float32/255
-#   )
-
-# proc xyz*(v: Vec4): Vec3 =
-#   vec3(v.x, v.y, v.z)
-
-proc mix*(a, b: Vec2, v: float32): Vec2 =
-  lerp(a, b, v)
-
-proc mix*(a, b: Vec3, v: float32): Vec3 =
-  lerp(a, b, v)
-
-proc mix*(a, b: Vec4, v: float32): Vec4 =
-  result.x = lerp(a.x, b.x, v)
-  result.y = lerp(a.y, b.y, v)
-  result.z = lerp(a.z, b.z, v)
-  result.w = lerp(a.w, b.w, v)
-
-proc `mod`*(a, b: Vec2): Vec2 =
-  result.x = a.x mod b.x
-  result.y = a.y mod b.y
-
-proc `mod`*(a, b: Vec3): Vec3 =
-  result.x = a.x mod b.x
-  result.y = a.y mod b.y
-  result.z = a.y mod b.z
-
-proc `mod`*(a, b: Vec4): Vec4 =
-  result.x = a.x mod b.x
-  result.y = a.y mod b.y
-  result.z = a.y mod b.z
-  result.w = a.w mod b.w
-
-proc `zmod`*(a, b: float32): float32 =
-  return a - b * floor(a/b)
-
-proc `zmod`*(a, b: Vec2): Vec2 =
-  result.x = zmod(a.x, b.x)
-  result.y = zmod(a.y, b.y)
-
-proc `zmod`*(a, b: Vec3): Vec3 =
-  result.x = zmod(a.x, b.x)
-  result.y = zmod(a.y, b.y)
-  result.z = zmod(a.y, b.z)
-
-proc `zmod`*(a, b: Vec4): Vec4 =
-  result.x = zmod(a.x, b.x)
-  result.y = zmod(a.y, b.y)
-  result.z = zmod(a.y, b.z)
-  result.w = zmod(a.w, b.w)
-
-# proc `*`*(m: Mat4, v: Vec4): Vec4 =
-#   vec4(m * v.xyz, 1.0)
-
-# proc `xy=`*(a: var Vec4, b: Vec2) =
-#   a.x = b.x
-#   a.y = b.y
-
-# proc `xy`*(a: Vec4): Vec2 =
-#   vec2(a.x, a.y)
-
-# proc `xyz=`*(a: var Vec4, b: Vec3) =
-#   a.x = b.x
-#   a.y = b.y
-#   a.z = b.z
-
-# proc `xyz`*(a: Vec4): Vec3 =
-#   vec3(a.x, a.y, a.z)
 
 proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
   vec4(buffer.data[index.int], 0, 0, 0)
@@ -955,47 +803,3 @@ proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
     ((pos.x mod 1.0) * buffer.image.width.float32),
     ((pos.y mod 1.0) * buffer.image.height.float32)
   ).vec4()
-
-# proc floor*(a: Vec2): Vec2 =
-#   result.x = a.x.floor
-#   result.y = a.y.floor
-
-# proc round*(a: Vec2): Vec2 =
-#   result.x = a.x.round
-#   result.y = a.y.round
-
-# proc min*(a, b: Vec2): Vec2 =
-#   result.x = min(a.x, b.x)
-#   result.y = min(a.y, b.y)
-
-# proc min*(a, b: Vec3): Vec3 =
-#   result.x = min(a.x, b.x)
-#   result.y = min(a.y, b.y)
-#   result.z = min(a.z, b.z)
-
-# proc min*(a, b: Vec4): Vec4 =
-#   result.x = min(a.x, b.x)
-#   result.y = min(a.y, b.y)
-#   result.z = min(a.z, b.z)
-#   result.w = min(a.w, b.w)
-
-# proc max*(a, b: Vec2): Vec2 =
-#   result.x = max(a.x, b.x)
-#   result.y = max(a.y, b.y)
-
-# proc max*(a, b: Vec3): Vec3 =
-#   result.x = max(a.x, b.x)
-#   result.y = max(a.y, b.y)
-#   result.z = max(a.z, b.z)
-
-# proc max*(a, b: Vec4): Vec4 =
-#   result.x = max(a.x, b.x)
-#   result.y = max(a.y, b.y)
-#   result.z = max(a.z, b.z)
-#   result.w = max(a.w, b.w)
-
-# proc `/`*(a: Vec4, b: float32): Vec4 =
-#   result.x = a.x / b
-#   result.y = a.y / b
-#   result.z = a.z / b
-#   result.w = a.w / b
