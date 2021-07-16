@@ -75,7 +75,7 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   glBufferData(
     GL_ARRAY_BUFFER,
     vertices.len * 5 * 4,
-    addr vertices[0],
+    vertices[0].unsafeAddr,
     GL_STATIC_DRAW
   )
   glVertexAttribPointer(
