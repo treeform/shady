@@ -1,8 +1,7 @@
 ## Inspired by https://www.shadertoy.com/
 
-import chroma, opengl, shady, staticglfw, times, vmath
-
-var
+import opengl, shady, staticglfw, times, vmath
+let
   vertices: seq[float32] = @[
     -1f, -1f, #1.0f, 0.0f, 0.0f,
     +1f, -1f, #0.0f, 1.0f, 0.0f,
@@ -12,19 +11,13 @@ var
     -1f, -1f, #0.0f, 0.0f, 1.0f
   ]
 
-  # vertices: seq[float32] = @[
-  #   -sin(0.toRadians), -cos(0.toRadians), 1.0f, 0.0f, 0.0f,
-  #   -sin(120.toRadians), -cos(120.toRadians), 0.0f, 1.0f, 0.0f,
-  #   -sin(240.toRadians), -cos(240.toRadians), 0.0f, 0.0f, 1.0f
-  # ]
-
 var
   program: GLuint
-  mvpLocation: GLuint
-  vposLocation: GLuint
+  vPosLocation: GLint
   timeLocation: GLint
   window: Window
   startTime: float64
+  vertexArrayId: GLuint
 
 proc checkError*(shader: GLuint) =
   var code: GLint
@@ -42,6 +35,9 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
     raise newException(Exception, "Failed to Initialize GLFW")
 
   # Open window.
+  windowHint(SAMPLES, 0)
+  windowHint(CONTEXT_VERSION_MAJOR, 4)
+  windowHint(CONTEXT_VERSION_MINOR, 1)
   window = createWindow(500, 500, title, nil, nil)
   # Connect the GL context.
   window.makeContextCurrent()
@@ -49,11 +45,6 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   when not defined(emscripten):
     # This must be called to make any GL function work
     loadExtensions()
-
-  var vertexBuffer: GLuint
-  glGenBuffers(1, addr vertexBuffer)
-  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-  glBufferData(GL_ARRAY_BUFFER, vertices.len * 5 * 4, addr vertices[0], GL_STATIC_DRAW)
 
   var vertexShader = glCreateShader(GL_VERTEX_SHADER)
   var vertexShaderTextArr = allocCStringArray([vertexShaderText])
@@ -71,12 +62,32 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
   glAttachShader(program, vertexShader)
   glAttachShader(program, fragmentShader)
   glLinkProgram(program)
-  vposLocation = glGetAttribLocation(program, "vPos").GLuint
 
+  vPosLocation = glGetAttribLocation(program, "vPos")
   timeLocation = glGetUniformLocation(program, "time")
 
-  glEnableVertexAttribArray(vposLocation)
-  glVertexAttribPointer(vposLocation, 2.GLint, cGL_FLOAT, GL_FALSE, 0.GLsizei, nil)
+  glGenVertexArrays(1, vertexArrayId.addr)
+  glBindVertexArray(vertexArrayId)
+
+  var vertexBuffer: GLuint
+  glGenBuffers(1, addr vertexBuffer)
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer)
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    vertices.len * 5 * 4,
+    addr vertices[0],
+    GL_STATIC_DRAW
+  )
+  glVertexAttribPointer(
+    vPosLocation.GLuint,
+    2.GLint,
+    cGL_FLOAT,
+    GL_FALSE,
+    0.GLsizei,
+    nil
+  )
+
+  glEnableVertexAttribArray(vPosLocation.GLuint)
 
   startTime = epochTime()
 
@@ -90,10 +101,8 @@ proc draw() {.cdecl.} =
   glClear(GL_COLOR_BUFFER_BIT)
 
   glUseProgram(program)
-
   let now = epochTime() - startTime
   glUniform1f(timeLocation, now.float32)
-
   glDrawArrays(GL_TRIANGLES, 0, 6)
 
   # Swap buffers (this will display the red color)
@@ -104,8 +113,7 @@ proc run*(title, shader: string) =
   proc basicVert(
     gl_Position: var Vec4,
     uv: var Vec2,
-    vPos: Attribute[Vec3],
-    fragColor: var Vec3
+    vPos: Vec3
   ) =
     gl_Position = vec4(vPos.x, vPos.y, 0.0, 1.0)
     uv.x = gl_Position.x * 500
