@@ -1,5 +1,13 @@
 # Nim to GPU shader language compiler and supporting utilities.
 
+`nimble install shady`
+
+![Github Actions](https://github.com/treeform/shady/workflows/Github%20Actions/badge.svg)
+
+[API reference](https://nimdocs.com/treeform/shady)
+
+## About
+
 Shady can compile a subset of Nim into `OpenGL Shader Language` used by the GPU. This allows you to test your shader code with `echo` statements on the CPU and then run the exact same code on the GPU.
 
 ![Github Actions](https://github.com/treeform/shady/workflows/Github%20Actions/badge.svg)
