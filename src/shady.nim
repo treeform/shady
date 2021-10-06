@@ -5,6 +5,10 @@ from chroma import ColorRGBX
 
 var useResult {.compiletime.}: bool
 
+var
+  glsl {.compiletime.} = true
+  metal {.compiletime.} = false
+
 proc show(n: NimNode): string =
   result.add $n.kind
   case n.kind
@@ -23,7 +27,8 @@ proc show(n: NimNode): string =
   result.add ")"
 
 proc typeRename(t: string): string =
-  ## Some GLSL type names don't match Nim names, rename here.
+  ## Rename Nim types to shader types
+
   case t
   of "Mat2": "mat2"
   of "Mat3": "mat3"
@@ -49,6 +54,9 @@ proc typeRename(t: string): string =
   of "SamplerBuffer": "samplerBuffer"
   of "Sampler2d": "sampler2D"
   of "UImageBuffer": "uimageBuffer"
+
+  of "StageIn": "stage_in"
+
   else: t
 
 proc typeString(n: NimNode): string =
@@ -122,7 +130,9 @@ const glslFunctions = [
   "floor", "ceil", "round", "exp",
   "[]", "[]=",
   "inverse",
-  "sin", "cos", "tan", "pow"
+  "sin", "cos", "tan", "pow",
+
+  "StageIn", "Uniform", "Attribute"
 ]
 
 ## Simply SKIP these functions.
@@ -636,6 +646,7 @@ proc procDef(topLevelNode: NimNode): string =
           for param in paramDef[0 ..< ^2]:
             # Process each `x`, `y`, `z` in a loop.
             paramsStr.add "  "
+            var extra = ""
             let paramName = param.repr()
             let paramType = param.getTypeInst()
             if paramType.kind == nnkVarTy:
@@ -646,10 +657,14 @@ proc procDef(topLevelNode: NimNode): string =
               paramsStr.add typeRename(paramType[0].strVal)
             elif paramType.kind == nnkBracketExpr:
               # Process varying[uniform].
-              # TODO test?
-              paramsStr.add paramType[0].strVal
-              paramsStr.add " "
-              paramsStr.add typeRename(paramType[1].strVal)
+              if glsl:
+                # GLSL
+                paramsStr.add paramType[0].strVal
+                paramsStr.add " "
+                paramsStr.add typeRename(paramType[1].strVal)
+              if metal:
+                extra = " [[" & typeRename(paramType[0].strVal) & "]]"
+                paramsStr.add typeRename(paramType[1].strVal)
             else:
               # Just a simple `x: float` case.
               if paramType.strVal == "int":
@@ -657,6 +672,7 @@ proc procDef(topLevelNode: NimNode): string =
               paramsStr.add typeRename(paramType.strVal)
             paramsStr.add " "
             paramsStr.add paramName
+            paramsStr.add extra
             paramsStr.add ",\n"
     else:
       result.add "\n"
@@ -712,9 +728,11 @@ proc gatherFunction(
             if impl[2].kind != nnkEmpty:
               defStr.add " = " & repr(impl[2])
             defStr.addSmart ';'
-            if defStr notin ["uniform Uniform = T;",
-                "attribute Attribute = T;"]:
-              globals[name] = defStr
+            # if defStr notin [
+            #     "uniform Uniform = T;",
+            #     "attribute Attribute = T;",
+            #   ]:
+            globals[name] = defStr
 
     if n.kind == nnkCall:
       # Looking for functions.
@@ -780,7 +798,66 @@ macro toGLSL*(
   extra = "precision highp float;\n"
 ): string =
   ## Converts proc to a glsl string.
+  glsl = true
+  metal = false
   newLit(toGLSLInner(s, version.strVal, extra.strVal))
+
+proc toMetalInner*(s: NimNode, version, extra, qualification: string): string =
+
+  var code: string
+
+  # Add header stuff.
+  code.add extra
+  code.add "// from " & s.strVal & "\n\n"
+
+  var n = getImpl(s)
+
+  # Gather all globals and functions, and globals and functions they use.
+  var functions: Table[string, string]
+  var globals: Table[string, string]
+  gatherFunction(n, functions, globals)
+
+  # Put globals first.
+  for k, v in globals:
+    code.add(v)
+    code.add "\n"
+
+  # Put functions definition (just name and types part).
+  code.add "\n"
+  for k, v in functions:
+    var funCode = v.split(" {")[0]
+    funCode = funCode
+      .replace("\n", "")
+      .replace("  ", " ")
+      .replace(",  ", ", ")
+      .replace("( ", "(")
+    code.add funCode
+    code.addSmart ';'
+    code.add "\n"
+
+  # Put functions (with bodies) next.
+  code.add "\n"
+  for k, v in functions:
+    code.add v
+    code.add "\n"
+
+  code.add qualification & " " & procDef(n)
+
+  return code
+
+macro toMetal*(
+  s: typed,
+  version = "1.1",
+  extra = "#define vec2 float2\n#define vec3 float3\n#define vec4 float4\n",
+  qualification = ""
+): string =
+  ## Converts proc to a glsl string.
+
+  glsl = false
+  metal = true
+
+  newLit(toMetalInner(s, version.strVal, extra.strVal, qualification.strVal))
+
 
 ## GLSL helper functions
 
@@ -799,6 +876,9 @@ type
 
   Sampler2d* = object
     image*: Image
+
+type
+  StageIn*[T] = T
 
 #   Color* = object
 #     r*: float32
