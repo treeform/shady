@@ -14,14 +14,22 @@ proc typeRename(t: string): string =
   of "Mat2": "mat2"
   of "Mat3": "mat3"
   of "Mat4": "mat4"
-  of "Vec4": "vec4"
-  of "Vec3": "vec3"
-  of "Vec2": "vec2"
 
-  of "UVec3": "uvec3"
+  of "Vec2": "vec2"
+  of "Vec3": "vec3"
+  of "Vec4": "vec4"
+
+  of "IVec2": "ivec2"
   of "IVec3": "ivec3"
-  of "UVec4": "uvec4"
   of "IVec4": "ivec4"
+
+  of "UVec2": "uvec2"
+  of "UVec3": "uvec3"
+  of "UVec4": "uvec4"
+
+  of "DVec2": "dvec2"
+  of "DVec3": "dvec3"
+  of "DVec4": "dvec4"
 
   of "int32": "int"
   of "uint32": "uint"
@@ -113,7 +121,7 @@ const glslFunctions = [
 
 ## Simply SKIP these functions.
 const ignoreFunctions = [
-  "echo", "print", "debugEcho"
+  "echo", "print", "debugEcho", "$"
 ]
 
 proc procRename(t: string): string =
@@ -520,6 +528,18 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     n[0].toCode(res)
     res.add ")"
 
+  of nnkObjConstr:
+    echo repr(n[0][0])
+    if repr(n[0][0]) == "[]":
+      # probably a swizzle call.
+      res.add n[1][1][1][1][0][0].strval
+      res.add "."
+      for part in n[1][1]:
+        res.add "xyzw"[part[1][1][1].intVal]
+    else:
+      echo n.treeRepr
+      err "Some sort of object constructor", n
+
   else:
     echo n.treeRepr
     err "Can't compile", n
@@ -698,7 +718,9 @@ proc gatherFunction(
 
     if n.kind == nnkCall:
       # Looking for functions.
-      let procName = n[0].strVal()
+      if repr(n[0]) == "[]":
+        continue
+      let procName = repr n[0]
       if procName in ignoreFunctions:
         continue
       if procName notin glslFunctions and procName notin functions:
