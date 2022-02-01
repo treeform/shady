@@ -104,3 +104,11 @@ block:
   var c: Vec4
   textureFrag(c)
   assert c == vec4(1.0, 0.4980392158031464, 0.0, 1.0)
+
+block:
+  echo "--------------------------------------------------"
+  echo "https://github.com/treeform/shady/issues/4"
+  proc vertexShade(position: Vec3, in_color: Vec4, color: var Vec4, gl_Position: var Vec3) =
+      color = in_color
+      gl_Position = position
+  echo toGLSL(vertexShade, "300 es")
