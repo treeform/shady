@@ -2,18 +2,100 @@
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 // from commandsToImage
 
+int[63] hits;
 uniform samplerBuffer inputCommandBuffer;
+int ip = 0;
+int hitCount = 0;
 uniform ivec4 dimensions;
 writeonly uniform uimageBuffer outputImageBuffer;
 
+uint readInt();
+float readFloat();
+void writeColor(vec2 pos, vec4 color);
 
+
+uint readInt(
+) {
+  uint result;
+  result = uint(texelFetch(inputCommandBuffer, ip).x);
+  ip += 1;
+  return result;
+}
+
+float readFloat(
+) {
+  float result;
+  result = texelFetch(inputCommandBuffer, ip).x;
+  ip += 1;
+  return result;
+}
+
+void writeColor(
+  vec2 pos,
+  vec4 color
+) {
+  uvec4 colorValue = uvec4(uint(color.x * 255.0), uint(color.y * 255.0), uint(color.z * 255.0), uint(color.w * 255.0));
+  imageStore(outputImageBuffer, int(uint(pos.y) * uint(dimensions.x) + uint(pos.x)), colorValue);
+}
 
 void main() {
   uvec3 pos = gl_GlobalInvocationID;
-  for(int x = int(0); x < dimensions.x; x++) {
-    pos.x = uint(x);
-    uint value = uint(texelFetch(inputCommandBuffer, int(pos.x)).x);
-    uvec4 colorValue = uvec4(uint(128), uint(0), value, uint(255));
-    imageStore(outputImageBuffer, int(pos.y * uint(dimensions.x) + pos.x), colorValue);
+  float scanY = float(pos.y);
+  ip = int(0);
+  hitCount = int(0);
+  while(true) {
+    uint opcode = readInt();
+    if (opcode == uint(0)) {
+      break;
+    }
+    if (opcode == uint(2)) {
+      vec4 fillColor = vec4(readFloat(), readFloat(), readFloat(), readFloat());
+      if (int(0) < hitCount) {
+        int atHit = 1;
+        int x = hits[0];
+        while(x < dimensions.x) {
+          if (hits[atHit] <= x) {
+            x = hits[atHit + 1];
+            atHit += 2;
+            if (int(hitCount) < atHit) {
+              break;
+            }
+          }
+          vec2 pos = vec2(uvec2(uint(x), pos.y));
+          writeColor(pos, fillColor);
+          x += 1;
+        }
+        hitCount = int(0);
+      }
+    }
+    if (opcode == uint(1)) {
+      vec2 at = vec2(readFloat(), readFloat());
+      vec2 to = vec2(readFloat(), readFloat());
+      float m = (at.y - to.y) / (at.x - to.x);
+      float b = at.y - m * at.x;
+      if ((scanY <= min(at.y, to.y)) || (max(at.y, to.y) < scanY)) {
+        ;
+      } else {
+        int x = int(0);
+        if (float(abs(at.x - to.x)) < 0.0003141592653589793) {
+          x = int(at.x);
+        } else {
+          x = int((scanY - b) / (m));
+        }
+        hits[hitCount] = x;
+        hitCount += 1;
+        int i = hitCount - int(1);
+        while(! (i == int(0))) {
+          if (hits[i] < hits[i - int(1)]) {
+            int tmp = hits[i - int(1)];
+            hits[i - int(1)] = hits[i];
+            hits[i] = tmp;
+            i -= 1;
+          } else {
+            break;
+          }
+        }
+      }
+    }
   }
 }

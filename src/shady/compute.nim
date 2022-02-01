@@ -21,7 +21,7 @@ macro compute*(n: typed) =
 var
   windowInitialized = false
   window: Window
-proc initOffscreenWindow*() =
+proc initOffscreenWindow*(size = ivec2(100, 100)) =
   ## Makes sure there is an off screen openGL window.
   if windowInitialized == false:
     if init() == 0:
@@ -37,8 +37,8 @@ proc initOffscreenWindow*() =
     windowHint(VISIBLE, FALSE)
 
     window = createWindow(
-      100,
-      100,
+      size.x.cint,
+      size.y.cint,
       "background window",
       nil,
       nil
