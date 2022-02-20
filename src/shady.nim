@@ -540,6 +540,33 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       echo n.treeRepr
       err "Some sort of object constructor", n
 
+  of nnkIfExpr:
+    var gotElse = false
+    res.add "("
+    for subn in n:
+      case subn.kind
+      of nnkElifExpr:
+        if gotElse:
+          echo n.treeRepr
+          err "Cannot have elif after else", n
+        res.add "("
+        subn[0].toCode(res)
+        res.add ") ? ("
+        subn[1].toCode(res)
+        res.add ") : "
+      of nnkElseExpr:
+        gotElse = true
+        res.add "("
+        subn[0].toCode(res)
+        res.add ")"
+      else:
+        echo n.treeRepr
+        err "Invalid child of nnkIfExpr: " & subn.kind.repr, n
+    res.add ")"
+    if not gotElse:
+      echo n.treeRepr
+      err "nnkIfExpr is missing an else clause", n
+
   else:
     echo n.treeRepr
     err "Can't compile", n
