@@ -112,3 +112,27 @@ block:
       color = in_color
       gl_Position = position
   echo toGLSL(vertexShade, "300 es")
+
+block:
+  echo "--------------------------------------------------"
+  echo "Ternary operator."
+
+  proc ternaryOperator(fragColor: var Vec4, normal: Vec3) =
+    fragColor = vec4(
+      if normal.x <= 0: 0 else: 1,
+      if normal.y <= 0:
+        0
+      else:
+        1,
+      if normal.z < -0.5:
+        -0.5
+      elif normal.z < 0:
+        0
+      else:
+        1,
+      1)
+
+  echo toGLSL(ternaryOperator)
+  var c: Vec4
+  ternaryOperator(c, vec3(-1.0, 1.0, -0.6))
+  assert c == vec4(0.0, 1.0, -0.5, 1.0)
