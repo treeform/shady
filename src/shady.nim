@@ -113,10 +113,12 @@ const glslFunctions = [
   "abs", "clamp", "min", "max", "dot", "sqrt", "mix", "length",
   "texelFetch", "imageStore", "texture",
   "normalize",
-  "floor", "ceil", "round", "exp",
+  "floor", "ceil", "round", "exp", "inversesqrt",
   "[]", "[]=",
   "inverse",
-  "sin", "cos", "tan", "pow"
+  "sin", "cos", "tan", "pow",
+  "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
+  "equal", "notEqual"
 ]
 
 ## Simply SKIP these functions.
@@ -529,7 +531,6 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.add ")"
 
   of nnkObjConstr:
-    echo repr(n[0][0])
     if repr(n[0][0]) == "[]":
       # probably a swizzle call.
       res.add n[1][1][1][1][0][0].strval
