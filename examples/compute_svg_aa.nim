@@ -7,13 +7,30 @@ initOffscreenWindow(ivec2(900, 900))
 # Setup the uniforms.
 var inputCommandBuffer*: Uniform[SamplerBuffer]
 var outputImageBuffer*: UniformWriteOnly[UImageBuffer]
-var dimensions*: Uniform[IVec4] # ivec4(width, height, 0, 0)
+var dimensions*: Uniform[IVec4] # ivec4(width, height, aa, 0)
+
+
+
+proc blendAlpha*(backdrop, source: float32): float32 {.inline.} =
+  ## Blends alphas of backdrop, source.
+  source + ((backdrop * (1 - source)))
+
+proc blendNormal*(backdrop, source: Vec4): Vec4 =
+  if backdrop.a == 0 or source.a == 1:
+    return source
+  if source.a == 0:
+    return backdrop
+  let k = (1 - source.a)
+  result.r = source.r + ((backdrop.r * k))
+  result.g = source.g + ((backdrop.g * k))
+  result.b = source.b + ((backdrop.b * k))
+  result.a = blendAlpha(backdrop.a, source.a)
 
 var
   ip: int32 = 0
   hitCount: int32 = 0
-  hits: array[64, float32]
-  hitsWinding: array[64, int32]
+  hits: array[128, float32]
+  hitsWinding: array[128, int32]
   colorBuffer: array[900, Vec4]
   colorBufferAA: array[900, Vec4]
 
@@ -55,37 +72,7 @@ proc commandsInner(pos: Vec2, aa: Vec2) =
     if opcode == 0:
       break
 
-    if opcode == 2:
-      # fill
-      let fillColor = vec4(
-        readFloat(),
-        readFloat(),
-        readFloat(),
-        readFloat()
-      )
-
-      if hitCount > 0:
-
-        # if scanY.int == 200:
-        #   echo hits[0 ..< hitCount]
-        #   echo hitsWinding[0 ..< hitCount]
-
-        var
-          atHit = 0
-          pen = 0
-
-        for x in 0 ..< dimensions.x:
-          while atHit < hitCount and x.float32 >= hits[atHit]:
-            pen += hitsWinding[atHit]
-            atHit += 1
-
-          #if abs(pen) mod 2 == 1:
-          if pen != 0:
-            colorBuffer[x] = fillColor
-
-        hitCount = 0
-
-    if opcode == 1:
+    elif opcode == 1:
       # line
       let
         at = vec2(readFloat(), readFloat()) + aa
@@ -94,7 +81,7 @@ proc commandsInner(pos: Vec2, aa: Vec2) =
         m = (at.y - to.y) / (at.x - to.x)
         b = at.y - m * at.x
 
-      if scanY <= min(at.y, to.y) or scanY > max(at.y, to.y):
+      if scanY <= at.y or scanY > to.y:
         discard
       else:
         var x: float32 = 0
@@ -127,23 +114,94 @@ proc commandsInner(pos: Vec2, aa: Vec2) =
           else:
             break
 
+    elif opcode == 2:
+      # fill
+      let fillColor = vec4(
+        readFloat(),
+        readFloat(),
+        readFloat(),
+        readFloat()
+      )
+
+      # if hitCount > 0:
+      #   # ----- x walker
+      #   var
+      #     atHit = 0
+      #     pen = 0
+      #   for x in 0 ..< dimensions.x:
+      #     while atHit < hitCount and x.float32 >= hits[atHit]:
+      #       pen += hitsWinding[atHit]
+      #       atHit += 1
+      #     #if abs(pen) mod 2 == 1:
+      #     if pen != 0:
+      #       colorBuffer[x] = fillColor
+      #   hitCount = 0
+
+
+      # ------ x jumper
+      if hitCount > 0:
+
+        var atHit = 0
+        while atHit < hitCount:
+          var
+            pen = hitsWinding[atHit]
+            xAt = hits[atHit]
+            xTo = 0f
+          atHit += 1
+
+          while true:
+            pen += hitsWinding[atHit]
+            xTo = hits[atHit]
+            atHit += 1
+            if pen == 0:
+              break
+
+          colorBuffer[floor(xAt).int32] = blendNormal(colorBuffer[floor(xAt).int32], fillColor * (ceil(xAt) - xAt))
+          colorBuffer[floor(xTo).int32] = blendNormal(colorBuffer[floor(xTo).int32], fillColor * (xTo - floor(xTo)))
+          for x in (xAt + 1).int32 ..< xTo.int32:
+            colorBuffer[x] = fillColor
+
+        hitCount = 0
+
+    elif opcode == 3:
+      let
+        y = readFloat()
+        h = readFloat()
+        label = readFloat()
+
+      if scanY < y or scanY > y + h:
+        ip = label.int32
+
+    else:
+      echo "unknown op code: ", opcode
+
+
 # The shader itself.
 proc commandsToImage() =
   let
     pos = gl_GlobalInvocationID
 
-  # clear buffer AA
+
+  # # ----- without AA
+  # for x in 0 ..< dimensions.x:
+  #   colorBuffer[x] = vec4(0, 0, 0, 0)
+  # commandsInner(pos.xy.vec2, vec2(0, 0))
+  # # write colorBufferAA to image
+  # for x in 0 ..< dimensions.x:
+  #   writeColor(vec2(x.float32, pos.y.float32), colorBuffer[x])
+
+  # ----- with AA
   for x in 0 ..< dimensions.x:
     colorBufferAA[x] = vec4(0, 0, 0, 0)
 
-  let aa = 2
-  for aaX in 0 ..< aa:
-    for aaY in 0 ..< aa:
+  var aa = 5 #dimensions.z
+  #for aaX in 0 ..< aa:
+  for aaY in 0 ..< aa:
       # clear buffer
       for x in 0 ..< dimensions.x:
         colorBuffer[x] = vec4(0, 0, 0, 0)
 
-      commandsInner(pos.xy.vec2, vec2(aaX.float32, aaY.float32) / aa.float32)
+      commandsInner(pos.xy.vec2, vec2(0.float32, aaY.float32) / aa.float32)
 
       # write colorBuffer to colorBufferAA
       for x in 0 ..< dimensions.x:
@@ -151,7 +209,10 @@ proc commandsToImage() =
 
   # write colorBufferAA to image
   for x in 0 ..< dimensions.x:
-    writeColor(vec2(x.float32, pos.y.float32), colorBufferAA[x]/(aa * aa).float32)
+    writeColor(vec2(x.float32, pos.y.float32), colorBufferAA[x]/(aa).float32)
+
+proc commandFinish() =
+  inputCommandBuffer.data.add(0)
 
 proc commandLine(at, to: Vec2, winding: int16) =
   inputCommandBuffer.data.add(1)
@@ -168,8 +229,15 @@ proc commandFill(color: Color) =
   inputCommandBuffer.data.add(color.b)
   inputCommandBuffer.data.add(color.a)
 
-proc commandFinish() =
+proc commandSkipBoundsGoto(rect: Rect): int =
+  inputCommandBuffer.data.add(3)
+  inputCommandBuffer.data.add(rect.y)
+  inputCommandBuffer.data.add(rect.h)
+  result = inputCommandBuffer.data.len
   inputCommandBuffer.data.add(0)
+
+proc commandSkipBoundsLabel(index: int) =
+  inputCommandBuffer.data[index] = inputCommandBuffer.data.len.float32
 
 let start0 = epochTime()
 
@@ -200,9 +268,16 @@ proc pathToCommands() =
   commandFill(color(1, 0, 0, 1))
   commandFinish()
 
-proc svgToCommands() =
-  ## tiger
-  let data = readFile("examples/data/tiger.svg")
+proc svgToCommands(filePath: string) =
+
+  proc segmentsToCommands(segments: seq[(Segment, int16)]) =
+    let bounds = segments.computeBounds()
+    let idx = commandSkipBoundsGoto(bounds)
+    for (segment, w) in segments:
+      commandLine(segment.at, segment.to, w)
+    commandSkipBoundsLabel(idx)
+
+  let data = readFile(filePath)
   let root = parseXml(data)
   let mat = mat3(
     1.7656463, 0, 0,
@@ -222,9 +297,8 @@ proc svgToCommands() =
             #echo "   ", node.attr("d")
             var path = parsePath(node.attr("d"))
             path.transform(mat)
-            let segs = path.commandsToShapes(true, 1.0).shapesToSegments()
-            for (seg, w) in segs:
-              commandLine(seg.at, seg.to, w)
+            let segments = path.commandsToShapes(true, 1.0).shapesToSegments()
+            segments.segmentsToCommands()
             commandFill(parseHtmlColor(fillColor))
       let
         strokeColor = node.attr("stroke")
@@ -241,7 +315,7 @@ proc svgToCommands() =
                 parseFloat(strokeWidth).float32
               else:
                 1.0.float32
-            let segs = path.commandsToShapes(false, 1.0).strokeShapes(
+            let segments = path.commandsToShapes(false, 1.0).strokeShapes(
               strokeWidth,
               ButtCap,
               MiterJoin,
@@ -249,16 +323,14 @@ proc svgToCommands() =
               @[],
               1.0
             ).shapesToSegments()
-            for (seg, w) in segs:
-              commandLine(seg.at, seg.to, w)
-
+            segments.segmentsToCommands()
             commandFill(parseHtmlColor(strokeColor))
   commandFinish()
 
 
-proc svgToCommands2() =
+proc svgToCommands2(filePath: string) =
   ## tiger
-  let data = readFile("examples/data/dragon2.svg")
+  let data = readFile(filePath)
   let root = parseXml(data)
   let mat = mat3(
     1, 0, 0,
@@ -266,8 +338,15 @@ proc svgToCommands2() =
     0, 0, 1
   )
 
+  proc segmentsToCommands(segments: seq[(Segment, int16)]) =
+    let bounds = segments.computeBounds()
+    let idx = commandSkipBoundsGoto(bounds)
+    for (segment, w) in segments:
+      commandLine(segment.at, segment.to, w)
+    commandSkipBoundsLabel(idx)
+
   proc processNode(node: XMLNode) =
-    echo "tag: ", node.tag
+    #echo "tag: ", node.tag
     case node.tag:
       of "svg":
         for child in node:
@@ -280,9 +359,8 @@ proc svgToCommands2() =
           #echo "   ", node.attr("d")
           var path = parsePath(node.attr("d"))
           path.transform(mat)
-          let segs = path.commandsToShapes(true, 1.0).shapesToSegments()
-          for (seg, w) in segs:
-            commandLine(seg.at, seg.to, w)
+          let segments = path.commandsToShapes(true, 1.0).shapesToSegments()
+          segments.segmentsToCommands()
           commandFill(parseHtmlColor(fillColor))
 
         let
@@ -296,7 +374,7 @@ proc svgToCommands2() =
               parseFloat(strokeWidth).float32
             else:
               1.0.float32
-          let segs = path.commandsToShapes(false, 1.0).strokeShapes(
+          let segments = path.commandsToShapes(false, 1.0).strokeShapes(
             strokeWidth,
             ButtCap,
             MiterJoin,
@@ -304,9 +382,7 @@ proc svgToCommands2() =
             @[],
             1.0
           ).shapesToSegments()
-          for (seg, w) in segs:
-            commandLine(seg.at, seg.to, w)
-
+          segments.segmentsToCommands()
           commandFill(parseHtmlColor(strokeColor))
 
   processNode(root)
@@ -314,8 +390,8 @@ proc svgToCommands2() =
 
 # linesToCommands()
 # pathToCommands()
-svgToCommands()
-# svgToCommands2()
+svgToCommands("examples/data/tiger.svg")
+#svgToCommands2("examples/data/tiger_no_group.svg")
 
 echo "buffer:", (epochTime() - start0) * 1000, "ms"
 
@@ -403,7 +479,7 @@ template runComputeOnGpu(computeShader: proc(), invocationSize: UVec3) =
     invocationSize.y.GLuint,
     invocationSize.z.GLuint
   )
-  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT)
+  glMemoryBarrier(GL_ALL_BARRIER_BITS)
 
   # Read back the outputImageBuffer.
   let p = cast[ptr UncheckedArray[uint8]](

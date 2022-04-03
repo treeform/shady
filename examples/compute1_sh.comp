@@ -2,7 +2,7 @@
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 // from commandsToImage
 
-float[63] hits;
+float[127] hits;
 uniform samplerBuffer inputCommandBuffer;
 int ip = 0;
 int hitCount = 0;
@@ -10,13 +10,25 @@ uniform ivec4 dimensions;
 writeonly uniform uimageBuffer outputImageBuffer;
 vec4[899] colorBuffer;
 vec4[899] colorBufferAA;
-int[63] hitsWinding;
+int[127] hitsWinding;
 
+float blendAlpha(float backdrop, float source);
 uint readInt();
 void commandsInner(vec2 pos, vec2 aa);
 float readFloat();
 void writeColor(vec2 pos, vec4 color);
+vec4 blendNormal(vec4 backdrop, vec4 source);
 
+
+float blendAlpha(
+  float backdrop,
+  float source
+) {
+  float result;
+  result = // Blends alphas of backdrop, source.
+source + (backdrop) * (1.0 - source);
+  return result;
+}
 
 uint readInt(
 ) {
@@ -37,31 +49,13 @@ void commandsInner(
     uint opcode = readInt();
     if (opcode == uint(0)) {
       break;
-    }
-    if (opcode == uint(2)) {
-      vec4 fillColor = vec4(readFloat(), readFloat(), readFloat(), readFloat());
-      if (int(0) < hitCount) {
-        int atHit = 0;
-        int pen = 0;
-        for(int x = int(0); x < dimensions.x; x++) {
-          while((atHit < int(hitCount)) && (hits[atHit] <= float(x))) {
-            pen += int(hitsWinding[atHit]);
-            atHit += 1;
-          }
-          if (! (pen == 0)) {
-            colorBuffer[x] = fillColor;
-          }
-        }
-        hitCount = int(0);
-      }
-    }
-    if (opcode == uint(1)) {
+    } else if (opcode == uint(1)) {
       vec2 at = vec2(readFloat(), readFloat()) + aa;
       vec2 to = vec2(readFloat(), readFloat()) + aa;
       float winding = readFloat();
       float m = (at.y - to.y) / (at.x - to.x);
       float b = at.y - m * at.x;
-      if ((scanY <= min(at.y, to.y)) || (max(at.y, to.y) < scanY)) {
+      if ((scanY <= at.y) || (to.y < scanY)) {
         ;
       } else {
         float x = 0.0;
@@ -88,6 +82,40 @@ void commandsInner(
           }
         }
       }
+    } else if (opcode == uint(2)) {
+      vec4 fillColor = vec4(readFloat(), readFloat(), readFloat(), readFloat());
+      if (int(0) < hitCount) {
+        int atHit = 0;
+        while(atHit < int(hitCount)) {
+          int pen = hitsWinding[atHit];
+          float xAt = hits[atHit];
+          float xTo = 0.0;
+          atHit += 1;
+          while(true) {
+            pen += hitsWinding[atHit];
+            xTo = hits[atHit];
+            atHit += 1;
+            if (pen == int(0)) {
+              break;
+            }
+          }
+          colorBuffer[int(floor(xAt))] = blendNormal(colorBuffer[int(floor(xAt))], (fillColor) * (ceil(xAt) - xAt));
+          colorBuffer[int(floor(xTo))] = blendNormal(colorBuffer[int(floor(xTo))], (fillColor) * (xTo - floor(xTo)));
+          for(int x = int(xAt + 1.0); x < int(xTo); x++) {
+            colorBuffer[x] = fillColor;;
+          }
+        }
+        hitCount = int(0);
+      }
+    } else if (opcode == uint(3)) {
+      float y = readFloat();
+      float h = readFloat();
+      float label = readFloat();
+      if ((scanY < y) || (y + h < scanY)) {
+        ip = int(label);
+      }
+    } else {
+      ;
     }
   }
 }
@@ -108,24 +136,43 @@ void writeColor(
   imageStore(outputImageBuffer, int(uint(pos.y) * uint(dimensions.x) + uint(pos.x)), colorValue);
 }
 
+vec4 blendNormal(
+  vec4 backdrop,
+  vec4 source
+) {
+  vec4 result;
+  if ((backdrop.w == 0.0) || (source.w == 1.0)) {
+    result = source;
+    return result;
+  }
+  if (source.w == 0.0) {
+    result = backdrop;
+    return result;
+  }
+  float k = 1.0 - source.w;
+  result.x = source.x + backdrop.x * k;
+  result.y = source.y + backdrop.y * k;
+  result.z = source.z + backdrop.z * k;
+  result.w = blendAlpha(backdrop.w, source.w);
+  return result;
+}
+
 void main() {
   uvec3 pos = gl_GlobalInvocationID;
   for(int x = int(0); x < dimensions.x; x++) {
     colorBufferAA[x] = vec4(0.0, 0.0, 0.0, 0.0);;
   }
-  int aa = 2;
-  for(int aaX = 0; aaX < aa; aaX++) {
-    for(int aaY = 0; aaY < aa; aaY++) {
-      for(int x = int(0); x < dimensions.x; x++) {
-        colorBuffer[x] = vec4(0.0, 0.0, 0.0, 0.0);;
-      }
-      commandsInner(vec2(pos.xy), vec2(float(aaX), float(aaY)) / float(aa));
-      for(int x = int(0); x < dimensions.x; x++) {
-        colorBufferAA[x] += colorBuffer[x];;
-      }
-    };
+  int aa = 5;
+  for(int aaY = 0; aaY < aa; aaY++) {
+    for(int x = int(0); x < dimensions.x; x++) {
+      colorBuffer[x] = vec4(0.0, 0.0, 0.0, 0.0);;
+    }
+    commandsInner(vec2(pos.xy), vec2(float(0), float(aaY)) / float(aa));
+    for(int x = int(0); x < dimensions.x; x++) {
+      colorBufferAA[x] += colorBuffer[x];;
+    }
   }
   for(int x = int(0); x < dimensions.x; x++) {
-  writeColor(vec2(float(x), float(pos.y)), colorBufferAA[x] / float(aa * aa));
+  writeColor(vec2(float(x), float(pos.y)), colorBufferAA[x] / float(aa));
   }
 }
