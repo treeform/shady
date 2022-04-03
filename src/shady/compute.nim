@@ -1,4 +1,4 @@
-import macros, opengl, shady, staticglfw, strformat, strutils, vmath
+import macros, opengl, shady, windy, strformat, strutils, vmath
 
 macro compute*(n: typed) =
   echo n.repr
@@ -24,28 +24,15 @@ var
 proc initOffscreenWindow*(size = ivec2(100, 100)) =
   ## Makes sure there is an off screen openGL window.
   if windowInitialized == false:
-    if init() == 0:
-      quit("Failed to Initialize GLFW.")
-    windowHint(RESIZABLE, false.cint)
-
-    windowHint(OPENGL_FORWARD_COMPAT, GL_TRUE.cint)
-    windowHint(OPENGL_PROFILE, OPENGL_CORE_PROFILE)
-    windowHint(CONTEXT_VERSION_MAJOR, 4)
-    windowHint(CONTEXT_VERSION_MINOR, 5)
-
-    # Don't show the window.
-    windowHint(VISIBLE, FALSE)
-
-    window = createWindow(
-      size.x.cint,
-      size.y.cint,
-      "background window",
-      nil,
-      nil
+    window = newWindow(
+      title = "Shady hidden window",
+      size = size,
+      # style = Undecorated,
+      visible = false,
+      openglMajorVersion = 4,
+      openglMinorVersion = 5,
     )
-    if window == nil:
-      quit("Failed to create window.")
-    makeContextCurrent(window)
+    window.makeContextCurrent()
     loadExtensions()
     windowInitialized = true
 

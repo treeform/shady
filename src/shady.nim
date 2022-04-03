@@ -111,7 +111,7 @@ const glslFunctions = [
   "IVec2", "IVec3", "IVec4",
 
   "abs", "clamp", "min", "max", "dot", "sqrt", "mix", "length",
-  "texelFetch", "imageStore", "texture",
+  "texelFetch", "imageStore", "imageLoad", "texture",
   "normalize",
   "floor", "ceil", "round", "exp", "inversesqrt",
   "[]", "[]=",
@@ -480,7 +480,12 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.add n[0].strVal
     res.add "++"
     res.add ") {\n"
-    n[2].toCode(res, level + 1)
+    if n[2].kind == nnkStmtList:
+      n[2].toCode(res, level + 1)
+    else:
+      res.addIndent level
+      n[2].toCode(res, level + 1)
+      res.add ";"
     res.addIndent level
     res.add "}"
 
@@ -831,13 +836,28 @@ type
 proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
   vec4(buffer.data[index.int], 0, 0, 0)
 
+proc imageLoad*(
+  buffer: var UniformWriteOnly[UImageBuffer], index: int32
+): UVec4 =
+  result.x = buffer.image.data[index.int].r
+  result.g = buffer.image.data[index.int].g
+  result.b = buffer.image.data[index.int].b
+  result.a = buffer.image.data[index.int].a
+
 proc imageStore*(buffer: var UniformWriteOnly[UImageBuffer], index: int32,
     color: UVec4) =
-  #buffer.data[index.int] = color.x.uint8
   buffer.image.data[index.int].r = clamp(color.x, 0, 255).uint8
   buffer.image.data[index.int].g = clamp(color.y, 0, 255).uint8
   buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
   buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
+
+proc imageStore*(buffer: var Uniform[UImageBuffer], index: int32,
+    color: UVec4) =
+  buffer.image.data[index.int].r = clamp(color.x, 0, 255).uint8
+  buffer.image.data[index.int].g = clamp(color.y, 0, 255).uint8
+  buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
+  buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
+
 
 proc vec4*(c: ColorRGBX): Vec4 =
   vec4(
