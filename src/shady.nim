@@ -827,6 +827,9 @@ type
   SamplerBuffer* = object
     data*: seq[float32]
 
+  ImageBuffer* = object
+    image*: Image
+
   UImageBuffer* = object
     image*: Image
 
@@ -851,12 +854,19 @@ proc imageStore*(buffer: var UniformWriteOnly[UImageBuffer], index: int32,
   buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
   buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
 
-proc imageStore*(buffer: var Uniform[UImageBuffer], index: int32,
-    color: UVec4) =
-  buffer.image.data[index.int].r = clamp(color.x, 0, 255).uint8
-  buffer.image.data[index.int].g = clamp(color.y, 0, 255).uint8
-  buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
-  buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
+# proc imageStore*(buffer: var Uniform[UImageBuffer], index: int32,
+#     color: UVec4) =
+#   buffer.image.data[index.int].r = clamp(color.x, 0, 255).uint8
+#   buffer.image.data[index.int].g = clamp(color.y, 0, 255).uint8
+#   buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
+#   buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
+
+proc imageStore*(buffer: var UniformWriteOnly[ImageBuffer], index: int32,
+    color: Vec4) =
+  buffer.image.data[index.int].r = clamp(color.x*255, 0, 255).uint8
+  buffer.image.data[index.int].g = clamp(color.y*255, 0, 255).uint8
+  buffer.image.data[index.int].b = clamp(color.z*255, 0, 255).uint8
+  buffer.image.data[index.int].a = clamp(color.w*255, 0, 255).uint8
 
 
 proc vec4*(c: ColorRGBX): Vec4 =

@@ -1,6 +1,6 @@
 ## Inspired by https://www.shadertoy.com/
 
-import opengl, shady, staticglfw, times, vmath
+import opengl, shady, windy, times, vmath
 let
   vertices: seq[float32] = @[
     -1f, -1f, #1.0f, 0.0f, 0.0f,
@@ -30,15 +30,14 @@ proc checkError*(shader: GLuint) =
     echo log
 
 proc start(title, vertexShaderText, fragmentShaderText: string) =
-  # Init GLFW
-  if init() == 0:
-    raise newException(Exception, "Failed to Initialize GLFW")
 
-  # Open window.
-  windowHint(SAMPLES, 0)
-  windowHint(CONTEXT_VERSION_MAJOR, 4)
-  windowHint(CONTEXT_VERSION_MINOR, 1)
-  window = createWindow(500, 500, title, nil, nil)
+  window = newWindow(
+      title = title,
+      size = ivec2(500, 500),
+      visible = true,
+      openglMajorVersion = 4,
+      openglMinorVersion = 1,
+    )
   # Connect the GL context.
   window.makeContextCurrent()
 
@@ -91,12 +90,11 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
 
   startTime = epochTime()
 
-proc draw() {.cdecl.} =
+proc display() =
   var ratio: float32
-  var width, height: cint
-  getFramebufferSize(window, addr width, addr height)
-  ratio = width.float32 / height.float32
-  glViewport(0, 0, width, height)
+
+  ratio = window.size.x.float32 / window.size.x.float32
+  glViewport(0, 0, window.size.x, window.size.y)
   glClearColor(0, 0, 0, 1)
   glClear(GL_COLOR_BUFFER_BIT)
 
@@ -124,13 +122,6 @@ proc run*(title, shader: string) =
 
   start(title, vertexShaderText, shader)
 
-  # When running native code we can block in an infinite loop.
-  while windowShouldClose(window) == 0:
-    draw()
-
-    # Check for events.
+  while not window.closeRequested:
+    display()
     pollEvents()
-
-    # If you get ESC key quit.
-    if window.getKey(KEY_ESCAPE) == 1:
-      window.setWindowShouldClose(1)

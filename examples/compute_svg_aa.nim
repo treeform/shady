@@ -16,15 +16,17 @@ proc blendAlpha*(backdrop, source: float32): float32 {.inline.} =
   source + ((backdrop * (1 - source)))
 
 proc blendNormal*(backdrop, source: Vec4): Vec4 =
-  if backdrop.a == 0 or source.a == 1:
-    return source
-  if source.a == 0:
-    return backdrop
-  let k = (1 - source.a)
-  result.r = source.r + ((backdrop.r * k))
-  result.g = source.g + ((backdrop.g * k))
-  result.b = source.b + ((backdrop.b * k))
-  result.a = blendAlpha(backdrop.a, source.a)
+  # if backdrop.a == 0 or source.a == 1:
+  #   return source
+  # if source.a == 0:
+  #   return backdrop
+  #let k = (1 - source.a)
+    # result.r = source.r + ((backdrop.r * k))
+  # result.g = source.g + ((backdrop.g * k))
+  # result.b = source.b + ((backdrop.b * k))
+  # result.a = blendAlpha(backdrop.a, source.a)
+
+  result = source + backdrop * (1 - source.a)
 
 var
   ip: int32 = 0
@@ -43,31 +45,22 @@ proc readFloat(): float32 =
   ip += 1
 
 proc writeColor(pos: Vec2, color: Vec4) =
-  let colorValue = uvec4(
-    (color.x * 255).uint32,
-    (color.y * 255).uint32,
-    (color.z * 255).uint32,
-    (color.w * 255).uint32
-  )
   imageStore(
     outputImageBuffer,
     int32(pos.y.uint32 * uint32(dimensions.x) + pos.x.uint32),
-    colorValue
+    (color * 255).uvec4
   )
 
 const
   epsilon = 0.0001 * PI ## Tiny value used for some computations.
 
-proc commandsInner(pos: Vec2, aa: Vec2) =
-  let
-    scanY = pos.y
+proc commandsInner(scanY: float32, aa: Vec2) =
 
   ip = 0
   hitCount = 0
 
   while true:
     let opcode = readInt()
-    # echo "got opcode", opcode
 
     if opcode == 0:
       break
@@ -92,10 +85,6 @@ proc commandsInner(pos: Vec2, aa: Vec2) =
 
         hits[hitCount] = x
         hitsWinding[hitCount] = winding.int32
-
-        # if scanY.int == 200:
-        #   echo "add ", hits[hitCount], " ", hitsWinding[hitCount], " .. ", m
-
         hitCount += 1
 
         # insertion sort
@@ -141,8 +130,11 @@ proc commandsInner(pos: Vec2, aa: Vec2) =
       # ------ x jumper
       if hitCount > 0:
 
+        #echo hitCount
+
         var atHit = 0
         while atHit < hitCount:
+          #echo "atHit 1 ", atHit
           var
             pen = hitsWinding[atHit]
             xAt = hits[atHit]
@@ -150,30 +142,44 @@ proc commandsInner(pos: Vec2, aa: Vec2) =
           atHit += 1
 
           while true:
+            #echo "atHit 2 ", atHit
             pen += hitsWinding[atHit]
             xTo = hits[atHit]
             atHit += 1
             if pen == 0:
               break
+            if atHit >= hitCount:
+              break
 
-          colorBuffer[floor(xAt).int32] = blendNormal(colorBuffer[floor(xAt).int32], fillColor * (ceil(xAt) - xAt))
-          colorBuffer[floor(xTo).int32] = blendNormal(colorBuffer[floor(xTo).int32], fillColor * (xTo - floor(xTo)))
+          colorBuffer[floor(xAt).int32] = blendNormal(
+            colorBuffer[floor(xAt).int32],
+            fillColor * (ceil(xAt) - xAt)
+          )
+          colorBuffer[floor(xTo).int32] = blendNormal(
+            colorBuffer[floor(xTo).int32],
+            fillColor * (xTo - floor(xTo))
+          )
           for x in (xAt + 1).int32 ..< xTo.int32:
-            colorBuffer[x] = fillColor
+            colorBuffer[x] = blendNormal(colorBuffer[x], fillColor)
 
         hitCount = 0
 
     elif opcode == 3:
       let
-        y = readFloat()
-        h = readFloat()
+        yMin = readFloat() + aa.y
+        yMax = readFloat() + aa.y
         label = readFloat()
 
-      if scanY < y or scanY > y + h:
+      # if scanY >= 450 and scanY <= 451:
+      #   echo "here ", scanY + aa.y, " -> ", yMin, " ... ", yMax
+
+      if scanY < yMin or scanY >= yMax:
+        # if scanY == 450:
+        #   echo "skip"
         ip = label.int32
 
-    else:
-      echo "unknown op code: ", opcode
+    # else:
+    #   echo "unknown op code: ", opcode
 
 
 # The shader itself.
@@ -181,11 +187,14 @@ proc commandsToImage() =
   let
     pos = gl_GlobalInvocationID
 
+  # ---- just solid red
+  # for x in 0 ..< dimensions.x:
+  #   writeColor(vec2(x.float32, pos.y.float32), vec4(1, 0, 0, 1))
 
   # # ----- without AA
   # for x in 0 ..< dimensions.x:
   #   colorBuffer[x] = vec4(0, 0, 0, 0)
-  # commandsInner(pos.xy.vec2, vec2(0, 0))
+  # commandsInner(pos.y.float32, vec2(0, 0.5))
   # # write colorBufferAA to image
   # for x in 0 ..< dimensions.x:
   #   writeColor(vec2(x.float32, pos.y.float32), colorBuffer[x])
@@ -194,18 +203,18 @@ proc commandsToImage() =
   for x in 0 ..< dimensions.x:
     colorBufferAA[x] = vec4(0, 0, 0, 0)
 
-  var aa = 5 #dimensions.z
-  #for aaX in 0 ..< aa:
+  var aa = 5
   for aaY in 0 ..< aa:
-      # clear buffer
-      for x in 0 ..< dimensions.x:
-        colorBuffer[x] = vec4(0, 0, 0, 0)
+    # clear buffer
+    for x in 0 ..< dimensions.x:
+      colorBuffer[x] = vec4(0, 0, 0, 0)
 
-      commandsInner(pos.xy.vec2, vec2(0.float32, aaY.float32) / aa.float32)
+    commandsInner(pos.y.float32, vec2(0.float32, aaY.float32 + 0.5) / aa.float32)
+    #echo vec2(0.float32, aaY.float32 + 0.5) / aa.float32
 
-      # write colorBuffer to colorBufferAA
-      for x in 0 ..< dimensions.x:
-        colorBufferAA[x] += colorBuffer[x]
+    # write colorBuffer to colorBufferAA
+    for x in 0 ..< dimensions.x:
+      colorBufferAA[x] += colorBuffer[x]
 
   # write colorBufferAA to image
   for x in 0 ..< dimensions.x:
@@ -231,8 +240,15 @@ proc commandFill(color: Color) =
 
 proc commandSkipBoundsGoto(rect: Rect): int =
   inputCommandBuffer.data.add(3)
-  inputCommandBuffer.data.add(rect.y)
-  inputCommandBuffer.data.add(rect.h)
+  inputCommandBuffer.data.add(rect.y.floor())
+  inputCommandBuffer.data.add((rect.y + rect.h).ceil())
+  result = inputCommandBuffer.data.len
+  inputCommandBuffer.data.add(0)
+
+proc commandSkipBoundsGoto(minY, maxY: float32): int =
+  inputCommandBuffer.data.add(3)
+  inputCommandBuffer.data.add(minY)
+  inputCommandBuffer.data.add(maxY)
   result = inputCommandBuffer.data.len
   inputCommandBuffer.data.add(0)
 
@@ -247,9 +263,9 @@ proc linesToCommands() =
   # line(vec2(100, 100), vec2(0, 200))
 
   commandLine(vec2(100, 100), vec2(100, 300), 1)
-  commandLine(vec2(300, 100), vec2(300, 300), 1)
-  commandLine(vec2(310, 300), vec2(310, 100), -1)
-  commandLine(vec2(320, 300), vec2(320, 100), -1)
+  commandLine(vec2(300, 100), vec2(300, 300), -1)
+  # commandLine(vec2(310, 300), vec2(310, 100), -1)
+  #commandLine(vec2(320, 300), vec2(320, 100), -1)
   commandFill(color(1, 0, 0, 1))
   commandFinish()
 
@@ -271,11 +287,36 @@ proc pathToCommands() =
 proc svgToCommands(filePath: string) =
 
   proc segmentsToCommands(segments: seq[(Segment, int16)]) =
+
     let bounds = segments.computeBounds()
     let idx = commandSkipBoundsGoto(bounds)
     for (segment, w) in segments:
       commandLine(segment.at, segment.to, w)
     commandSkipBoundsLabel(idx)
+
+    # let
+    #   bounds = computeBounds(segments).snapToPixels()
+    #   startX = max(0, bounds.x.int)
+    #   startY = max(0, bounds.y.int)
+    #   pathWidth =
+    #     if startX < 900:
+    #       min(bounds.w.int, 900 - startX)
+    #     else:
+    #       0
+    #   pathHeight = min(900, (bounds.y + bounds.h).int)
+    #   partitioning = partitionSegments(segments, startY, pathHeight - startY)
+
+    # var startYPart = partitioning.startY.float32
+    # for partition in partitioning.partitions:
+    #   let idx = commandSkipBoundsGoto(
+    #     startYPart,
+    #     startYPart + partitioning.partitionHeight.float32
+    #   )
+    #   startYPart += partitioning.partitionHeight.float32
+    #   for entry in partition.entries:
+    #     commandLine(entry.segment.at, entry.segment.to, entry.winding)
+    #   commandSkipBoundsLabel(idx)
+
 
   let data = readFile(filePath)
   let root = parseXml(data)
@@ -388,10 +429,17 @@ proc svgToCommands2(filePath: string) =
   processNode(root)
   commandFinish()
 
+proc nothingCommands() =
+  commandFinish()
+
 # linesToCommands()
 # pathToCommands()
 svgToCommands("examples/data/tiger.svg")
-#svgToCommands2("examples/data/tiger_no_group.svg")
+# svgToCommands2("examples/data/tiger_no_group.svg")
+# svgToCommands2("examples/data/wad_of_text.svg")
+# svgToCommands2("examples/data/shape.svg")
+
+nothingCommands()
 
 echo "buffer:", (epochTime() - start0) * 1000, "ms"
 
@@ -480,6 +528,7 @@ template runComputeOnGpu(computeShader: proc(), invocationSize: UVec3) =
     invocationSize.z.GLuint
   )
   glMemoryBarrier(GL_ALL_BARRIER_BITS)
+  # echo "gpu barrier:", (epochTime() - start2) * 1000, "ms"
 
   # Read back the outputImageBuffer.
   let p = cast[ptr UncheckedArray[uint8]](

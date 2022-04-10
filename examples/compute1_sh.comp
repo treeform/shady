@@ -12,23 +12,12 @@ vec4[899] colorBuffer;
 vec4[899] colorBufferAA;
 int[127] hitsWinding;
 
-float blendAlpha(float backdrop, float source);
 uint readInt();
-void commandsInner(vec2 pos, vec2 aa);
+void commandsInner(float scanY, vec2 aa);
 float readFloat();
 void writeColor(vec2 pos, vec4 color);
 vec4 blendNormal(vec4 backdrop, vec4 source);
 
-
-float blendAlpha(
-  float backdrop,
-  float source
-) {
-  float result;
-  result = // Blends alphas of backdrop, source.
-source + (backdrop) * (1.0 - source);
-  return result;
-}
 
 uint readInt(
 ) {
@@ -39,10 +28,9 @@ uint readInt(
 }
 
 void commandsInner(
-  vec2 pos,
+  float scanY,
   vec2 aa
 ) {
-  float scanY = pos.y;
   ip = int(0);
   hitCount = int(0);
   while(true) {
@@ -98,24 +86,25 @@ void commandsInner(
             if (pen == int(0)) {
               break;
             }
+            if (int(hitCount) <= atHit) {
+              break;
+            }
           }
           colorBuffer[int(floor(xAt))] = blendNormal(colorBuffer[int(floor(xAt))], (fillColor) * (ceil(xAt) - xAt));
           colorBuffer[int(floor(xTo))] = blendNormal(colorBuffer[int(floor(xTo))], (fillColor) * (xTo - floor(xTo)));
           for(int x = int(xAt + 1.0); x < int(xTo); x++) {
-            colorBuffer[x] = fillColor;;
+            colorBuffer[x] = blendNormal(colorBuffer[x], fillColor);;
           }
         }
         hitCount = int(0);
       }
     } else if (opcode == uint(3)) {
-      float y = readFloat();
-      float h = readFloat();
+      float yMin = readFloat() + aa.y;
+      float yMax = readFloat() + aa.y;
       float label = readFloat();
-      if ((scanY < y) || (y + h < scanY)) {
+      if ((scanY < yMin) || (yMax <= scanY)) {
         ip = int(label);
       }
-    } else {
-      ;
     }
   }
 }
@@ -132,8 +121,7 @@ void writeColor(
   vec2 pos,
   vec4 color
 ) {
-  uvec4 colorValue = uvec4(uint(color.x * 255.0), uint(color.y * 255.0), uint(color.z * 255.0), uint(color.w * 255.0));
-  imageStore(outputImageBuffer, int(uint(pos.y) * uint(dimensions.x) + uint(pos.x)), colorValue);
+  imageStore(outputImageBuffer, int(uint(pos.y) * uint(dimensions.x) + uint(pos.x)), uvec4(color * 255.0));
 }
 
 vec4 blendNormal(
@@ -141,19 +129,7 @@ vec4 blendNormal(
   vec4 source
 ) {
   vec4 result;
-  if ((backdrop.w == 0.0) || (source.w == 1.0)) {
-    result = source;
-    return result;
-  }
-  if (source.w == 0.0) {
-    result = backdrop;
-    return result;
-  }
-  float k = 1.0 - source.w;
-  result.x = source.x + backdrop.x * k;
-  result.y = source.y + backdrop.y * k;
-  result.z = source.z + backdrop.z * k;
-  result.w = blendAlpha(backdrop.w, source.w);
+  result = source + (backdrop) * (1.0 - source.w);
   return result;
 }
 
@@ -167,7 +143,7 @@ void main() {
     for(int x = int(0); x < dimensions.x; x++) {
       colorBuffer[x] = vec4(0.0, 0.0, 0.0, 0.0);;
     }
-    commandsInner(vec2(pos.xy), vec2(float(0), float(aaY)) / float(aa));
+    commandsInner(float(pos.y), vec2(float(0), float(float(float(aaY)) + 0.5)) / float(aa));
     for(int x = int(0); x < dimensions.x; x++) {
       colorBufferAA[x] += colorBuffer[x];;
     }
