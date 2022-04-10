@@ -374,7 +374,7 @@ proc svgToCommands(filePath: string) =
 proc svgToCommands2(filePath: string) =
   ## tiger
   ##
-  let scanHeight = 32.float32
+  let scanHeight = 16.float32
   let data = readFile(filePath)
   let root = parseXml(data)
   let mat = mat3(
