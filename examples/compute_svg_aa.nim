@@ -34,7 +34,7 @@ var
   hits: array[128, float32]
   hitsWinding: array[128, int32]
   colorBuffer: array[900, Vec4]
-  colorBufferAA: array[900, Vec4]
+  alphas: array[900, float32]
 
 proc readInt(): uint32 =
   result = uint32(texelFetch(inputCommandBuffer, ip).x)
@@ -66,44 +66,91 @@ proc commandsInner(scanY: float32, aa: Vec2) =
       break
 
     elif opcode == 1:
-      # line
-      let
-        at = vec2(readFloat(), readFloat()) + aa
-        to = vec2(readFloat(), readFloat()) + aa
-        winding = readFloat()
-        m = (at.y - to.y) / (at.x - to.x)
-        b = at.y - m * at.x
+      # shape
 
-      if scanY <= at.y or scanY > to.y:
-        discard
-      else:
-        var x: float32 = 0
-        if abs(at.x - to.x) < epsilon:
-          x = at.x
-        else:
-          x = ((scanY - b) / m)
+      let number = readFloat().int
+      let minX = readFloat().int
+      let maxX = readFloat().int
 
-        hits[hitCount] = x
-        hitsWinding[hitCount] = winding.int32
-        hitCount += 1
 
-        # insertion sort
-        var i = hitCount - 1
-        while i != 0:
-          if hits[i - 1] > hits[i]:
-            let tmp = hits[i - 1]
-            hits[i - 1] = hits[i]
-            hits[i] = tmp
+      let ipStart = ip
 
-            let tmpWinding = hitsWinding[i - 1]
-            hitsWinding[i - 1] = hitsWinding[i]
-            hitsWinding[i] = tmpWinding
+      let numAA = 5
 
-            i -= 1
+      for x in minX ..< maxX:
+        alphas[x] = 0
+
+      for aaLine in 0 ..< numAA:
+        var yAAOffset = vec2(0, (aaLine.float32 + 0.5) / numAA.float32)
+        ip = ipStart
+        for i in 0 ..< number:
+          let
+            at = vec2(readFloat(), readFloat()) + aa
+            to = vec2(readFloat(), readFloat()) + aa
+            winding = readFloat()
+            m = (at.y - to.y) / (at.x - to.x)
+            b = at.y - m * at.x
+
+          if scanY <= at.y or scanY > to.y:
+            discard
           else:
-            break
+            var x: float32 = 0
+            if abs(at.x - to.x) < epsilon:
+              x = at.x
+            else:
+              x = ((scanY - b) / m)
 
-    elif opcode == 2:
+            hits[hitCount] = x
+            hitsWinding[hitCount] = winding.int32
+            hitCount += 1
+
+            # insertion sort
+            var i = hitCount - 1
+            while i != 0:
+              if hits[i - 1] > hits[i]:
+                let tmp = hits[i - 1]
+                hits[i - 1] = hits[i]
+                hits[i] = tmp
+
+                let tmpWinding = hitsWinding[i - 1]
+                hitsWinding[i - 1] = hitsWinding[i]
+                hitsWinding[i] = tmpWinding
+
+                i -= 1
+              else:
+                break
+
+        # ------ x jumper
+        if hitCount > 0:
+
+          #echo hitCount
+
+          var atHit = 0
+          while atHit < hitCount:
+            #echo "atHit 1 ", atHit
+            var
+              pen = hitsWinding[atHit]
+              xAt = hits[atHit]
+              xTo = 0f
+            atHit += 1
+
+            while true:
+              #echo "atHit 2 ", atHit
+              pen += hitsWinding[atHit]
+              xTo = hits[atHit]
+              atHit += 1
+              if pen == 0:
+                break
+              if atHit >= hitCount:
+                break
+
+            alphas[floor(xAt).int32] += (ceil(xAt) - xAt)
+            alphas[floor(xTo).int32] += (xTo - floor(xTo))
+            for x in (xAt + 1).int32 ..< xTo.int32:
+              alphas[x] += 1.0
+
+          hitCount = 0
+
       # fill
       let fillColor = vec4(
         readFloat(),
@@ -112,57 +159,9 @@ proc commandsInner(scanY: float32, aa: Vec2) =
         readFloat()
       )
 
-      # if hitCount > 0:
-      #   # ----- x walker
-      #   var
-      #     atHit = 0
-      #     pen = 0
-      #   for x in 0 ..< dimensions.x:
-      #     while atHit < hitCount and x.float32 >= hits[atHit]:
-      #       pen += hitsWinding[atHit]
-      #       atHit += 1
-      #     #if abs(pen) mod 2 == 1:
-      #     if pen != 0:
-      #       colorBuffer[x] = fillColor
-      #   hitCount = 0
+      for x in minX ..< maxX:
+        colorBuffer[x] = blendNormal(colorBuffer[x], fillColor * alphas[x] / numAA.float32)
 
-
-      # ------ x jumper
-      if hitCount > 0:
-
-        #echo hitCount
-
-        var atHit = 0
-        while atHit < hitCount:
-          #echo "atHit 1 ", atHit
-          var
-            pen = hitsWinding[atHit]
-            xAt = hits[atHit]
-            xTo = 0f
-          atHit += 1
-
-          while true:
-            #echo "atHit 2 ", atHit
-            pen += hitsWinding[atHit]
-            xTo = hits[atHit]
-            atHit += 1
-            if pen == 0:
-              break
-            if atHit >= hitCount:
-              break
-
-          colorBuffer[floor(xAt).int32] = blendNormal(
-            colorBuffer[floor(xAt).int32],
-            fillColor * (ceil(xAt) - xAt)
-          )
-          colorBuffer[floor(xTo).int32] = blendNormal(
-            colorBuffer[floor(xTo).int32],
-            fillColor * (xTo - floor(xTo))
-          )
-          for x in (xAt + 1).int32 ..< xTo.int32:
-            colorBuffer[x] = blendNormal(colorBuffer[x], fillColor)
-
-        hitCount = 0
 
     elif opcode == 3:
       let
@@ -191,40 +190,39 @@ proc commandsToImage() =
   # for x in 0 ..< dimensions.x:
   #   writeColor(vec2(x.float32, pos.y.float32), vec4(1, 0, 0, 1))
 
-  # # ----- without AA
-  # for x in 0 ..< dimensions.x:
-  #   colorBuffer[x] = vec4(0, 0, 0, 0)
-  # commandsInner(pos.y.float32, vec2(0, 0.5))
-  # # write colorBufferAA to image
-  # for x in 0 ..< dimensions.x:
-  #   writeColor(vec2(x.float32, pos.y.float32), colorBuffer[x])
-
-  # ----- with AA
+  # ----- without AA
   for x in 0 ..< dimensions.x:
-    colorBufferAA[x] = vec4(0, 0, 0, 0)
-
-  var aa = 5
-  for aaY in 0 ..< aa:
-    # clear buffer
-    for x in 0 ..< dimensions.x:
-      colorBuffer[x] = vec4(0, 0, 0, 0)
-
-    commandsInner(pos.y.float32, vec2(0.float32, aaY.float32 + 0.5) / aa.float32)
-    #echo vec2(0.float32, aaY.float32 + 0.5) / aa.float32
-
-    # write colorBuffer to colorBufferAA
-    for x in 0 ..< dimensions.x:
-      colorBufferAA[x] += colorBuffer[x]
-
+    colorBuffer[x] = vec4(0, 0, 0, 0)
+  commandsInner(pos.y.float32, vec2(0, 0.5))
   # write colorBufferAA to image
   for x in 0 ..< dimensions.x:
-    writeColor(vec2(x.float32, pos.y.float32), colorBufferAA[x]/(aa).float32)
+    writeColor(vec2(x.float32, pos.y.float32), colorBuffer[x])
+
+  # # ----- with AA
+  # for x in 0 ..< dimensions.x:
+  #   colorBufferAA[x] = vec4(0, 0, 0, 0)
+
+  # var aa = 5
+  # for aaY in 0 ..< aa:
+  #   # clear buffer
+  #   for x in 0 ..< dimensions.x:
+  #     colorBuffer[x] = vec4(0, 0, 0, 0)
+
+  #   commandsInner(pos.y.float32, vec2(0.float32, aaY.float32 + 0.5) / aa.float32)
+  #   #echo vec2(0.float32, aaY.float32 + 0.5) / aa.float32
+
+  #   # write colorBuffer to colorBufferAA
+  #   for x in 0 ..< dimensions.x:
+  #     colorBufferAA[x] += colorBuffer[x]
+
+  # # write colorBufferAA to image
+  # for x in 0 ..< dimensions.x:
+  #   writeColor(vec2(x.float32, pos.y.float32), colorBufferAA[x]/(aa).float32)
 
 proc commandFinish() =
   inputCommandBuffer.data.add(0)
 
 proc commandLine(at, to: Vec2, winding: int16) =
-  inputCommandBuffer.data.add(1)
   inputCommandBuffer.data.add(at.x)
   inputCommandBuffer.data.add(at.y)
   inputCommandBuffer.data.add(to.x)
@@ -232,7 +230,6 @@ proc commandLine(at, to: Vec2, winding: int16) =
   inputCommandBuffer.data.add(winding.float32)
 
 proc commandFill(color: Color) =
-  inputCommandBuffer.data.add(2)
   inputCommandBuffer.data.add(color.r)
   inputCommandBuffer.data.add(color.g)
   inputCommandBuffer.data.add(color.b)
@@ -288,11 +285,12 @@ proc svgToCommands(filePath: string) =
 
   proc segmentsToCommands(segments: seq[(Segment, int16)]) =
 
-    let bounds = segments.computeBounds()
-    let idx = commandSkipBoundsGoto(bounds)
+    #let bounds = segments.computeBounds()
+    #let idx = commandSkipBoundsGoto(bounds)
     for (segment, w) in segments:
-      commandLine(segment.at, segment.to, w)
-    commandSkipBoundsLabel(idx)
+      if segment.at.y < 32:
+        commandLine(segment.at, segment.to, w)
+    #commandSkipBoundsLabel(idx)
 
     # let
     #   bounds = computeBounds(segments).snapToPixels()
@@ -369,8 +367,11 @@ proc svgToCommands(filePath: string) =
   commandFinish()
 
 
+
 proc svgToCommands2(filePath: string) =
   ## tiger
+  ##
+  let scanHeight = 32.float32
   let data = readFile(filePath)
   let root = parseXml(data)
   let mat = mat3(
@@ -379,12 +380,25 @@ proc svgToCommands2(filePath: string) =
     0, 0, 1
   )
 
-  proc segmentsToCommands(segments: seq[(Segment, int16)]) =
-    let bounds = segments.computeBounds()
-    let idx = commandSkipBoundsGoto(bounds)
-    for (segment, w) in segments:
-      commandLine(segment.at, segment.to, w)
-    commandSkipBoundsLabel(idx)
+  type
+    ShapeScan = object
+      lines: seq[(Vec2, Vec2, int16)]
+      color: Color
+
+  var scanGroups = newSeq[seq[ShapeScan]](ceil(900/scanHeight).int)
+
+
+  proc makeShapeScan(segments: seq[(Segment, int16)], color: Color) =
+    for y in 0 ..< ceil(900/scanHeight).int:
+      let yMin = y.float32 * scanHeight
+      let yMax = (y.float32 + 1) * scanHeight
+      var shapeScan = ShapeScan()
+      for (segment, w) in segments:
+        if segment.at.y < yMax and segment.to.y > yMin:
+          shapeScan.lines.add((segment.at, segment.to, w))
+      shapeScan.color = color
+      if shapeScan.lines.len > 0:
+        scanGroups[y].add(shapeScan)
 
   proc processNode(node: XMLNode) =
     #echo "tag: ", node.tag
@@ -395,14 +409,17 @@ proc svgToCommands2(filePath: string) =
       of "path":
         #echo "..", node.tag
         #echo "  ", node.attr("fill")
+
         let fillColor = node.attr("fill")
         if fillColor != "":
           #echo "   ", node.attr("d")
           var path = parsePath(node.attr("d"))
           path.transform(mat)
           let segments = path.commandsToShapes(true, 1.0).shapesToSegments()
-          segments.segmentsToCommands()
-          commandFill(parseHtmlColor(fillColor))
+          makeShapeScan(
+            segments,
+            parseHtmlColor(fillColor)
+          )
 
         let
           strokeColor = node.attr("stroke")
@@ -423,10 +440,32 @@ proc svgToCommands2(filePath: string) =
             @[],
             1.0
           ).shapesToSegments()
-          segments.segmentsToCommands()
-          commandFill(parseHtmlColor(strokeColor))
+          makeShapeScan(
+            segments,
+            parseHtmlColor(strokeColor)
+          )
 
   processNode(root)
+
+  for y, scanGroup in scanGroups:
+    let yMin = y.float32 * scanHeight
+    let yMax = (y.float32 + 1) * scanHeight
+    let idx = commandSkipBoundsGoto(yMin, yMax)
+    for shapeScan in scanGroup:
+      inputCommandBuffer.data.add(1) # shape
+      inputCommandBuffer.data.add(shapeScan.lines.len.float32)
+      var minX = shapeScan.lines[0][0].x
+      var maxX = shapeScan.lines[0][0].x
+      for line in shapeScan.lines:
+        minX = min(minX, min(line[0].x, line[1].x))
+        maxX = max(maxX, max(line[0].x, line[1].x))
+      # x bounds
+      inputCommandBuffer.data.add(minX.floor)
+      inputCommandBuffer.data.add(maxX.ceil)
+      for line in shapeScan.lines:
+        commandLine(line[0], line[1], line[2])
+      commandFill(shapeScan.color)
+    commandSkipBoundsLabel(idx)
   commandFinish()
 
 proc nothingCommands() =
@@ -434,8 +473,8 @@ proc nothingCommands() =
 
 # linesToCommands()
 # pathToCommands()
-svgToCommands("examples/data/tiger.svg")
-# svgToCommands2("examples/data/tiger_no_group.svg")
+# svgToCommands("examples/data/tiger.svg")
+svgToCommands2("examples/data/tiger_no_group.svg")
 # svgToCommands2("examples/data/wad_of_text.svg")
 # svgToCommands2("examples/data/shape.svg")
 
