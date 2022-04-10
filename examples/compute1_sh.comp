@@ -47,11 +47,11 @@ void commandsInner(
         alphas[x] = 0.0;;
       }
       for(int aaLine = 0; aaLine < numAA; aaLine++) {
-        vec2 yAAOffset = vec2(0.0, float((float(float(aaLine)) + 0.5) / (float(float(numAA)))));
+        float yAAOffset = (float(float(aaLine)) + 0.5) / (float(float(numAA)));
         ip = ipStart;
         for(int i = 0; i < number; i++) {
-          vec2 at = vec2(readFloat(), readFloat()) + aa;
-          vec2 to = vec2(readFloat(), readFloat()) + aa;
+          vec2 at = vec2(readFloat(), float(float(readFloat()) + yAAOffset));
+          vec2 to = vec2(readFloat(), float(float(readFloat()) + yAAOffset));
           float winding = readFloat();
           float m = (at.y - to.y) / (at.x - to.x);
           float b = at.y - m * at.x;
@@ -101,8 +101,12 @@ void commandsInner(
                 break;
               }
             }
-            alphas[int(floor(xAt))] += ceil(xAt) - xAt;
-            alphas[int(floor(xTo))] += xTo - floor(xTo);
+            if (int(floor(xAt)) == int(floor(xTo))) {
+              alphas[int(floor(xAt))] += xTo - xAt;
+            } else {
+              alphas[int(floor(xAt))] += ceil(xAt) - xAt;
+              alphas[int(floor(xTo))] += xTo - floor(xTo);
+            }
             for(int x = int(xAt + 1.0); x < int(xTo); x++) {
               alphas[x] += 1.0;;
             }

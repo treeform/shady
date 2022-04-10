@@ -81,12 +81,12 @@ proc commandsInner(scanY: float32, aa: Vec2) =
         alphas[x] = 0
 
       for aaLine in 0 ..< numAA:
-        var yAAOffset = vec2(0, (aaLine.float32 + 0.5) / numAA.float32)
+        var yAAOffset = (aaLine.float32 + 0.5) / numAA.float32
         ip = ipStart
         for i in 0 ..< number:
           let
-            at = vec2(readFloat(), readFloat()) + aa
-            to = vec2(readFloat(), readFloat()) + aa
+            at = vec2(readFloat(), readFloat() + yAAOffset)
+            to = vec2(readFloat(), readFloat() + yAAOffset)
             winding = readFloat()
             m = (at.y - to.y) / (at.x - to.x)
             b = at.y - m * at.x
@@ -144,8 +144,11 @@ proc commandsInner(scanY: float32, aa: Vec2) =
               if atHit >= hitCount:
                 break
 
-            alphas[floor(xAt).int32] += (ceil(xAt) - xAt)
-            alphas[floor(xTo).int32] += (xTo - floor(xTo))
+            if floor(xAt).int32 == floor(xTo).int32:
+              alphas[floor(xAt).int32] += xTo - xAt
+            else:
+              alphas[floor(xAt).int32] += (ceil(xAt) - xAt)
+              alphas[floor(xTo).int32] += (xTo - floor(xTo))
             for x in (xAt + 1).int32 ..< xTo.int32:
               alphas[x] += 1.0
 
