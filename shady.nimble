@@ -1,5 +1,5 @@
 version     = "0.1.0"
-author      = "treeform"
+author      = "Andre von Houck"
 description = "Nim to GPU shader language compiler and supporting utilities."
 license     = "MIT"
 
