@@ -32,12 +32,10 @@ proc checkError*(shader: GLuint) =
 proc start(title, vertexShaderText, fragmentShaderText: string) =
 
   window = newWindow(
-      title = title,
-      size = ivec2(500, 500),
-      visible = true,
-      openglMajorVersion = 4,
-      openglMinorVersion = 1,
-    )
+    title = title,
+    size = ivec2(500, 500),
+    visible = true
+  )
   # Connect the GL context.
   window.makeContextCurrent()
 
