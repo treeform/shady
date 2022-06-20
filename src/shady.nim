@@ -218,19 +218,20 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         a = n.getPrecedence()
         l = n[1].getPrecedence()
         r = n[2].getPrecedence()
-      if l > a or r > a:
+      if l >= a:
         res.add "("
         n[1].toCode(res)
-        res.add ") "
-        n[0].toCode(res)
-        res.add " ("
-        n[2].toCode(res)
         res.add ")"
       else:
         n[1].toCode(res)
-        res.add " "
-        n[0].toCode(res)
-        res.add " "
+      res.add " "
+      n[0].toCode(res)
+      res.add " "
+      if r >= a:
+        res.add "("
+        n[2].toCode(res)
+        res.add ")"
+      else:
         n[2].toCode(res)
 
   of nnkHiddenDeref, nnkHiddenAddr:

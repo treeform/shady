@@ -136,3 +136,10 @@ block:
   var c: Vec4
   ternaryOperator(c, vec3(-1.0, 1.0, -0.6))
   assert c == vec4(0.0, 1.0, -0.5, 1.0)
+
+block:
+  echo "--------------------------------------------------"
+  echo "+*() presedence."
+  proc presedence(y, r: float32, a: var float32) =
+    a = exp(-(y*y).float32/(r*r)*2)
+  echo toGLSL(presedence)
