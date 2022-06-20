@@ -133,7 +133,7 @@ proc procRename(t: string): string =
   of "and": "&&"
   of "or": "||"
   of "mod": "%"
-  else: t
+  else: t.replace("`", "_")
 
 proc opPrecedence(op: string): int =
   ## Given an operator return its precedence.
