@@ -101,7 +101,6 @@ const glslGlobals = [
 
 ## List of function that GLSL provides, don't include their Nim src.
 const glslFunctions = [
-  "rgb=", "rgb", "xyz", "xyz=", "xy", "xy=",
   "bool", "array",
   "vec2", "vec3", "vec4", "mat2", "mat3", "mat4",
   "Vec2", "Vec3", "Vec4", "mat2", "Mat3", "Mat4",
@@ -125,6 +124,19 @@ const glslFunctions = [
 const ignoreFunctions = [
   "echo", "print", "debugEcho", "$"
 ]
+
+proc isVectorAccess(s: string): bool =
+  ## is it a x,y,z or swizzle rgba=
+  for flavor in ["xyzw", "rgba", "stpq"]:
+    if s[0] in flavor:
+      for i, c in s:
+        if c notin flavor:
+          if c == '=' and i == s.len - 1:
+            return true
+          else:
+            return false
+      return true
+  return  false
 
 proc procRename(t: string): string =
   ## Some GLSL proc names don't match Nim names, rename here.
@@ -258,7 +270,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         n[i].toCode(res)
         res.add "]"
 
-    elif procName in ["rgb=", "rgb", "xyz", "xy", "xy="]:
+    elif isVectorAccess(procName):
       if n[1].kind == nnkSym:
         n[1].toCode(res)
       else:
@@ -757,7 +769,9 @@ proc gatherFunction(
       let procName = repr n[0]
       if procName in ignoreFunctions:
         continue
-      if procName notin glslFunctions and procName notin functions:
+      if procName notin glslFunctions and
+        procName notin functions and
+        not isVectorAccess(procName):
         ## If its not a builtin proc, we need to bring definition.
         let impl = n[0].getImpl()
         gatherFunction(impl, functions, globals)
