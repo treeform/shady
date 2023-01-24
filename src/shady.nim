@@ -735,7 +735,7 @@ proc gatherFunction(
       if name notin glslGlobals and name notin glslFunctions and name notin globals:
         if n.owner().symKind == nskModule:
           let impl = n.getImpl()
-          if impl.kind notin {nnkIteratorDef, nnkProcDef} and
+          if impl.kind notin {nnkIteratorDef, nnkProcDef, nnkFuncDef} and
               impl.kind != nnkNilLit:
             var defStr = ""
             let typeInst = n.getTypeInst
