@@ -1,4 +1,4 @@
-import opengl, pixie/demo, shady, shady/compute
+import opengl, pixie, shady, shady/compute
 
 initOffscreenWindow()
 
