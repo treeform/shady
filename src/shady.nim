@@ -117,7 +117,8 @@ const glslFunctions = [
   "inverse",
   "sin", "cos", "tan", "pow",
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
-  "equal", "notEqual"
+  "equal", "notEqual",
+  "dFdx", "dFdy", "fract"
 ]
 
 ## Simply SKIP these functions.
