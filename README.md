@@ -6,7 +6,7 @@ Shady can compile a subset of Nim into `OpenGL Shader Language` used by the GPU.
 
 ![Github Actions](https://github.com/treeform/shady/workflows/Github%20Actions/badge.svg)
 
-[API reference](https://nimdocs.com/treeform/shady)
+[API reference](https://treeform.github.io/shady)
 
 Shady has two main goals:
 
