@@ -24,24 +24,30 @@ Shady uses:
 ![circle example](docs/circle.png)
 
 ```nim
+import shady, vmath, shady/demo
+
 # both CPU and GPU code:
-proc circleSmooth(gl_FragColor: var Color, uv: Vec2) =
+proc circleSmooth(fragColor: var Vec4, uv: Vec2, time: Uniform[float32]) =
   var a = 0.0
+  var radius = 300.0 + 100 * sin(time)
   for x in 0 ..< 8:
     for y in 0 ..< 8:
-      if (uv + vec2(x.float32 - 4.0, y.float32 - 4.0) / 8.0).length < 400.0:
+      if (uv + vec2(x.float32 - 4.0, y.float32 - 4.0) / 8.0).length < radius:
         a += 1
   a = a / (8 * 8)
-  gl_FragColor = color(a, a, a, 1)
+  fragColor = vec4(a, a, a, 1)
 
 # test on the CPU:
-var testColor: Color
-circleSmooth(testColor, vec2(100, 100))
+var testColor: Vec4
+circleSmooth(testColor, vec2(100, 100), 0.0)
 echo testColor
 
 # compile to a GPU shader:
-var shader = toShader(circleSmooth)
+var shader = toGLSL(circleSmooth)
 echo shader
+
+# run the GPU shader and display it in a window:
+run("Circle", shader)
 ```
 
 [See the source](examples/circle.nim)
