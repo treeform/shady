@@ -1,15 +1,20 @@
-toGLSLInner	shady.html#toGLSLInner,NimNode,string,string	shady: toGLSLInner(s: NimNode; version, extra: string): string	
-toGLSL	shady.html#toGLSL.m,typed,string,string	shady: toGLSL(s: typed; version = &quot;410&quot;; extra = &quot;precision highp float;\n&quot;): string	
-Uniform	shady.html#Uniform	shady: Uniform	
-UniformWriteOnly	shady.html#UniformWriteOnly	shady: UniformWriteOnly	
-Attribute	shady.html#Attribute	shady: Attribute	
-SamplerBuffer	shady.html#SamplerBuffer	shady: SamplerBuffer	
-ImageBuffer	shady.html#ImageBuffer	shady: ImageBuffer	
-UImageBuffer	shady.html#UImageBuffer	shady: UImageBuffer	
-Sampler2d	shady.html#Sampler2d	shady: Sampler2d	
-texelFetch	shady.html#texelFetch,Uniform[SamplerBuffer],SomeInteger	shady: texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4	
-imageLoad	shady.html#imageLoad,UniformWriteOnly[UImageBuffer],int32	shady: imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4	
-imageStore	shady.html#imageStore,UniformWriteOnly[UImageBuffer],int32,UVec4	shady: imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;\n           color: UVec4)	
-imageStore	shady.html#imageStore,UniformWriteOnly[ImageBuffer],int32,Vec4	shady: imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)	
-vec4	shady.html#vec4,ColorRGBX	shady: vec4(c: ColorRGBX): Vec4	
-texture	shady.html#texture,Uniform[Sampler2d],Vec2	shady: texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4	
+nimTitle	shady	shady.html	module src/shady		0
+nim	toGLSLInner	shady.html#toGLSLInner,NimNode,string,string	proc toGLSLInner(s: NimNode; version, extra: string): string		787
+nim	toGLSL	shady.html#toGLSL.m,typed,string,string	macro toGLSL(s: typed; version = "410"; extra = "precision highp float;\n"): string		832
+nim	Uniform	shady.html#Uniform	type Uniform		843
+nim	UniformWriteOnly	shady.html#UniformWriteOnly	type UniformWriteOnly		844
+nim	Attribute	shady.html#Attribute	type Attribute		845
+nim	SamplerBuffer	shady.html#SamplerBuffer	object SamplerBuffer		847
+nim	ImageBuffer	shady.html#ImageBuffer	object ImageBuffer		850
+nim	UImageBuffer	shady.html#UImageBuffer	object UImageBuffer		853
+nim	Sampler2d	shady.html#Sampler2d	object Sampler2d		856
+nim	texelFetch	shady.html#texelFetch,Uniform[SamplerBuffer],SomeInteger	proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4		859
+nim	texelFetch	shady.html#texelFetch,Uniform[Sampler2d],IVec2,int	proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4		862
+nim	imageLoad	shady.html#imageLoad,UniformWriteOnly[UImageBuffer],int32	proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4		866
+nim	imageStore	shady.html#imageStore,UniformWriteOnly[UImageBuffer],int32,UVec4	proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;\n           color: UVec4)		874
+nim	imageStore	shady.html#imageStore,UniformWriteOnly[ImageBuffer],int32,Vec4	proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)		888
+nim	imageStore	shady.html#imageStore,Uniform[Sampler2d],IVec2,Vec4	proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)		895
+nim	vec4	shady.html#vec4,ColorRGBX	proc vec4(c: ColorRGBX): Vec4		904
+nim	texture	shady.html#texture,Uniform[Sampler2d],Vec2	proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4		912
+nimgrp	texelfetch	shady.html#texelFetch-procs-all	proc		859
+nimgrp	imagestore	shady.html#imageStore-procs-all	proc		874
