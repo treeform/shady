@@ -40,7 +40,7 @@ circleSmooth(testColor, vec2(100, 100))
 echo testColor
 
 # compile to a GPU shader:
-var shader = toShader(circleSmooth)
+var shader = toGLSL(circleSmooth)
 echo shader
 ```
 

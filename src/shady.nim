@@ -71,7 +71,7 @@ proc typeString(n: NimNode): string =
     of "Uniform[float32]": "float"
     of "Uniform[int]": "int"
     else:
-      err "can't figure out type", n
+      err "can't figure out type: " & n.repr, n
 
 ## Default constructor for different GLSL types.
 proc typeDefault(t: string, n: NimNode): string =
@@ -736,8 +736,12 @@ proc gatherFunction(
       if name notin glslGlobals and name notin glslFunctions and name notin globals:
         if n.owner().symKind == nskModule:
           let impl = n.getImpl()
-          if impl.kind notin {nnkIteratorDef, nnkProcDef, nnkFuncDef} and
-              impl.kind != nnkNilLit:
+          if impl.kind notin {
+            nnkTypeDef,
+            nnkIteratorDef,
+            nnkProcDef,
+            nnkFuncDef
+            } and impl.kind != nnkNilLit:
             var defStr = ""
             let typeInst = n.getTypeInst
             if typeInst.kind == nnkBracketExpr:
@@ -855,6 +859,10 @@ type
 proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
   vec4(buffer.data[index.int], 0, 0, 0)
 
+proc texelFetch*(buffer: Uniform[Sampler2D], pos: IVec2, level: int): Vec4 =
+  let c = buffer.image[pos.x.int, pos.y.int]
+  return vec4(c.r.float32/255, c.g.float32/255, c.b.float32/255, c.a.float32/255)
+
 proc imageLoad*(
   buffer: var UniformWriteOnly[UImageBuffer], index: int32
 ): UVec4 =
@@ -884,6 +892,14 @@ proc imageStore*(buffer: var UniformWriteOnly[ImageBuffer], index: int32,
   buffer.image.data[index.int].b = clamp(color.z*255, 0, 255).uint8
   buffer.image.data[index.int].a = clamp(color.w*255, 0, 255).uint8
 
+proc imageStore*(buffer: var Uniform[Sampler2D], pos: IVec2,
+    color: Vec4) =
+  buffer.image[pos.x.int, pos.y.int] = rgbx(
+    clamp(color.x*255, 0, 255).uint8,
+    clamp(color.y*255, 0, 255).uint8,
+    clamp(color.z*255, 0, 255).uint8,
+    clamp(color.w*255, 0, 255).uint8,
+  )
 
 proc vec4*(c: ColorRGBX): Vec4 =
   vec4(

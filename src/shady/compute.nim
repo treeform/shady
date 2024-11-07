@@ -29,8 +29,7 @@ proc initOffscreenWindow*(size = ivec2(100, 100)) =
       size = size,
       # style = Undecorated,
       visible = false,
-      openglMajorVersion = 4,
-      openglMinorVersion = 5,
+      openglVersion = OpenGL4Dot5
     )
     window.makeContextCurrent()
     loadExtensions()
