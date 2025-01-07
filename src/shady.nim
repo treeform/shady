@@ -633,7 +633,13 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
             if param[1].kind == nnkBracketExpr:
               res.add typeRename(param[1][0].strVal)
               res.add " "
-              res.add typeRename(param[1][1].strVal)
+              if param[1][1].kind == nnkBracketExpr and param[1][1][0].strVal == "array":
+                res.add typeRename(param[1][1][2].strVal)
+                res.add "["
+                res.add $param[1][1][1].intVal
+                res.add "]"
+              else:
+                res.add typeRename(param[1][1].strVal)
             else:
               if param[0].strVal == "gl_FragCoord":
                 res.add "layout(origin_upper_left) "
