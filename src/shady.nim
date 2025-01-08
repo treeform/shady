@@ -600,6 +600,7 @@ proc toCodeStmts(n: NimNode, res: var string, level = 0) =
   else:
     n.toCode(res, level)
 
+proc procDef(topLevelNode: NimNode): string
 proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
   ## Top level block such as in and out params.
   ## Generates the main function (which is not like all the other functions)
@@ -633,7 +634,13 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
             if param[1].kind == nnkBracketExpr:
               res.add typeRename(param[1][0].strVal)
               res.add " "
-              res.add typeRename(param[1][1].strVal)
+              if param[1][1].kind == nnkBracketExpr and param[1][1][0].strVal == "array":
+                res.add typeRename(param[1][1][2].strVal)
+                res.add "["
+                res.add $param[1][1][1].intVal
+                res.add "]"
+              else:
+                res.add typeRename(param[1][1].strVal)
             else:
               if param[0].strVal == "gl_FragCoord":
                 res.add "layout(origin_upper_left) "
@@ -646,6 +653,21 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
           res.addSmart ';'
           res.add "\n"
     else:
+      # Include function defs directly in main defined before any code (so you can use globals in them)
+      let n =
+        if n.kind != nnkStmtList: n
+        else:
+          res.add "\n"
+          var i = 0
+          for stmt in n:
+            if stmt.kind notin {nnkProcDef, nnkFuncDef}: break
+            inc i
+            res.add procDef(stmt)
+            res.add "\n"
+          var newBody = newNimNode(nnkStmtList)
+          for stmt in n[i..^1]:
+            newBody.add(stmt)
+          newBody
       res.add "\n"
       res.add "void main() {\n"
       n.toCodeStmts(res, level+1)
@@ -725,7 +747,8 @@ proc procDef(topLevelNode: NimNode): string =
 proc gatherFunction(
   topLevelNode: NimNode,
   functions: var Table[string, string],
-  globals: var Table[string, string]
+  globals: var Table[string, string],
+  innerFunctions: seq[string]
 ) =
 
   ## Looks for functions this function calls and brings them up
@@ -776,13 +799,14 @@ proc gatherFunction(
         continue
       if procName notin glslFunctions and
         procName notin functions and
+        procName notin innerFunctions and
         not isVectorAccess(procName):
         ## If its not a builtin proc, we need to bring definition.
         let impl = n[0].getImpl()
-        gatherFunction(impl, functions, globals)
+        gatherFunction(impl, functions, globals, innerFunctions)
         functions[procName] = procDef(impl)
 
-    gatherFunction(n, functions, globals)
+    gatherFunction(n, functions, globals, innerFunctions)
 
 proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
@@ -796,9 +820,15 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   var n = getImpl(s)
 
   # Gather all globals and functions, and globals and functions they use.
+  var innerFunctions: seq[string]
   var functions: Table[string, string]
   var globals: Table[string, string]
-  gatherFunction(n, functions, globals)
+  # Include function defs directly in main defined before any code (so you can use globals in them)
+  for stmt in n[6]:
+    if stmt.kind notin {nnkProcDef, nnkFuncDef}: break
+    innerFunctions.add(repr stmt[0])
+    gatherFunction(stmt, functions, globals, innerFunctions)
+  gatherFunction(n, functions, globals, innerFunctions)
 
   # Put globals first.
   for k, v in globals:
