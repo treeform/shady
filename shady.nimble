@@ -7,4 +7,4 @@ srcDir = "src"
 
 requires "nim >= 1.1.4"
 requires "vmath >= 1.2.0"
-requires "pixie >= 4.3.0"
+requires "pixie >= 5.1.0"
