@@ -6,5 +6,5 @@ license     = "MIT"
 srcDir = "src"
 
 requires "nim >= 1.1.4"
-requires "vmath >= 1.2.0"
+requires "vmath >= 2.0.1"
 requires "pixie >= 5.1.0"

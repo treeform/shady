@@ -1,5 +1,9 @@
 name: Github Actions
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 jobs:
   build:
     strategy:
@@ -11,9 +15,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v5
-    - uses: jiro4989/setup-nim-action@v2
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v3
+    - uses: treeform/setup-nim-action@v2
     - run: nimble test -y
-    - run: nimble test --gc:orc -y

@@ -42,6 +42,8 @@ proc typeRename(t: string): string =
 
   of "SamplerBuffer": "samplerBuffer"
   of "Sampler2d": "sampler2D"
+  of "USampler2d": "usampler2D"
+  of "Sampler2dArray": "sampler2DArray"
   of "UImageBuffer": "uimageBuffer"
   else: t
 
@@ -97,6 +99,7 @@ proc typeDefault(t: string, n: NimNode): string =
 
 const glslGlobals = [
   "gl_Position", "gl_FragCoord", "gl_GlobalInvocationID",
+  "gl_VertexID",
 ]
 
 ## List of function that GLSL provides, don't include their Nim src.
@@ -110,7 +113,8 @@ const glslFunctions = [
   "IVec2", "IVec3", "IVec4",
 
   "abs", "clamp", "min", "max", "dot", "sqrt", "mix", "length",
-  "texelFetch", "imageStore", "imageLoad", "texture",
+  "texelFetch", "imageStore", "imageLoad", "texture", "textureSize",
+  "textureGrad",
   "normalize",
   "floor", "ceil", "round", "exp", "inversesqrt",
   "[]", "[]=",
@@ -118,7 +122,7 @@ const glslFunctions = [
   "sin", "cos", "tan", "pow",
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",
-  "dFdx", "dFdy", "fract"
+  "dFdx", "dFdy", "fract", "fwidth"
 ]
 
 ## Simply SKIP these functions.
@@ -146,6 +150,7 @@ proc procRename(t: string): string =
   of "and": "&&"
   of "or": "||"
   of "mod": "%"
+  of "div": "/"
   else: t.replace("`", "_")
 
 proc opPrecedence(op: string): int =
@@ -856,12 +861,27 @@ type
   Sampler2d* = object
     image*: Image
 
+  USampler2d* = object
+    image*: Image
+
+  Sampler2dArray* = object
+    images*: seq[Image]
+
+var
+  ## GLSL globals.
+  gl_Position*: Vec4
+  gl_VertexID*: uint32
+
 proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
   vec4(buffer.data[index.int], 0, 0, 0)
 
 proc texelFetch*(buffer: Uniform[Sampler2D], pos: IVec2, level: int): Vec4 =
   let c = buffer.image[pos.x.int, pos.y.int]
   return vec4(c.r.float32/255, c.g.float32/255, c.b.float32/255, c.a.float32/255)
+
+proc texelFetch*(buffer: Uniform[USampler2D], pos: IVec2, level: int): UVec4 =
+  ## CPU stub for usampler2D; not used at runtime. Returns zeros.
+  uvec4(0u32, 0u32, 0u32, 0u32)
 
 proc imageLoad*(
   buffer: var UniformWriteOnly[UImageBuffer], index: int32
@@ -877,13 +897,6 @@ proc imageStore*(buffer: var UniformWriteOnly[UImageBuffer], index: int32,
   buffer.image.data[index.int].g = clamp(color.y, 0, 255).uint8
   buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
   buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
-
-# proc imageStore*(buffer: var Uniform[UImageBuffer], index: int32,
-#     color: UVec4) =
-#   buffer.image.data[index.int].r = clamp(color.x, 0, 255).uint8
-#   buffer.image.data[index.int].g = clamp(color.y, 0, 255).uint8
-#   buffer.image.data[index.int].b = clamp(color.z, 0, 255).uint8
-#   buffer.image.data[index.int].a = clamp(color.w, 0, 255).uint8
 
 proc imageStore*(buffer: var UniformWriteOnly[ImageBuffer], index: int32,
     color: Vec4) =
@@ -909,6 +922,15 @@ proc vec4*(c: ColorRGBX): Vec4 =
     c.a.float32/255
   )
 
+proc dFdx*(a: Vec2): Vec2 =
+  raise newException(Exception, "dFdx is not implemented")
+
+proc dFdy*(a: Vec2): Vec2 =
+  raise newException(Exception, "dFdy is not implemented")
+
+proc fwidth*(a: Vec2): Vec2 =
+  raise newException(Exception, "fwidth is not implemented")
+
 proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
   let pos = pos - vec2(0.5 / buffer.image.width.float32, 0.5 /
       buffer.image.height.float32)
@@ -916,3 +938,22 @@ proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
     ((pos.x mod 1.0) * buffer.image.width.float32),
     ((pos.y mod 1.0) * buffer.image.height.float32)
   ).vec4()
+
+proc textureSize*(buffer: Uniform[Sampler2D], level: int): Vec2 =
+  vec2(buffer.image.width.float32, buffer.image.height.float32)
+
+proc textureGrad*(
+  s: Uniform[Sampler2D],
+  uv: Vec3,
+  dUVdx: Vec2,
+  dUVdy: Vec2
+): Vec4 =
+  texture(s, uv.xy)
+
+proc textureGrad*(
+  s: Uniform[Sampler2DArray],
+  uvw: Vec3,
+  dUVdx: Vec2,
+  dUVdy: Vec2
+): Vec4 =
+  vec4(0, 0, 0, 0)
