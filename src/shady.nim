@@ -865,9 +865,7 @@ type
     image*: Image
 
   Sampler2dArray* = object
-    # 3D array-of-2D layers represented as a flat array of images
-    # Only needed for type mapping; runtime sampling occurs on GPU
-    dummy*: int
+    images*: seq[Image]
 
 var
   ## GLSL globals.
