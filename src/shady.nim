@@ -959,7 +959,6 @@ proc textureGrad*(
   dUVdx: Vec2,
   dUVdy: Vec2
 ): Vec4 =
-  ## CPU stub: not used at runtime, real sampling happens on GPU.
   texture(s, uv.xy)
 
 proc textureGrad*(
@@ -968,5 +967,4 @@ proc textureGrad*(
   dUVdx: Vec2,
   dUVdy: Vec2
 ): Vec4 =
-  ## CPU stub for sampler2DArray. Not used at runtime.
   vec4(0, 0, 0, 0)
