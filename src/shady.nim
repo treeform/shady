@@ -953,7 +953,6 @@ proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
 proc textureSize*(buffer: Uniform[Sampler2D], level: int): Vec2 =
   vec2(buffer.image.width.float32, buffer.image.height.float32)
 
-# Stubs to allow CPU-side compilation when these appear in Nim shaders.
 proc textureGrad*(
   s: Uniform[Sampler2D],
   uv: Vec3,
