@@ -922,12 +922,6 @@ proc vec4*(c: ColorRGBX): Vec4 =
     c.a.float32/255
   )
 
-proc min*(a: Vec2, b: float32): Vec2 =
-  vec2(min(a.x, b), min(a.y, b))
-
-proc max*(a: Vec2, b: float32): Vec2 =
-  vec2(max(a.x, b), max(a.y, b))
-
 proc dFdx*(a: Vec2): Vec2 =
   raise newException(Exception, "dFdx is not implemented")
 
@@ -936,9 +930,6 @@ proc dFdy*(a: Vec2): Vec2 =
 
 proc fwidth*(a: Vec2): Vec2 =
   raise newException(Exception, "fwidth is not implemented")
-
-proc clamp*(v: Vec2, min, max: float32): Vec2 =
-  vec2(clamp(v.x, min, max), clamp(v.y, min, max))
 
 proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
   let pos = pos - vec2(0.5 / buffer.image.width.float32, 0.5 /
