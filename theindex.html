@@ -30,6 +30,26 @@
 <li><a class="reference external"
           data-doc-search-tag="shady: type Attribute" href="shady.html#Attribute">shady: type Attribute</a></li>
           </ul></dd>
+<dt><a name="dFdx" href="#dFdx"><span>dFdx:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: proc dFdx(a: Vec2): Vec2" href="shady.html#dFdx%2CVec2">shady: proc dFdx(a: Vec2): Vec2</a></li>
+          </ul></dd>
+<dt><a name="dFdy" href="#dFdy"><span>dFdy:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: proc dFdy(a: Vec2): Vec2" href="shady.html#dFdy%2CVec2">shady: proc dFdy(a: Vec2): Vec2</a></li>
+          </ul></dd>
+<dt><a name="fwidth" href="#fwidth"><span>fwidth:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: proc fwidth(a: Vec2): Vec2" href="shady.html#fwidth%2CVec2">shady: proc fwidth(a: Vec2): Vec2</a></li>
+          </ul></dd>
+<dt><a name="gl_Position" href="#gl_Position"><span>gl_Position:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: var gl_Position" href="shady.html#gl_Position">shady: var gl_Position</a></li>
+          </ul></dd>
+<dt><a name="gl_VertexID" href="#gl_VertexID"><span>gl_VertexID:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: var gl_VertexID" href="shady.html#gl_VertexID">shady: var gl_VertexID</a></li>
+          </ul></dd>
 <dt><a name="ImageBuffer" href="#ImageBuffer"><span>ImageBuffer:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="shady: object ImageBuffer" href="shady.html#ImageBuffer">shady: object ImageBuffer</a></li>
@@ -52,6 +72,10 @@
 <li><a class="reference external"
           data-doc-search-tag="shady: object Sampler2d" href="shady.html#Sampler2d">shady: object Sampler2d</a></li>
           </ul></dd>
+<dt><a name="Sampler2dArray" href="#Sampler2dArray"><span>Sampler2dArray:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: object Sampler2dArray" href="shady.html#Sampler2dArray">shady: object Sampler2dArray</a></li>
+          </ul></dd>
 <dt><a name="SamplerBuffer" href="#SamplerBuffer"><span>SamplerBuffer:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="shady: object SamplerBuffer" href="shady.html#SamplerBuffer">shady: object SamplerBuffer</a></li>
@@ -61,10 +85,22 @@
           data-doc-search-tag="shady: proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4" href="shady.html#texelFetch%2CUniform%5BSampler2d%5D%2CIVec2%2Cint">shady: proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4</a></li>
           <li><a class="reference external"
           data-doc-search-tag="shady: proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4" href="shady.html#texelFetch%2CUniform%5BSamplerBuffer%5D%2CSomeInteger">shady: proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="shady: proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4" href="shady.html#texelFetch%2CUniform%5BUSampler2d%5D%2CIVec2%2Cint">shady: proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4</a></li>
           </ul></dd>
 <dt><a name="texture" href="#texture"><span>texture:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="shady: proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4" href="shady.html#texture%2CUniform%5BSampler2d%5D%2CVec2">shady: proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4</a></li>
+          </ul></dd>
+<dt><a name="textureGrad" href="#textureGrad"><span>textureGrad:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady.html#textureGrad%2CUniform%5BSampler2d%5D%2CVec3%2CVec2%2CVec2">shady: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="shady: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady.html#textureGrad%2CUniform%5BSampler2dArray%5D%2CVec3%2CVec2%2CVec2">shady: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
+          </ul></dd>
+<dt><a name="textureSize" href="#textureSize"><span>textureSize:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2" href="shady.html#textureSize%2CUniform%5BSampler2d%5D%2Cint">shady: proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2</a></li>
           </ul></dd>
 <dt><a name="toGLSL" href="#toGLSL"><span>toGLSL:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -88,6 +124,10 @@
 <li><a class="reference external"
           data-doc-search-tag="shady: type UniformWriteOnly" href="shady.html#UniformWriteOnly">shady: type UniformWriteOnly</a></li>
           </ul></dd>
+<dt><a name="USampler2d" href="#USampler2d"><span>USampler2d:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shady: object USampler2d" href="shady.html#USampler2d">shady: object USampler2d</a></li>
+          </ul></dd>
 <dt><a name="vec4" href="#vec4"><span>vec4:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="shady: proc vec4(c: ColorRGBX): Vec4" href="shady.html#vec4%2CColorRGBX">shady: proc vec4(c: ColorRGBX): Vec4</a></li>
@@ -96,7 +136,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2025-09-20 04:02:51 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2025-10-27 23:46:40 UTC</small>
       </div>
     </div>
   </div>
