@@ -16,10 +16,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4QQQEwksSS9ZWwAAAk1JREFUWMPtll2ITVEUx39nn/O7Y5qR8f05wtCUUr6ZIS++8pEnkZInPImneaCQ5METNdOkeFBKUhMPRIkHKfEuUZSUlGlKPN2TrgfncpvmnntnmlEyq1Z7t89/rf9a6+y99oZxGZf/XeIq61EdtgKXgdXA0xrYAvBjOIF1AI9zvjcC74BSpndrJPkBWDScTF8Aa4E3wDlgHbASaANmVqlcCnwHvgDvgVfAJ+AikAAvgfVZwLnSVZHZaOuKoQi3ZOMi4NkYkpe1p4J7A8BpYAD49hfIy/oqG0+hLomiKP2L5L+1ubn5115S+3OAn4EnwBlgMzCjyt6ZAnQCJ4A7wOs88iRJHvw50HoujuPBoCKwHWiosy8MdfZnAdcHk8dxXFJ3VQbQlCTJvRBCGdRbD4M6uc5glpY3eAihpN5S5w12diSEcCCEcKUO4ljdr15T76ur1FDDLIQQ3qv71EdDOe3Kxj3leRXyk+pxdWnFWod6Wt2bY3de3aSuUHcPBVimHs7mK9WrmeOF6lR1o9qnzskh2ar2qm1qizpfXaPeVGdlmGN5pb09qMxz1Xb1kLqgzn1RyH7JUXW52lr5e/Kqi9qpto7V1atuUzfnARrV7jEib1T76gG2qxdGmXyiekkt1GswPTtek0aBfJp6YySGBfWg2tPQ0FAYgf1stUfdmdcjarbYJEniKIq6gY/Aw+zWHAC+p2labGpqiorFYgGYCEzN7oQdQClN07O1/EfDyGgC0ALMBdYAi4FyK+4H3gLPsxfR1zRNi+NP7nH5J+QntnXe5B5mpfQAAAAASUVORK5CYII=">
 
 <!-- CSS -->
-<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.4">
+<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.6">
 
 <!-- JS -->
-<script type="text/javascript" src="dochack.js?v=2.2.4"></script>
+<script type="text/javascript" src="dochack.js?v=2.2.6"></script>
 </head>
 <body>
   <div class="document" id="documentId">
@@ -112,6 +112,13 @@
            color: UVec4)</a></li>
 
 </ul>
+<ul class="simple nested-toc-section">smoothstep
+  <li><a class="reference" href="#smoothstep%2Cfloat32%2Cfloat32%2Cfloat32" title="smoothstep(a, b, x: float32): float32">smoothstep(a, b, x: float32): float32</a></li>
+<li><a class="reference" href="#smoothstep%2CVec2%2CVec2%2CVec2" title="smoothstep(a, b, x: Vec2): Vec2">smoothstep(a, b, x: Vec2): Vec2</a></li>
+<li><a class="reference" href="#smoothstep%2CVec3%2CVec3%2CVec3" title="smoothstep(a, b, x: Vec3): Vec3">smoothstep(a, b, x: Vec3): Vec3</a></li>
+<li><a class="reference" href="#smoothstep%2CVec4%2CVec4%2CVec4" title="smoothstep(a, b, x: Vec4): Vec4">smoothstep(a, b, x: Vec4): Vec4</a></li>
+
+</ul>
 <ul class="simple nested-toc-section">texelFetch
   <li><a class="reference" href="#texelFetch%2CUniform%5BSampler2d%5D%2CIVec2%2Cint" title="texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4">texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4</a></li>
 <li><a class="reference" href="#texelFetch%2CUniform%5BSamplerBuffer%5D%2CSomeInteger" title="texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4">texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4</a></li>
@@ -174,8 +181,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L850" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L850" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L851" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L851" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -185,8 +192,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L855" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L855" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L856" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L856" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -196,8 +203,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L861" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L861" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L862" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L862" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -207,8 +214,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L867" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L867" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L868" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L868" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -218,8 +225,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L852" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L852" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L853" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L853" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -229,8 +236,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L858" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L858" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L859" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L859" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -239,8 +246,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L848" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L848" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L849" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L849" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -249,8 +256,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L849" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L849" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L850" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L850" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -260,8 +267,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L864" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L864" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L865" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L865" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -276,8 +283,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L872" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L872" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L873" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L873" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -286,8 +293,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L873" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L873" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L874" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L874" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -303,8 +310,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L925" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L925" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L926" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L926" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -316,8 +323,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L928" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L928" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L929" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L929" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -329,8 +336,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L931" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L931" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L932" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L932" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -343,8 +350,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L886" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L886" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L887" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L887" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -357,8 +364,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L908" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L908" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L909" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L909" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -368,8 +375,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L901" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L901" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L902" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L902" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -379,8 +386,55 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L894" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L894" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L895" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L895" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+
+</div>
+<div id="smoothstep-procs-all">
+  <div id="smoothstep,float32,float32,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2Cfloat32%2Cfloat32%2Cfloat32"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L944" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L944" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="smoothstep,Vec2,Vec2,Vec2">
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec2%2CVec2%2CVec2"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
+                                       <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L935" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L935" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="smoothstep,Vec3,Vec3,Vec3">
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec3%2CVec3%2CVec3"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
+                                       <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L938" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L938" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="smoothstep,Vec4,Vec4,Vec4">
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec4%2CVec4%2CVec4"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
+                                       <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L941" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L941" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -393,8 +447,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L878" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L878" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L879" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L879" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -403,8 +457,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L875" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L875" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L876" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L876" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -414,8 +468,8 @@
   <dd>
     
     CPU stub for usampler2D; not used at runtime. Returns zeros.
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L882" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L882" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L883" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L883" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -428,8 +482,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L934" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L934" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L947" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L947" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -442,8 +496,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L945" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L945" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L958" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L958" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -453,8 +507,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L953" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L953" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L966" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L966" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -467,8 +521,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L942" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L942" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L955" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L955" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -481,8 +535,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L792" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L792" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L793" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L793" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -494,8 +548,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L917" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L917" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L918" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L918" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -513,8 +567,8 @@
   <dd>
     
     Converts proc to a glsl string.
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L837" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L837" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L838" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L838" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -530,7 +584,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2025-10-27 23:47:32 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2025-12-08 22:31:01 UTC</small>
       </div>
     </div>
   </div>
