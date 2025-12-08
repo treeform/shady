@@ -122,7 +122,8 @@ const glslFunctions = [
   "sin", "cos", "tan", "pow",
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",
-  "dFdx", "dFdy", "fract", "fwidth"
+  "dFdx", "dFdy", "fract", "fwidth",
+  "smoothstep"
 ]
 
 ## Simply SKIP these functions.
@@ -930,6 +931,18 @@ proc dFdy*(a: Vec2): Vec2 =
 
 proc fwidth*(a: Vec2): Vec2 =
   raise newException(Exception, "fwidth is not implemented")
+
+proc smoothstep*(a, b, x: Vec2): Vec2 =
+  raise newException(Exception, "smoothstep is not implemented")
+
+proc smoothstep*(a, b, x: Vec3): Vec3 =
+  raise newException(Exception, "smoothstep is not implemented")
+
+proc smoothstep*(a, b, x: Vec4): Vec4 =
+  raise newException(Exception, "smoothstep is not implemented")
+
+proc smoothstep*(a, b, x: float32): float32 =
+  raise newException(Exception, "smoothstep is not implemented")
 
 proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
   let pos = pos - vec2(0.5 / buffer.image.width.float32, 0.5 /
