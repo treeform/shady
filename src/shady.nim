@@ -257,6 +257,11 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     n[0].toCode(res)
 
   of nnkCall, nnkCommand:
+    if n[0].strVal == "discardFragment":
+      # Special case for discarding the fragment.
+      # Because both Nim discard and GLSL discard are keywords that do different things.
+      res.add "discard"
+      return
     var procName = procRename(n[0].strVal)
     if procName in ignoreFunctions:
       return
@@ -970,3 +975,6 @@ proc textureGrad*(
   dUVdy: Vec2
 ): Vec4 =
   vec4(0, 0, 0, 0)
+
+proc discardFragment*() =
+  discard
