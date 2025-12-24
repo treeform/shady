@@ -4,8 +4,6 @@ Basic fragment shader:
 precision highp float;
 // from basicFrag
 
-
-
 out vec4 fragColor;
 
 void main() {
@@ -18,15 +16,14 @@ Fragment with a function:
 precision highp float;
 // from functionFrag
 
-
 void vec3Fun(inout vec3 output);
-
 
 void vec3Fun(
   inout vec3 output
 ) {
   output = vec3(0.5, 0.3, 0.1);
 }
+
 out vec4 fragColor;
 
 void main() {
@@ -42,8 +39,6 @@ Using var, let and math operators.
 #version 410
 precision highp float;
 // from mathFrag
-
-
 
 in vec2 uv;
 in vec4 color;
@@ -72,7 +67,6 @@ precision highp float;
 
 uniform samplerBuffer dataBuffer;
 
-
 out vec4 fragColor;
 
 void main() {
@@ -92,7 +86,6 @@ precision highp float;
 uniform sampler2D textureAtlasSampler;
 vec2 uv = vec2(0.5, 0.5);
 
-
 out vec4 fragColor;
 
 void main() {
@@ -104,8 +97,6 @@ https://github.com/treeform/shady/issues/4
 #version 300 es
 precision highp float;
 // from vertexShade
-
-
 
 in vec3 position;
 in vec4 in_color;
@@ -122,8 +113,6 @@ Ternary operator.
 precision highp float;
 // from ternaryOperator
 
-
-
 out vec4 fragColor;
 in vec3 normal;
 
@@ -136,8 +125,6 @@ Testin +*() presedence.
 #version 410
 precision highp float;
 // from presedence
-
-
 
 in r y;
 out float a;
@@ -157,7 +144,6 @@ struct Vertex {
   vec4 color;
 };
 
-
 in Vertex v;
 out vec4 fragColor;
 
@@ -176,7 +162,6 @@ struct SilkyVertex {
   vec2 uvPos;
   vec4 color;
 };
-
 
 in SilkyVertex v;
 out vec4 fragColor;

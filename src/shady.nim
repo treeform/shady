@@ -218,6 +218,14 @@ proc addIndent(res: var string, level: int) =
   for i in 0 ..< level:
     res.add "  "
 
+proc addGap(res: var string) =
+  if res.len > 0:
+    if not res.endsWith("\n\n"):
+      if res.endsWith("\n"):
+        res.add "\n"
+      else:
+        res.add "\n\n"
+
 proc addSmart(res: var string, c: char, others = {'}'}) =
   ## Ads a char but first checks if its already here.
   var idx = res.len - 1
@@ -653,6 +661,7 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
       discard
     of nnkFormalParams:
       ## Main function parameters are different in they they go in as globals.
+      res.addGap()
       for param in n:
         if param.kind != nnkEmpty:
           if param[0].strVal in ["gl_FragColor", "gl_Position"]:
@@ -685,7 +694,7 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
           res.addSmart ';'
           res.add "\n"
     else:
-      res.add "\n"
+      res.addGap()
       res.add "void main() {\n"
       n.toCodeStmts(res, level+1)
       res.add "}\n"
@@ -745,7 +754,6 @@ proc procDef(topLevelNode: NimNode): string =
             paramsStr.add paramName
             paramsStr.add ",\n"
     else:
-      result.add "\n"
       if paramsStr.len > 0:
         paramsStr = paramsStr[0 .. ^3] & "\n"
       result.add returnType & " " & procName & "(\n" & paramsStr & ") {\n"
@@ -877,7 +885,7 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   # Add GLS header stuff.
   code.add "#version " & version & "\n"
   code.add extra
-  code.add "// from " & s.strVal & "\n\n"
+  code.add "// from " & s.strVal & "\n"
 
   var n = getImpl(s)
 
@@ -888,17 +896,19 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   gatherFunction(n, functions, globals, types)
 
   # Put types first.
+  code.addGap()
   for k, v in types:
     code.add(v)
     code.add "\n"
 
   # Put globals next.
+  code.addGap()
   for k, v in globals:
     code.add(v)
     code.add "\n"
 
   # Put functions definition (just name and types part).
-  code.add "\n"
+  code.addGap()
   for k, v in functions:
     var funCode = v.split(" {")[0]
     funCode = funCode
@@ -911,7 +921,7 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     code.add "\n"
 
   # Put functions (with bodies) next.
-  code.add "\n"
+  code.addGap()
   for k, v in functions:
     code.add v
     code.add "\n"
