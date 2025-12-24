@@ -9,12 +9,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        nim-version: [stable]
+        os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v3
-    - uses: treeform/setup-nim-action@v2
-    - run: nimble test -y
+    - uses: treeform/setup-nim-action@v5
+    - run: nimby install -g shady.nimble
+    - run: nim r tests/test_shady.nim

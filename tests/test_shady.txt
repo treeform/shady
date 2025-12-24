@@ -1,0 +1,417 @@
+--------------------------------------------------
+Basic fragment shader:
+#version 410
+precision highp float;
+// from basicFrag
+
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+--------------------------------------------------
+Fragment with a function:
+#version 410
+precision highp float;
+// from functionFrag
+
+void vec3Fun(inout vec3 output);
+
+void vec3Fun(
+  inout vec3 output
+) {
+  output = vec3(0.5, 0.3, 0.1);
+}
+
+out vec4 fragColor;
+
+void main() {
+  vec3 v = vec3(0.0);
+  vec3Fun(v);
+  fragColor.x = v.x;
+  fragColor.y = v.y;
+  fragColor.z = v.z;
+}
+
+--------------------------------------------------
+Using var, let and math operators.
+#version 410
+precision highp float;
+// from mathFrag
+
+in vec2 uv;
+in vec4 color;
+in vec3 normal;
+flat in int texelOffset;
+out vec4 fragColor;
+
+void main() {
+  vec3 a = vec3(0.5, 0.5, 0.5);
+  vec3 b = vec3(0.5, 0.5, 0.5);
+  vec3 c = vec3(1.0, 1.0, 1.0);
+  vec3 d = vec3(1.0, 0.0, 1.0);
+  vec3 e = vec3(1.0, 0.0, 0.0);
+  vec3 f = color.xyz * dot(normal, normalize(vec3(1.0, 1.0, 1.0)));
+  fragColor.x = f.x;
+  fragColor.y = f.y;
+  fragColor.z = f.z;
+  fragColor.w = 1.0;
+}
+
+--------------------------------------------------
+Using data buffer and texelFetch.
+#version 410
+precision highp float;
+// from bufferFrag
+
+uniform samplerBuffer dataBuffer;
+
+out vec4 fragColor;
+
+void main() {
+  if (texelFetch(dataBuffer, 0).x == 0.0) {
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  } else {
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  }
+}
+
+--------------------------------------------------
+Using textures.
+#version 410
+precision highp float;
+// from textureFrag
+
+uniform sampler2D textureAtlasSampler;
+vec2 uv = vec2(0.5, 0.5);
+
+out vec4 fragColor;
+
+void main() {
+  fragColor = texture(textureAtlasSampler, uv);
+}
+
+--------------------------------------------------
+https://github.com/treeform/shady/issues/4
+#version 300 es
+precision highp float;
+// from vertexShade
+
+in vec3 position;
+in vec4 in_color;
+out vec4 color;
+
+void main() {
+  color = in_color;
+  gl_Position = position;
+}
+
+--------------------------------------------------
+Ternary operator.
+#version 410
+precision highp float;
+// from ternaryOperator
+
+out vec4 fragColor;
+in vec3 normal;
+
+void main() {
+  fragColor = vec4(float(((normal.x <= 0.0) ? (0) : (1))), float(((normal.y <= 0.0) ? (0) : (1))), float(((float(normal.z) < -0.5) ? (-0.5) : (normal.z < 0.0) ? (0.0) : (1.0))), 1.0);
+}
+
+--------------------------------------------------
+Testin +*() presedence.
+#version 410
+precision highp float;
+// from presedence
+
+in float y;
+in float r;
+out float a;
+
+void main() {
+  a = exp((- (float(y * y)) / (r * r)) * 2.0);
+}
+
+--------------------------------------------------
+Structs for interleaved buffers:
+#version 410
+precision highp float;
+// from structShader
+
+struct Vertex {
+  vec2 pos;
+  vec4 color;
+};
+
+in Vertex v;
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(v.color);
+}
+
+--------------------------------------------------
+Structs with arrays (SilkyVertex-like):
+#version 410
+precision highp float;
+// from silkyShader
+
+struct SilkyVertex {
+  vec2 pos;
+  vec2 uvPos;
+  vec4 color;
+};
+
+in SilkyVertex v;
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(v.color);
+}
+
+--------------------------------------------------
+Loops (For and While):
+#version 410
+precision highp float;
+// from loops
+
+out vec4 fragColor;
+
+void main() {
+  float sum = 0.0;
+  for(int i = 0; i < 10; i++) {
+    sum += 0.1;;
+  }
+  int j = 0;
+  while(j < 5) {
+    sum += 0.01;
+    j += 1;
+  }
+  j += 2;
+  int k = 10;
+  while(0 < k) {
+    sum += 0.001;
+    k -= 1;
+  }
+  fragColor = vec4(float(sum), 0.0, 0.0, 1.0);
+}
+
+--------------------------------------------------
+Switch/Case statement:
+#version 410
+precision highp float;
+// from switchCase
+
+flat in int i;
+out vec4 fragColor;
+
+void main() {
+  switch(i) {
+  case 0:{
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  }; break;
+  case 1:{
+    fragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  }; break;
+  default: {
+    fragColor = vec4(0.0, 0.0, 1.0, 1.0);
+  }; break;
+  }
+}
+
+--------------------------------------------------
+Functions with results and returns:
+#version 410
+precision highp float;
+// from returnShader
+
+float multiply(float a, float b);
+float add(float a, float b);
+
+float multiply(
+  float a,
+  float b
+) {
+  float result;
+  result = a * b;
+  return result;
+}
+float add(
+  float a,
+  float b
+) {
+  float result;
+  result = a + b;
+  return result;
+}
+
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(add(0.1, 0.2), multiply(0.3, 0.4), 0.0, 1.0);
+}
+
+--------------------------------------------------
+Matrix inverse and swizzles:
+#version 410
+precision highp float;
+// from matrixShader
+
+in mat4 m;
+in vec4 v;
+out vec4 fragColor;
+
+void main() {
+  mat4 m2 = inverse(m);
+  vec4 v2 = v.zyxw;
+  fragColor = m2 * v2;
+}
+
+--------------------------------------------------
+gl_FragCoord and flat int attributes:
+#version 410
+precision highp float;
+// from complexShader
+
+layout(origin_upper_left) in vec4 gl_FragCoord;
+flat in int someInt;
+out vec4 fragColor;
+
+void main() {
+  if (someInt == 0) {
+    fragColor = gl_FragCoord;
+  } else {
+    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  }
+}
+
+--------------------------------------------------
+Type conversions and unary minus:
+#version 410
+precision highp float;
+// from conversionShader
+
+flat in int i;
+in float f;
+out vec4 fragColor;
+
+void main() {
+  float f2 = float(i);
+  int i2 = int(f);
+  fragColor = vec4(f2, float(i2), - (f), 1.0);
+}
+
+--------------------------------------------------
+Image storage (compute-like):
+#version 410
+precision highp float;
+// from imageShader
+
+writeonly uniform imageBuffer outputImage;
+
+out vec4 fragColor;
+
+void main() {
+  imageStore(outputImage, 0, vec4(1.0, 1.0, 0.0, 1.0));
+  fragColor = vec4(1.0, 0.0, 1.0, 1.0);
+}
+
+--------------------------------------------------
+Derivatives, fract and mod:
+#version 410
+precision highp float;
+// from mathExtraShader
+
+in vec2 v;
+out vec4 fragColor;
+
+void main() {
+  float dx = dFdx(v.x);
+  float fw = fwidth(v.y);
+  float fr = fract(v.x);
+  float mo = mod(v.y, float(2.0));
+  fragColor = vec4(dx, fw, fr, mo);
+}
+
+--------------------------------------------------
+discardFragment and break:
+#version 410
+precision highp float;
+// from discardShader
+
+in vec2 v;
+out vec4 fragColor;
+
+void main() {
+  if (float(v.x) < 0.0) {
+    discard;
+  }
+  float sum = 0.0;
+  for(int i = 0; i < 10; i++) {
+    if (5 < i) {
+      break;
+    }
+    sum += 1.0;
+  }
+  fragColor = vec4(float(sum / 10.0), 0.0, 0.0, 1.0);
+}
+
+--------------------------------------------------
+Built-in math (mix, smoothstep, clamp):
+#version 410
+precision highp float;
+// from mathBuiltinShader
+
+in float a;
+in float b;
+in float t;
+out vec4 fragColor;
+
+void main() {
+  float m = mix(a, b, t);
+  float s = smoothstep(0.0, 1.0, t);
+  float c = clamp(t, 0.0, 1.0);
+  fragColor = vec4(m, s, c, 1.0);
+}
+
+--------------------------------------------------
+gl_VertexID and integer mod (Silky-like):
+#version 300 es
+precision highp float;
+// from silkyVertTest
+
+struct SilkyVertex {
+  vec2 pos;
+  vec2 uvPos;
+  vec4 color;
+};
+
+uniform vec2 atlasSize;
+uniform mat4 mvp;
+
+in SilkyVertex v;
+out vec2 fragmentUv;
+
+void main() {
+  uvec2 corner = uvec2(uint((gl_VertexID) % (2)), uint((gl_VertexID) / (2)));
+  float dx = float(v.pos.x) + float(float(corner.x)) * 10.0;
+  gl_Position = mvp * vec4(float(dx), v.pos.y, 0.0, 1.0);
+  fragmentUv = vec2(float(dx), v.pos.y) / atlasSize;
+}
+
+--------------------------------------------------
+Uint32 mod and explicit conversion:
+#version 410
+precision highp float;
+// from uintModTest
+
+in uint u;
+out vec4 fragColor;
+
+void main() {
+  uint m = (u) % (2);
+  fragColor = vec4(float(m), 0.0, 0.0, 1.0);
+}
+

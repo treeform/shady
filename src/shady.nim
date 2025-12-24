@@ -39,11 +39,13 @@ proc typeRename(t: string): string =
   of "Uniform": "uniform"
   of "UniformWriteOnly": "writeonly uniform"
   of "Attribute": "attribute"
+  of "ColorRGBX": "vec4"
 
   of "SamplerBuffer": "samplerBuffer"
   of "Sampler2d": "sampler2D"
   of "USampler2d": "usampler2D"
   of "Sampler2dArray": "sampler2DArray"
+  of "ImageBuffer": "imageBuffer"
   of "UImageBuffer": "uimageBuffer"
   else: t
 
@@ -73,6 +75,33 @@ proc typeString(n: NimNode): string =
     of "Uniform[float32]": "float"
     of "Uniform[int]": "int"
     else:
+      if n[0].repr == "array":
+        var length = 0
+        if n[1].kind == nnkIntLit:
+          length = n[1].intVal.int
+        elif n[1].kind == nnkBracketExpr and n[1].len == 3 and n[1][0].repr == "..":
+           # array[0..1, T] case
+           length = n[1][2].intVal.int - n[1][1].intVal.int + 1
+        elif n[1].kind == nnkInfix and n[1].len == 3 and n[1][0].repr == "..":
+           # array[0..1, T] case
+           length = n[1][2].intVal.int - n[1][1].intVal.int + 1
+        
+        if length == 2:
+          if n[2].repr == "uint16": return "vec2"
+          if n[2].repr in ["uint32"]: return "uvec2"
+          if n[2].repr in ["int16", "int32"]: return "ivec2"
+          if n[2].repr in ["float32", "float64"]: return "vec2"
+        elif length == 3:
+          if n[2].repr == "uint16": return "vec3"
+          if n[2].repr in ["uint32"]: return "uvec3"
+          if n[2].repr in ["int16", "int32"]: return "ivec3"
+          if n[2].repr in ["float32", "float64"]: return "vec3"
+        elif length == 4:
+          if n[2].repr == "uint16": return "vec4"
+          if n[2].repr in ["uint32"]: return "uvec4"
+          if n[2].repr in ["int16", "int32"]: return "ivec4"
+          if n[2].repr in ["float32", "float64"]: return "vec4"
+      
       err "can't figure out type: " & n.repr, n
 
 ## Default constructor for different GLSL types.
@@ -120,10 +149,11 @@ const glslFunctions = [
   "[]", "[]=",
   "inverse",
   "sin", "cos", "tan", "pow",
+  "fmod",
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",
   "dFdx", "dFdy", "fract", "fwidth",
-  "smoothstep"
+  "smoothstep", "inc", "dec", "discardFragment"
 ]
 
 ## Simply SKIP these functions.
@@ -150,6 +180,7 @@ proc procRename(t: string): string =
   of "not": "!"
   of "and": "&&"
   of "or": "||"
+  of "fmod": "mod"
   of "mod": "%"
   of "div": "/"
   else: t.replace("`", "_")
@@ -190,6 +221,14 @@ proc addIndent(res: var string, level: int) =
   for i in 0 ..< level:
     res.add "  "
 
+proc addGap(res: var string) =
+  if res.len > 0:
+    if not res.endsWith("\n\n"):
+      if res.endsWith("\n"):
+        res.add "\n"
+      else:
+        res.add "\n\n"
+
 proc addSmart(res: var string, c: char, others = {'}'}) =
   ## Ads a char but first checks if its already here.
   var idx = res.len - 1
@@ -199,6 +238,9 @@ proc addSmart(res: var string, c: char, others = {'}'}) =
     res.add c
 
 proc toCodeStmts(n: NimNode, res: var string, level = 0)
+
+proc isIntegerType(t: string): bool =
+  t in ["int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64"]
 
 proc toCode(n: NimNode, res: var string, level = 0) =
   ## Inner code block.
@@ -213,7 +255,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.addSmart ';'
 
   of nnkInfix:
-    if n[0].repr in ["mod"] and n[1].getType().repr != "int":
+    if n[0].repr in ["mod"] and not isIntegerType(n[1].getType().repr):
       # In Nim float mod and integer made are same thing.
       # In GLSL mod(float, float) is a function while % is for integers.
       res.add n[0].repr
@@ -261,6 +303,22 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       # Special case for discarding the fragment.
       # Because both Nim discard and GLSL discard are keywords that do different things.
       res.add "discard"
+      return
+    if n[0].strVal == "inc":
+      n[1].toCode(res)
+      if n.len == 3:
+        res.add " += "
+        n[2].toCode(res)
+      else:
+        res.add "++"
+      return
+    if n[0].strVal == "dec":
+      n[1].toCode(res)
+      if n.len == 3:
+        res.add " -= "
+        n[2].toCode(res)
+      else:
+        res.add "--"
       return
     var procName = procRename(n[0].strVal)
     if procName in ignoreFunctions:
@@ -333,7 +391,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
 
   of nnkStmtList:
     for j in 0 ..< n.len:
-      if n[j].kind in [nnkCall]:
+      if n[j].kind in [nnkCall, nnkCommand]:
         res.addIndent level
       n[j].toCode(res, level)
       if n[j].kind notin [nnkLetSection, nnkVarSection, nnkCommentStmt]:
@@ -389,6 +447,8 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       res.add $n[1].intVal.float64
     elif typeStr == "float" and n[1].kind == nnkFloatLit:
       res.add $n[1].floatVal.float64
+    elif typeStr in ["int", "uint"] and n[1].kind in {nnkIntLit .. nnkInt64Lit}:
+      n[1].toCode(res)
     else:
       for j in 1 .. n.len-1:
         res.add typeStr
@@ -625,39 +685,41 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
       discard
     of nnkFormalParams:
       ## Main function parameters are different in they they go in as globals.
-      for param in n:
-        if param.kind != nnkEmpty:
-          if param[0].strVal in ["gl_FragColor", "gl_Position"]:
-            continue
-          if param[1].kind == nnkVarTy:
-            #if param[0].strVal == "fragColor":
-            #  res.add "layout(location = 0) "
-            if param[1][0].repr == "seq":
-              res.add "buffer?"
-              res.add param[1].repr
+      res.addGap()
+      for paramDefs in n:
+        if paramDefs.kind == nnkIdentDefs:
+          let typeNode = paramDefs[^2]
+          for i in 0 ..< paramDefs.len - 2:
+            let param = paramDefs[i]
+            if param.strVal in ["gl_FragColor", "gl_Position"]:
               continue
-            elif param[1][0].repr == "int":
-              res.add "flat "
-            res.add "out "
-            res.add typeRename(param[1][0].strVal)
-          else:
-            if param[1].kind == nnkBracketExpr:
-              res.add typeRename(param[1][0].strVal)
-              res.add " "
-              res.add typeRename(param[1][1].strVal)
-            else:
-              if param[0].strVal == "gl_FragCoord":
-                res.add "layout(origin_upper_left) "
-              if param[1].strVal == "int":
+            if typeNode.kind == nnkVarTy:
+              if typeNode[0].repr == "seq":
+                res.add "buffer?"
+                res.add typeNode.repr
+                continue
+              elif typeNode[0].repr == "int":
                 res.add "flat "
-              res.add "in "
-              res.add typeRename(param[1].strVal)
-          res.add " "
-          res.add param[0].strVal
-          res.addSmart ';'
-          res.add "\n"
+              res.add "out "
+              res.add typeRename(typeNode[0].strVal)
+            else:
+              if typeNode.kind == nnkBracketExpr:
+                res.add typeRename(typeNode[0].strVal)
+                res.add " "
+                res.add typeRename(typeNode[1].strVal)
+              else:
+                if param.strVal == "gl_FragCoord":
+                  res.add "layout(origin_upper_left) "
+                if typeNode.strVal == "int":
+                  res.add "flat "
+                res.add "in "
+                res.add typeRename(typeNode.strVal)
+            res.add " "
+            res.add param.strVal
+            res.addSmart ';'
+            res.add "\n"
     else:
-      res.add "\n"
+      res.addGap()
       res.add "void main() {\n"
       n.toCodeStmts(res, level+1)
       res.add "}\n"
@@ -717,7 +779,6 @@ proc procDef(topLevelNode: NimNode): string =
             paramsStr.add paramName
             paramsStr.add ",\n"
     else:
-      result.add "\n"
       if paramsStr.len > 0:
         paramsStr = paramsStr[0 .. ^3] & "\n"
       result.add returnType & " " & procName & "(\n" & paramsStr & ") {\n"
@@ -733,10 +794,50 @@ proc procDef(topLevelNode: NimNode): string =
           result.add "return result;\n"
       result.add "}"
 
+proc gatherTypes(
+  typeInst: NimNode,
+  types: var Table[string, string]
+) =
+  ## Looks for types used and gathers their struct definitions.
+  var typeInst = typeInst
+  if typeInst.kind == nnkVarTy:
+    typeInst = typeInst[0]
+  if typeInst.kind == nnkBracketExpr:
+    for i in 1 ..< typeInst.len:
+      gatherTypes(typeInst[i], types)
+    return
+
+  if typeInst.kind == nnkSym:
+    let name = typeInst.strVal
+    if name in types: return
+    if typeRename(name) != name: return
+    if name in ["ColorRGBX"]:
+      # Special case for ColorRGBX which is handled as vec4.
+      return
+
+    let impl = typeInst.getImpl()
+    if impl.kind == nnkTypeDef and impl[2].kind == nnkObjectTy:
+      var def = "struct " & name & " {\n"
+      let obj = impl[2]
+      let reclist = obj[2]
+      for field in reclist:
+        if field.kind == nnkIdentDefs:
+          let fieldTypeNode = field[^2]
+          let fieldType = fieldTypeNode.getTypeInst()
+          gatherTypes(fieldType, types)
+          for i in 0 ..< field.len - 2:
+            var fieldName = field[i].repr
+            if fieldName.endsWith("*"):
+              fieldName = fieldName[0 .. ^2]
+            def.add "  " & typeString(fieldType) & " " & fieldName & ";\n"
+      def.add "};"
+      types[name] = def
+
 proc gatherFunction(
   topLevelNode: NimNode,
   functions: var Table[string, string],
-  globals: var Table[string, string]
+  globals: var Table[string, string],
+  types: var Table[string, string]
 ) =
 
   ## Looks for functions this function calls and brings them up
@@ -755,14 +856,15 @@ proc gatherFunction(
             } and impl.kind != nnkNilLit:
             var defStr = ""
             let typeInst = n.getTypeInst
+            gatherTypes(typeInst, types)
             if typeInst.kind == nnkBracketExpr:
               # might be a uniform
               if typeInst[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
                 defStr.add typeRename(typeInst[0].repr)
                 defStr.add " "
-                defStr.add typeRename(typeInst[1].repr)
+                defStr.add typeString(typeInst[1])
               elif typeInst[0].repr == "array":
-                defStr.add typeRename(typeInst[2].repr)
+                defStr.add typeString(typeInst[2])
                 defStr.add "["
                 defStr.add typeRename(typeInst[1][2].repr)
                 defStr.add "]"
@@ -790,10 +892,16 @@ proc gatherFunction(
         not isVectorAccess(procName):
         ## If its not a builtin proc, we need to bring definition.
         let impl = n[0].getImpl()
-        gatherFunction(impl, functions, globals)
+        gatherFunction(impl, functions, globals, types)
         functions[procName] = procDef(impl)
 
-    gatherFunction(n, functions, globals)
+    if n.kind == nnkFormalParams:
+      for i in 1 ..< n.len:
+        let paramDef = n[i]
+        let paramType = paramDef[^2].getTypeInst()
+        gatherTypes(paramType, types)
+
+    gatherFunction(n, functions, globals, types)
 
 proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
@@ -802,22 +910,30 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   # Add GLS header stuff.
   code.add "#version " & version & "\n"
   code.add extra
-  code.add "// from " & s.strVal & "\n\n"
+  code.add "// from " & s.strVal & "\n"
 
   var n = getImpl(s)
 
   # Gather all globals and functions, and globals and functions they use.
   var functions: Table[string, string]
   var globals: Table[string, string]
-  gatherFunction(n, functions, globals)
+  var types: Table[string, string]
+  gatherFunction(n, functions, globals, types)
 
-  # Put globals first.
+  # Put types first.
+  code.addGap()
+  for k, v in types:
+    code.add(v)
+    code.add "\n"
+
+  # Put globals next.
+  code.addGap()
   for k, v in globals:
     code.add(v)
     code.add "\n"
 
   # Put functions definition (just name and types part).
-  code.add "\n"
+  code.addGap()
   for k, v in functions:
     var funCode = v.split(" {")[0]
     funCode = funCode
@@ -830,7 +946,7 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     code.add "\n"
 
   # Put functions (with bodies) next.
-  code.add "\n"
+  code.addGap()
   for k, v in functions:
     code.add v
     code.add "\n"
@@ -876,7 +992,7 @@ type
 var
   ## GLSL globals.
   gl_Position*: Vec4
-  gl_VertexID*: uint32
+  gl_VertexID*: int32
 
 proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
   vec4(buffer.data[index.int], 0, 0, 0)
@@ -928,26 +1044,87 @@ proc vec4*(c: ColorRGBX): Vec4 =
     c.a.float32/255
   )
 
+proc dFdx*(a: float32): float32 =
+  raise newException(Exception, "dFdx is not implemented")
+
 proc dFdx*(a: Vec2): Vec2 =
   raise newException(Exception, "dFdx is not implemented")
+
+proc dFdx*(a: Vec3): Vec3 =
+  raise newException(Exception, "dFdx is not implemented")
+
+proc dFdx*(a: Vec4): Vec4 =
+  raise newException(Exception, "dFdx is not implemented")
+
+proc dFdy*(a: float32): float32 =
+  raise newException(Exception, "dFdy is not implemented")
 
 proc dFdy*(a: Vec2): Vec2 =
   raise newException(Exception, "dFdy is not implemented")
 
+proc dFdy*(a: Vec3): Vec3 =
+  raise newException(Exception, "dFdy is not implemented")
+
+proc dFdy*(a: Vec4): Vec4 =
+  raise newException(Exception, "dFdy is not implemented")
+
+proc fwidth*(a: float32): float32 =
+  raise newException(Exception, "fwidth is not implemented")
+
 proc fwidth*(a: Vec2): Vec2 =
   raise newException(Exception, "fwidth is not implemented")
 
-proc smoothstep*(a, b, x: Vec2): Vec2 =
-  raise newException(Exception, "smoothstep is not implemented")
+proc fwidth*(a: Vec3): Vec3 =
+  raise newException(Exception, "fwidth is not implemented")
 
-proc smoothstep*(a, b, x: Vec3): Vec3 =
-  raise newException(Exception, "smoothstep is not implemented")
+proc fwidth*(a: Vec4): Vec4 =
+  raise newException(Exception, "fwidth is not implemented")
 
-proc smoothstep*(a, b, x: Vec4): Vec4 =
-  raise newException(Exception, "smoothstep is not implemented")
+proc fmod*(x, y: float32): float32 =
+  x - y * floor(x / y)
+
+proc fmod*(x: Vec2, y: float32): Vec2 =
+  vec2(fmod(x.x, y), fmod(x.y, y))
+
+proc fmod*(x: Vec3, y: float32): Vec3 =
+  vec3(fmod(x.x, y), fmod(x.y, y), fmod(x.z, y))
+
+proc fmod*(x: Vec4, y: float32): Vec4 =
+  vec4(fmod(x.x, y), fmod(x.y, y), fmod(x.z, y), fmod(x.w, y))
+
+proc fmod*(x, y: Vec2): Vec2 =
+  vec2(fmod(x.x, y.x), fmod(x.y, y.y))
+
+proc fmod*(x, y: Vec3): Vec3 =
+  vec3(fmod(x.x, y.x), fmod(x.y, y.y), fmod(x.z, y.z))
+
+proc fmod*(x, y: Vec4): Vec4 =
+  vec4(fmod(x.x, y.x), fmod(x.y, y.y), fmod(x.z, y.z), fmod(x.w, y.w))
+
+proc fract*(a: float32): float32 =
+  a - floor(a)
+
+proc fract*(a: Vec2): Vec2 =
+  vec2(fract(a.x), fract(a.y))
+
+proc fract*(a: Vec3): Vec3 =
+  vec3(fract(a.x), fract(a.y), fract(a.z))
+
+proc fract*(a: Vec4): Vec4 =
+  vec4(fract(a.x), fract(a.y), fract(a.z), fract(a.w))
 
 proc smoothstep*(a, b, x: float32): float32 =
-  raise newException(Exception, "smoothstep is not implemented")
+  let t = clamp((x - a) / (b - a), 0.0, 1.0)
+  t * t * (3.0 - 2.0 * t)
+
+proc smoothstep*(a, b, x: Vec2): Vec2 =
+  vec2(smoothstep(a.x, b.x, x.x), smoothstep(a.y, b.y, x.y))
+
+proc smoothstep*(a, b, x: Vec3): Vec3 =
+  vec3(smoothstep(a.x, b.x, x.x), smoothstep(a.y, b.y, x.y), smoothstep(a.z, b.z, x.z))
+
+proc smoothstep*(a, b, x: Vec4): Vec4 =
+  vec4(smoothstep(a.x, b.x, x.x), smoothstep(a.y, b.y, x.y), smoothstep(a.z, b.z, x.z), smoothstep(a.w, b.w, x.w))
 
 proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
   let pos = pos - vec2(0.5 / buffer.image.width.float32, 0.5 /

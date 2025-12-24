@@ -1,21 +1,29 @@
-import pixie, shady, strutils, vmath
+import pixie, shady, vmath, os
+
+var masterOutput: string
+proc log(args: varargs[string, `$`]) =
+  for arg in args:
+    masterOutput.add(arg)
+  masterOutput.add("\n")
+
+const goldMasterPath = currentSourcePath().parentDir() / "test_shady.txt"
 
 block:
-  echo "--------------------------------------------------"
-  echo "Basic fragment shader:"
+  log "--------------------------------------------------"
+  log "Basic fragment shader:"
 
   proc basicFrag(fragColor: var Vec4) =
     fragColor = vec4(1.0, 0.0, 0.0, 1.0)
 
-  echo toGLSL(basicFrag)
+  log toGLSL(basicFrag)
 
   var c: Vec4
   basicFrag(c)
   assert c == vec4(1.0, 0.0, 0.0, 1.0)
 
 block:
-  echo "--------------------------------------------------"
-  echo "Fragment with a function:"
+  log "--------------------------------------------------"
+  log "Fragment with a function:"
 
   proc vec3Fun(output: var Vec3) =
     output = vec3(0.5, 0.3, 0.1)
@@ -27,15 +35,15 @@ block:
     fragColor.y = v.y
     fragColor.z = v.z
 
-  echo toGLSL(functionFrag)
+  log toGLSL(functionFrag)
 
   var c: Vec4
   functionFrag(c)
   assert c == vec4(0.5, 0.3, 0.1, 0.0)
 
 block:
-  echo "--------------------------------------------------"
-  echo "Using var, let and math operators."
+  log "--------------------------------------------------"
+  log "Using var, let and math operators."
 
   proc mathFrag(
     uv: Vec2,
@@ -57,15 +65,15 @@ block:
     fragColor.z = f.z
     fragColor.w = 1.0
 
-  echo toGLSL(mathFrag)
+  log toGLSL(mathFrag)
 
   var c: Vec4
   mathFrag(vec2(0, 0), vec4(1, 0, 0, 1), vec3(0, 1, 0), 1, c)
   assert c == vec4(0.5773502588272095, 0.0, 0.0, 1.0)
 
 block:
-  echo "--------------------------------------------------"
-  echo "Using data buffer and texelFetch."
+  log "--------------------------------------------------"
+  log "Using data buffer and texelFetch."
 
   var dataBuffer: Uniform[SamplerBuffer]
 
@@ -75,7 +83,7 @@ block:
     else:
       fragColor = vec4(0, 0, 0, 1)
 
-  echo toGLSL(bufferFrag)
+  log toGLSL(bufferFrag)
 
   dataBuffer.data = @[0.float32]
   var c: Vec4
@@ -87,8 +95,8 @@ block:
   assert c == vec4(0.0, 0.0, 0.0, 1.0)
 
 block:
-  echo "--------------------------------------------------"
-  echo "Using textures."
+  log "--------------------------------------------------"
+  log "Using textures."
 
   var textureAtlasSampler: Uniform[Sampler2d]
   var uv = vec2(0.5, 0.5)
@@ -99,7 +107,7 @@ block:
   proc textureFrag(fragColor: var Vec4) =
     fragColor = texture(textureAtlasSampler, uv)
 
-  echo toGLSL(textureFrag)
+  log toGLSL(textureFrag)
 
   var c: Vec4
   textureFrag(c)
@@ -107,16 +115,16 @@ block:
   assert (c - vec4(1.0, 0.5, 0.0, 1.0)).length < 0.005
 
 block:
-  echo "--------------------------------------------------"
-  echo "https://github.com/treeform/shady/issues/4"
+  log "--------------------------------------------------"
+  log "https://github.com/treeform/shady/issues/4"
   proc vertexShade(position: Vec3, in_color: Vec4, color: var Vec4, gl_Position: var Vec3) =
       color = in_color
       gl_Position = position
-  echo toGLSL(vertexShade, "300 es")
+  log toGLSL(vertexShade, "300 es")
 
 block:
-  echo "--------------------------------------------------"
-  echo "Ternary operator."
+  log "--------------------------------------------------"
+  log "Ternary operator."
 
   proc ternaryOperator(fragColor: var Vec4, normal: Vec3) =
     fragColor = vec4(
@@ -133,14 +141,195 @@ block:
         1,
       1)
 
-  echo toGLSL(ternaryOperator)
+  log toGLSL(ternaryOperator)
   var c: Vec4
   ternaryOperator(c, vec3(-1.0, 1.0, -0.6))
   assert c == vec4(0.0, 1.0, -0.5, 1.0)
 
 block:
-  echo "--------------------------------------------------"
-  echo "+*() presedence."
+  log "--------------------------------------------------"
+  log "Testin +*() presedence."
   proc presedence(y, r: float32, a: var float32) =
     a = exp(-(y*y).float32/(r*r)*2)
-  echo toGLSL(presedence)
+  log toGLSL(presedence)
+
+block:
+  log "--------------------------------------------------"
+  log "Structs for interleaved buffers:"
+
+  type Vertex = object
+    pos: Vec2
+    color: ColorRGBX
+
+  proc structShader(v: Vertex, fragColor: var Vec4) =
+    fragColor = vec4(v.color)
+
+  log toGLSL(structShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Structs with arrays (SilkyVertex-like):"
+
+  type SilkyVertex = object
+    pos: Vec2
+    uvPos: array[2, uint16]
+    color: ColorRGBX
+
+  proc silkyShader(v: SilkyVertex, fragColor: var Vec4) =
+    fragColor = vec4(v.color)
+
+  log toGLSL(silkyShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Loops (For and While):"
+  proc loops(fragColor: var Vec4) =
+    var sum = 0.0
+    for i in 0 ..< 10:
+      sum += 0.1
+    var j = 0
+    while j < 5:
+      sum += 0.01
+      inc j
+    inc(j, 2)
+    var k = 10
+    while k > 0:
+      sum += 0.001
+      dec k
+    fragColor = vec4(sum, 0.0, 0.0, 1.0)
+  log toGLSL(loops)
+
+block:
+  log "--------------------------------------------------"
+  log "Switch/Case statement:"
+  proc switchCase(i: int, fragColor: var Vec4) =
+    case i:
+    of 0: fragColor = vec4(1, 0, 0, 1)
+    of 1: fragColor = vec4(0, 1, 0, 1)
+    else: fragColor = vec4(0, 0, 1, 1)
+  log toGLSL(switchCase)
+
+block:
+  log "--------------------------------------------------"
+  log "Functions with results and returns:"
+  func add(a, b: float32): float32 =
+    result = a + b
+  func multiply(a, b: float32): float32 =
+    return a * b
+  proc returnShader(fragColor: var Vec4) =
+    fragColor = vec4(add(0.1, 0.2), multiply(0.3, 0.4), 0.0, 1.0)
+  log toGLSL(returnShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Matrix inverse and swizzles:"
+  proc matrixShader(m: Mat4, v: Vec4, fragColor: var Vec4) =
+    let m2 = inverse(m)
+    let v2 = v.zyxw
+    fragColor = m2 * v2
+  log toGLSL(matrixShader)
+
+block:
+  log "--------------------------------------------------"
+  log "gl_FragCoord and flat int attributes:"
+  proc complexShader(gl_FragCoord: Vec4, someInt: int, fragColor: var Vec4) =
+    if someInt == 0:
+      fragColor = gl_FragCoord
+    else:
+      fragColor = vec4(1, 1, 1, 1)
+  log toGLSL(complexShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Type conversions and unary minus:"
+  proc conversionShader(i: int, f: float32, fragColor: var Vec4) =
+    let f2 = float32(i)
+    let i2 = int32(f)
+    fragColor = vec4(f2, float32(i2), -f, 1.0)
+  log toGLSL(conversionShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Image storage (compute-like):"
+  var outputImage: UniformWriteOnly[ImageBuffer]
+  proc imageShader(fragColor: var Vec4) =
+    imageStore(outputImage, 0, vec4(1, 1, 0, 1))
+    fragColor = vec4(1, 0, 1, 1)
+  log toGLSL(imageShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Derivatives, fract and mod:"
+  proc mathExtraShader(v: Vec2, fragColor: var Vec4) =
+    let dx = dFdx(v.x)
+    let fw = fwidth(v.y)
+    let fr = fract(v.x)
+    let mo = fmod(v.y, 2.0.float32)
+    fragColor = vec4(dx, fw, fr, mo)
+  log toGLSL(mathExtraShader)
+  assert fmod(1.5.float32, 1.0.float32) == 0.5.float32
+  assert fmod(-0.5.float32, 1.0.float32) == 0.5.float32
+  assert fract(1.5.float32) == 0.5.float32
+  assert fract(-0.5.float32) == 0.5.float32
+  assert smoothstep(0.0.float32, 1.0.float32, 0.5.float32) == 0.5.float32
+
+block:
+  log "--------------------------------------------------"
+  log "discardFragment and break:"
+  proc discardShader(v: Vec2, fragColor: var Vec4) =
+    if v.x < 0.0:
+      discardFragment()
+    var sum = 0.0
+    for i in 0 ..< 10:
+      if i > 5:
+        break
+      sum += 1.0
+    fragColor = vec4(sum / 10.0, 0, 0, 1)
+  log toGLSL(discardShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Built-in math (mix, smoothstep, clamp):"
+  proc mathBuiltinShader(a, b, t: float32, fragColor: var Vec4) =
+    let m = mix(a, b, t)
+    let s = smoothstep(0.0, 1.0, t)
+    let c = clamp(t, 0.0, 1.0)
+    fragColor = vec4(m, s, c, 1.0)
+  log toGLSL(mathBuiltinShader)
+
+block:
+  log "--------------------------------------------------"
+  log "gl_VertexID and integer mod (Silky-like):"
+  var mvp: Uniform[Mat4]
+  var atlasSize: Uniform[Vec2]
+  type SilkyVertex = object
+    pos: Vec2
+    uvPos: array[2, uint16]
+    color: ColorRGBX
+
+  proc silkyVertTest(v: SilkyVertex, fragmentUv: var Vec2) =
+    let corner = uvec2(uint32(gl_VertexID mod 2), uint32(gl_VertexID div 2))
+    let dx = v.pos.x + float32(corner.x) * 10.0
+    gl_Position = mvp * vec4(dx, v.pos.y, 0.0, 1.0)
+    fragmentUv = vec2(dx, v.pos.y) / atlasSize
+  log toGLSL(silkyVertTest, "300 es")
+
+block:
+  log "--------------------------------------------------"
+  log "Uint32 mod and explicit conversion:"
+  proc uintModTest(u: uint32, fragColor: var Vec4) =
+    let m = u mod 2
+    fragColor = vec4(float32(m), 0, 0, 1)
+  log toGLSL(uintModTest)
+
+when defined(gen_master):
+  writeFile(goldMasterPath, masterOutput)
+else:
+  if fileExists(goldMasterPath):
+    let expected = readFile(goldMasterPath)
+    if expected != masterOutput:
+      echo "FAILED: Gold master mismatch!"
+      quit(1)
+  else:
+    echo "FAILED: Gold master file not found! Run with -d:gen_master to create it."
+    quit(1)
