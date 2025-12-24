@@ -16,5 +16,5 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: treeform/setup-nim-action@v5
-    - run: cd .. && nimby install shady/shady.nimble
+    - run: nimby install -g shady/shady.nimble
     - run: nim r tests/test_shady.nim
