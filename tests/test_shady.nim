@@ -180,6 +180,60 @@ block:
 
   log toGLSL(silkyShader)
 
+block:
+  log "--------------------------------------------------"
+  log "Loops (For and While):"
+  proc loops(fragColor: var Vec4) =
+    var sum = 0.0
+    for i in 0 ..< 10:
+      sum += 0.1
+    var j = 0
+    while j < 5:
+      sum += 0.01
+      j += 1
+    fragColor = vec4(sum, 0.0, 0.0, 1.0)
+  log toGLSL(loops)
+
+block:
+  log "--------------------------------------------------"
+  log "Switch/Case statement:"
+  proc switchCase(i: int, fragColor: var Vec4) =
+    case i:
+    of 0: fragColor = vec4(1, 0, 0, 1)
+    of 1: fragColor = vec4(0, 1, 0, 1)
+    else: fragColor = vec4(0, 0, 1, 1)
+  log toGLSL(switchCase)
+
+block:
+  log "--------------------------------------------------"
+  log "Functions with results and returns:"
+  func add(a, b: float32): float32 =
+    result = a + b
+  func multiply(a, b: float32): float32 =
+    return a * b
+  proc returnShader(fragColor: var Vec4) =
+    fragColor = vec4(add(0.1, 0.2), multiply(0.3, 0.4), 0.0, 1.0)
+  log toGLSL(returnShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Matrix inverse and swizzles:"
+  proc matrixShader(m: Mat4, v: Vec4, fragColor: var Vec4) =
+    let m2 = inverse(m)
+    let v2 = v.zyxw
+    fragColor = m2 * v2
+  log toGLSL(matrixShader)
+
+block:
+  log "--------------------------------------------------"
+  log "gl_FragCoord and flat int attributes:"
+  proc complexShader(gl_FragCoord: Vec4, someInt: int, fragColor: var Vec4) =
+    if someInt == 0:
+      fragColor = gl_FragCoord
+    else:
+      fragColor = vec4(1, 1, 1, 1)
+  log toGLSL(complexShader)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:

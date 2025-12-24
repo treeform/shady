@@ -170,3 +170,113 @@ void main() {
   fragColor = vec4(v.color);
 }
 
+--------------------------------------------------
+Loops (For and While):
+#version 410
+precision highp float;
+// from loops
+
+out vec4 fragColor;
+
+void main() {
+  float sum = 0.0;
+  for(int i = 0; i < 10; i++) {
+    sum += 0.1;;
+  }
+  int j = 0;
+  while(j < 5) {
+    sum += 0.01;
+    j += 1;
+  }
+  fragColor = vec4(float(sum), 0.0, 0.0, 1.0);
+}
+
+--------------------------------------------------
+Switch/Case statement:
+#version 410
+precision highp float;
+// from switchCase
+
+flat in int i;
+out vec4 fragColor;
+
+void main() {
+  switch(i) {
+  case 0:{
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  }; break;
+  case 1:{
+    fragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  }; break;
+  default: {
+    fragColor = vec4(0.0, 0.0, 1.0, 1.0);
+  }; break;
+  }
+}
+
+--------------------------------------------------
+Functions with results and returns:
+#version 410
+precision highp float;
+// from returnShader
+
+float multiply(float a, float b);
+float add(float a, float b);
+
+float multiply(
+  float a,
+  float b
+) {
+  float result;
+  result = a * b;
+  return result;
+}
+float add(
+  float a,
+  float b
+) {
+  float result;
+  result = a + b;
+  return result;
+}
+
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(add(0.1, 0.2), multiply(0.3, 0.4), 0.0, 1.0);
+}
+
+--------------------------------------------------
+Matrix inverse and swizzles:
+#version 410
+precision highp float;
+// from matrixShader
+
+in mat4 m;
+in vec4 v;
+out vec4 fragColor;
+
+void main() {
+  mat4 m2 = inverse(m);
+  vec4 v2 = v.zyxw;
+  fragColor = m2 * v2;
+}
+
+--------------------------------------------------
+gl_FragCoord and flat int attributes:
+#version 410
+precision highp float;
+// from complexShader
+
+layout(origin_upper_left) in vec4 gl_FragCoord;
+flat in int someInt;
+out vec4 fragColor;
+
+void main() {
+  if (someInt == 0) {
+    fragColor = gl_FragCoord;
+  } else {
+    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  }
+}
+
