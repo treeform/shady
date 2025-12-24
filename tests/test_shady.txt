@@ -314,7 +314,7 @@ writeonly uniform imageBuffer outputImage;
 out vec4 fragColor;
 
 void main() {
-  imageStore(outputImage, int(0), vec4(1.0, 1.0, 0.0, 1.0));
+  imageStore(outputImage, 0, vec4(1.0, 1.0, 0.0, 1.0));
   fragColor = vec4(1.0, 0.0, 1.0, 1.0);
 }
 
@@ -374,5 +374,44 @@ void main() {
   float s = smoothstep(0.0, 1.0, t);
   float c = clamp(t, 0.0, 1.0);
   fragColor = vec4(m, s, c, 1.0);
+}
+
+--------------------------------------------------
+gl_VertexID and integer mod (Silky-like):
+#version 300 es
+precision highp float;
+// from silkyVertTest
+
+struct SilkyVertex {
+  vec2 pos;
+  vec2 uvPos;
+  vec4 color;
+};
+
+uniform vec2 atlasSize;
+uniform mat4 mvp;
+
+in SilkyVertex v;
+out vec2 fragmentUv;
+
+void main() {
+  uvec2 corner = uvec2(uint((gl_VertexID) % (2)), uint((gl_VertexID) / (2)));
+  float dx = float(v.pos.x) + float(float(corner.x)) * 10.0;
+  gl_Position = mvp * vec4(float(dx), v.pos.y, 0.0, 1.0);
+  fragmentUv = vec2(float(dx), v.pos.y) / atlasSize;
+}
+
+--------------------------------------------------
+Uint32 mod and explicit conversion:
+#version 410
+precision highp float;
+// from uintModTest
+
+in uint u;
+out vec4 fragColor;
+
+void main() {
+  uint m = (u) % (2);
+  fragColor = vec4(float(m), 0.0, 0.0, 1.0);
 }
 

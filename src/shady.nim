@@ -239,6 +239,9 @@ proc addSmart(res: var string, c: char, others = {'}'}) =
 
 proc toCodeStmts(n: NimNode, res: var string, level = 0)
 
+proc isIntegerType(t: string): bool =
+  t in ["int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64"]
+
 proc toCode(n: NimNode, res: var string, level = 0) =
   ## Inner code block.
 
@@ -252,7 +255,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.addSmart ';'
 
   of nnkInfix:
-    if n[0].repr in ["mod"] and n[1].getType().repr != "int":
+    if n[0].repr in ["mod"] and not isIntegerType(n[1].getType().repr):
       # In Nim float mod and integer made are same thing.
       # In GLSL mod(float, float) is a function while % is for integers.
       res.add n[0].repr
@@ -444,6 +447,8 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       res.add $n[1].intVal.float64
     elif typeStr == "float" and n[1].kind == nnkFloatLit:
       res.add $n[1].floatVal.float64
+    elif typeStr in ["int", "uint"] and n[1].kind in {nnkIntLit .. nnkInt64Lit}:
+      n[1].toCode(res)
     else:
       for j in 1 .. n.len-1:
         res.add typeStr
@@ -987,7 +992,7 @@ type
 var
   ## GLSL globals.
   gl_Position*: Vec4
-  gl_VertexID*: uint32
+  gl_VertexID*: int32
 
 proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
   vec4(buffer.data[index.int], 0, 0, 0)

@@ -297,6 +297,31 @@ block:
     fragColor = vec4(m, s, c, 1.0)
   log toGLSL(mathBuiltinShader)
 
+block:
+  log "--------------------------------------------------"
+  log "gl_VertexID and integer mod (Silky-like):"
+  var mvp: Uniform[Mat4]
+  var atlasSize: Uniform[Vec2]
+  type SilkyVertex = object
+    pos: Vec2
+    uvPos: array[2, uint16]
+    color: ColorRGBX
+
+  proc silkyVertTest(v: SilkyVertex, fragmentUv: var Vec2) =
+    let corner = uvec2(uint32(gl_VertexID mod 2), uint32(gl_VertexID div 2))
+    let dx = v.pos.x + float32(corner.x) * 10.0
+    gl_Position = mvp * vec4(dx, v.pos.y, 0.0, 1.0)
+    fragmentUv = vec2(dx, v.pos.y) / atlasSize
+  log toGLSL(silkyVertTest, "300 es")
+
+block:
+  log "--------------------------------------------------"
+  log "Uint32 mod and explicit conversion:"
+  proc uintModTest(u: uint32, fragColor: var Vec4) =
+    let m = u mod 2
+    fragColor = vec4(float32(m), 0, 0, 1)
+  log toGLSL(uintModTest)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:
