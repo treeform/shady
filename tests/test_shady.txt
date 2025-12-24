@@ -126,7 +126,8 @@ Testin +*() presedence.
 precision highp float;
 // from presedence
 
-in r y;
+in float y;
+in float r;
 out float a;
 
 void main() {
@@ -284,5 +285,94 @@ void main() {
   } else {
     fragColor = vec4(1.0, 1.0, 1.0, 1.0);
   }
+}
+
+--------------------------------------------------
+Type conversions and unary minus:
+#version 410
+precision highp float;
+// from conversionShader
+
+flat in int i;
+in float f;
+out vec4 fragColor;
+
+void main() {
+  float f2 = float(i);
+  int i2 = int(f);
+  fragColor = vec4(f2, float(i2), - (f), 1.0);
+}
+
+--------------------------------------------------
+Image storage (compute-like):
+#version 410
+precision highp float;
+// from imageShader
+
+writeonly uniform imageBuffer outputImage;
+
+out vec4 fragColor;
+
+void main() {
+  imageStore(outputImage, int(0), vec4(1.0, 1.0, 0.0, 1.0));
+  fragColor = vec4(1.0, 0.0, 1.0, 1.0);
+}
+
+--------------------------------------------------
+Derivatives, fract and mod:
+#version 410
+precision highp float;
+// from mathExtraShader
+
+in vec2 v;
+out vec4 fragColor;
+
+void main() {
+  float dx = dFdx(v.x);
+  float fw = fwidth(v.y);
+  float fr = fract(v.x);
+  float mo = mod(v.y, float(2.0));
+  fragColor = vec4(dx, fw, fr, mo);
+}
+
+--------------------------------------------------
+discardFragment and break:
+#version 410
+precision highp float;
+// from discardShader
+
+in vec2 v;
+out vec4 fragColor;
+
+void main() {
+  if (float(v.x) < 0.0) {
+    discard;
+  }
+  float sum = 0.0;
+  for(int i = 0; i < 10; i++) {
+    if (5 < i) {
+      break;
+    }
+    sum += 1.0;
+  }
+  fragColor = vec4(float(sum / 10.0), 0.0, 0.0, 1.0);
+}
+
+--------------------------------------------------
+Built-in math (mix, smoothstep, clamp):
+#version 410
+precision highp float;
+// from mathBuiltinShader
+
+in float a;
+in float b;
+in float t;
+out vec4 fragColor;
+
+void main() {
+  float m = mix(a, b, t);
+  float s = smoothstep(0.0, 1.0, t);
+  float c = clamp(t, 0.0, 1.0);
+  fragColor = vec4(m, s, c, 1.0);
 }
 

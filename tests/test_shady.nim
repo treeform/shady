@@ -239,6 +239,61 @@ block:
       fragColor = vec4(1, 1, 1, 1)
   log toGLSL(complexShader)
 
+block:
+  log "--------------------------------------------------"
+  log "Type conversions and unary minus:"
+  proc conversionShader(i: int, f: float32, fragColor: var Vec4) =
+    let f2 = float32(i)
+    let i2 = int32(f)
+    fragColor = vec4(f2, float32(i2), -f, 1.0)
+  log toGLSL(conversionShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Image storage (compute-like):"
+  var outputImage: UniformWriteOnly[ImageBuffer]
+  proc imageShader(fragColor: var Vec4) =
+    imageStore(outputImage, 0, vec4(1, 1, 0, 1))
+    fragColor = vec4(1, 0, 1, 1)
+  log toGLSL(imageShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Derivatives, fract and mod:"
+  proc mathExtraShader(v: Vec2, fragColor: var Vec4) =
+    let dx = dFdx(v.x)
+    let fw = fwidth(v.y)
+    let fr = fract(v.x)
+    let mo = fmod(v.y, 2.0.float32)
+    fragColor = vec4(dx, fw, fr, mo)
+  log toGLSL(mathExtraShader)
+  assert fmod(1.5.float32, 1.0.float32) == 0.5.float32
+  assert fmod(-0.5.float32, 1.0.float32) == 0.5.float32
+
+block:
+  log "--------------------------------------------------"
+  log "discardFragment and break:"
+  proc discardShader(v: Vec2, fragColor: var Vec4) =
+    if v.x < 0.0:
+      discardFragment()
+    var sum = 0.0
+    for i in 0 ..< 10:
+      if i > 5:
+        break
+      sum += 1.0
+    fragColor = vec4(sum / 10.0, 0, 0, 1)
+  log toGLSL(discardShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Built-in math (mix, smoothstep, clamp):"
+  proc mathBuiltinShader(a, b, t: float32, fragColor: var Vec4) =
+    let m = mix(a, b, t)
+    let s = smoothstep(0.0, 1.0, t)
+    let c = clamp(t, 0.0, 1.0)
+    fragColor = vec4(m, s, c, 1.0)
+  log toGLSL(mathBuiltinShader)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:

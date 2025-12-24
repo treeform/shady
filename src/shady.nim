@@ -45,6 +45,7 @@ proc typeRename(t: string): string =
   of "Sampler2d": "sampler2D"
   of "USampler2d": "usampler2D"
   of "Sampler2dArray": "sampler2DArray"
+  of "ImageBuffer": "imageBuffer"
   of "UImageBuffer": "uimageBuffer"
   else: t
 
@@ -148,10 +149,11 @@ const glslFunctions = [
   "[]", "[]=",
   "inverse",
   "sin", "cos", "tan", "pow",
+  "fmod",
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",
   "dFdx", "dFdy", "fract", "fwidth",
-  "smoothstep", "inc", "dec"
+  "smoothstep", "inc", "dec", "discardFragment"
 ]
 
 ## Simply SKIP these functions.
@@ -178,6 +180,7 @@ proc procRename(t: string): string =
   of "not": "!"
   of "and": "&&"
   of "or": "||"
+  of "fmod": "mod"
   of "mod": "%"
   of "div": "/"
   else: t.replace("`", "_")
@@ -678,37 +681,38 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
     of nnkFormalParams:
       ## Main function parameters are different in they they go in as globals.
       res.addGap()
-      for param in n:
-        if param.kind != nnkEmpty:
-          if param[0].strVal in ["gl_FragColor", "gl_Position"]:
-            continue
-          if param[1].kind == nnkVarTy:
-            #if param[0].strVal == "fragColor":
-            #  res.add "layout(location = 0) "
-            if param[1][0].repr == "seq":
-              res.add "buffer?"
-              res.add param[1].repr
+      for paramDefs in n:
+        if paramDefs.kind == nnkIdentDefs:
+          let typeNode = paramDefs[^2]
+          for i in 0 ..< paramDefs.len - 2:
+            let param = paramDefs[i]
+            if param.strVal in ["gl_FragColor", "gl_Position"]:
               continue
-            elif param[1][0].repr == "int":
-              res.add "flat "
-            res.add "out "
-            res.add typeRename(param[1][0].strVal)
-          else:
-            if param[1].kind == nnkBracketExpr:
-              res.add typeRename(param[1][0].strVal)
-              res.add " "
-              res.add typeRename(param[1][1].strVal)
-            else:
-              if param[0].strVal == "gl_FragCoord":
-                res.add "layout(origin_upper_left) "
-              if param[1].strVal == "int":
+            if typeNode.kind == nnkVarTy:
+              if typeNode[0].repr == "seq":
+                res.add "buffer?"
+                res.add typeNode.repr
+                continue
+              elif typeNode[0].repr == "int":
                 res.add "flat "
-              res.add "in "
-              res.add typeRename(param[1].strVal)
-          res.add " "
-          res.add param[0].strVal
-          res.addSmart ';'
-          res.add "\n"
+              res.add "out "
+              res.add typeRename(typeNode[0].strVal)
+            else:
+              if typeNode.kind == nnkBracketExpr:
+                res.add typeRename(typeNode[0].strVal)
+                res.add " "
+                res.add typeRename(typeNode[1].strVal)
+              else:
+                if param.strVal == "gl_FragCoord":
+                  res.add "layout(origin_upper_left) "
+                if typeNode.strVal == "int":
+                  res.add "flat "
+                res.add "in "
+                res.add typeRename(typeNode.strVal)
+            res.add " "
+            res.add param.strVal
+            res.addSmart ';'
+            res.add "\n"
     else:
       res.addGap()
       res.add "void main() {\n"
@@ -1035,14 +1039,74 @@ proc vec4*(c: ColorRGBX): Vec4 =
     c.a.float32/255
   )
 
+proc dFdx*(a: float32): float32 =
+  raise newException(Exception, "dFdx is not implemented")
+
 proc dFdx*(a: Vec2): Vec2 =
   raise newException(Exception, "dFdx is not implemented")
+
+proc dFdx*(a: Vec3): Vec3 =
+  raise newException(Exception, "dFdx is not implemented")
+
+proc dFdx*(a: Vec4): Vec4 =
+  raise newException(Exception, "dFdx is not implemented")
+
+proc dFdy*(a: float32): float32 =
+  raise newException(Exception, "dFdy is not implemented")
 
 proc dFdy*(a: Vec2): Vec2 =
   raise newException(Exception, "dFdy is not implemented")
 
+proc dFdy*(a: Vec3): Vec3 =
+  raise newException(Exception, "dFdy is not implemented")
+
+proc dFdy*(a: Vec4): Vec4 =
+  raise newException(Exception, "dFdy is not implemented")
+
+proc fwidth*(a: float32): float32 =
+  raise newException(Exception, "fwidth is not implemented")
+
 proc fwidth*(a: Vec2): Vec2 =
   raise newException(Exception, "fwidth is not implemented")
+
+proc fwidth*(a: Vec3): Vec3 =
+  raise newException(Exception, "fwidth is not implemented")
+
+proc fwidth*(a: Vec4): Vec4 =
+  raise newException(Exception, "fwidth is not implemented")
+
+proc fmod*(x, y: float32): float32 =
+  x - y * floor(x / y)
+
+proc fmod*(x: Vec2, y: float32): Vec2 =
+  vec2(fmod(x.x, y), fmod(x.y, y))
+
+proc fmod*(x: Vec3, y: float32): Vec3 =
+  vec3(fmod(x.x, y), fmod(x.y, y), fmod(x.z, y))
+
+proc fmod*(x: Vec4, y: float32): Vec4 =
+  vec4(fmod(x.x, y), fmod(x.y, y), fmod(x.z, y), fmod(x.w, y))
+
+proc fmod*(x, y: Vec2): Vec2 =
+  vec2(fmod(x.x, y.x), fmod(x.y, y.y))
+
+proc fmod*(x, y: Vec3): Vec3 =
+  vec3(fmod(x.x, y.x), fmod(x.y, y.y), fmod(x.z, y.z))
+
+proc fmod*(x, y: Vec4): Vec4 =
+  vec4(fmod(x.x, y.x), fmod(x.y, y.y), fmod(x.z, y.z), fmod(x.w, y.w))
+
+proc fract*(a: float32): float32 =
+  raise newException(Exception, "fract is not implemented")
+
+proc fract*(a: Vec2): Vec2 =
+  raise newException(Exception, "fract is not implemented")
+
+proc fract*(a: Vec3): Vec3 =
+  raise newException(Exception, "fract is not implemented")
+
+proc fract*(a: Vec4): Vec4 =
+  raise newException(Exception, "fract is not implemented")
 
 proc smoothstep*(a, b, x: Vec2): Vec2 =
   raise newException(Exception, "smoothstep is not implemented")
