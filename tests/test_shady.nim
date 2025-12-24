@@ -153,6 +153,33 @@ block:
     a = exp(-(y*y).float32/(r*r)*2)
   log toGLSL(presedence)
 
+block:
+  log "--------------------------------------------------"
+  log "Structs for interleaved buffers:"
+
+  type Vertex = object
+    pos: Vec2
+    color: ColorRGBX
+
+  proc structShader(v: Vertex, fragColor: var Vec4) =
+    fragColor = vec4(v.color)
+
+  log toGLSL(structShader)
+
+block:
+  log "--------------------------------------------------"
+  log "Structs with arrays (SilkyVertex-like):"
+
+  type SilkyVertex = object
+    pos: Vec2
+    uvPos: array[2, uint16]
+    color: ColorRGBX
+
+  proc silkyShader(v: SilkyVertex, fragColor: var Vec4) =
+    fragColor = vec4(v.color)
+
+  log toGLSL(silkyShader)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:

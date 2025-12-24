@@ -146,3 +146,42 @@ void main() {
   a = exp((- (float(y * y)) / (r * r)) * 2.0);
 }
 
+--------------------------------------------------
+Structs for interleaved buffers:
+#version 410
+precision highp float;
+// from structShader
+
+struct Vertex {
+  vec2 pos;
+  vec4 color;
+};
+
+
+in Vertex v;
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(v.color);
+}
+
+--------------------------------------------------
+Structs with arrays (SilkyVertex-like):
+#version 410
+precision highp float;
+// from silkyShader
+
+struct SilkyVertex {
+  vec2 pos;
+  vec2 uvPos;
+  vec4 color;
+};
+
+
+in SilkyVertex v;
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(v.color);
+}
+
