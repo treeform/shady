@@ -79,7 +79,7 @@
     <summary><a class="reference reference-toplevel" href="#8" id="58">Vars</a></summary>
     <ul class="simple simple-toc-section">
       <li><a class="reference" href="#gl_Position" title="gl_Position: Vec4">gl_Position</a></li>
-<li><a class="reference" href="#gl_VertexID" title="gl_VertexID: uint32">gl_VertexID</a></li>
+<li><a class="reference" href="#gl_VertexID" title="gl_VertexID: int32">gl_VertexID</a></li>
 
     </ul>
   </details>
@@ -89,19 +89,45 @@
     <summary><a class="reference reference-toplevel" href="#12" id="62">Procs</a></summary>
     <ul class="simple simple-toc-section">
       <ul class="simple nested-toc-section">dFdx
-  <li><a class="reference" href="#dFdx%2CVec2" title="dFdx(a: Vec2): Vec2">dFdx(a: Vec2): Vec2</a></li>
+  <li><a class="reference" href="#dFdx%2Cfloat32" title="dFdx(a: float32): float32">dFdx(a: float32): float32</a></li>
+<li><a class="reference" href="#dFdx%2CVec2" title="dFdx(a: Vec2): Vec2">dFdx(a: Vec2): Vec2</a></li>
+<li><a class="reference" href="#dFdx%2CVec3" title="dFdx(a: Vec3): Vec3">dFdx(a: Vec3): Vec3</a></li>
+<li><a class="reference" href="#dFdx%2CVec4" title="dFdx(a: Vec4): Vec4">dFdx(a: Vec4): Vec4</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">dFdy
-  <li><a class="reference" href="#dFdy%2CVec2" title="dFdy(a: Vec2): Vec2">dFdy(a: Vec2): Vec2</a></li>
+  <li><a class="reference" href="#dFdy%2Cfloat32" title="dFdy(a: float32): float32">dFdy(a: float32): float32</a></li>
+<li><a class="reference" href="#dFdy%2CVec2" title="dFdy(a: Vec2): Vec2">dFdy(a: Vec2): Vec2</a></li>
+<li><a class="reference" href="#dFdy%2CVec3" title="dFdy(a: Vec3): Vec3">dFdy(a: Vec3): Vec3</a></li>
+<li><a class="reference" href="#dFdy%2CVec4" title="dFdy(a: Vec4): Vec4">dFdy(a: Vec4): Vec4</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">discardFragment
   <li><a class="reference" href="#discardFragment" title="discardFragment()">discardFragment()</a></li>
 
 </ul>
+<ul class="simple nested-toc-section">fmod
+  <li><a class="reference" href="#fmod%2Cfloat32%2Cfloat32" title="fmod(x, y: float32): float32">fmod(x, y: float32): float32</a></li>
+<li><a class="reference" href="#fmod%2CVec2%2CVec2" title="fmod(x, y: Vec2): Vec2">fmod(x, y: Vec2): Vec2</a></li>
+<li><a class="reference" href="#fmod%2CVec3%2CVec3" title="fmod(x, y: Vec3): Vec3">fmod(x, y: Vec3): Vec3</a></li>
+<li><a class="reference" href="#fmod%2CVec4%2CVec4" title="fmod(x, y: Vec4): Vec4">fmod(x, y: Vec4): Vec4</a></li>
+<li><a class="reference" href="#fmod%2CVec2%2Cfloat32" title="fmod(x: Vec2; y: float32): Vec2">fmod(x: Vec2; y: float32): Vec2</a></li>
+<li><a class="reference" href="#fmod%2CVec3%2Cfloat32" title="fmod(x: Vec3; y: float32): Vec3">fmod(x: Vec3; y: float32): Vec3</a></li>
+<li><a class="reference" href="#fmod%2CVec4%2Cfloat32" title="fmod(x: Vec4; y: float32): Vec4">fmod(x: Vec4; y: float32): Vec4</a></li>
+
+</ul>
+<ul class="simple nested-toc-section">fract
+  <li><a class="reference" href="#fract%2Cfloat32" title="fract(a: float32): float32">fract(a: float32): float32</a></li>
+<li><a class="reference" href="#fract%2CVec2" title="fract(a: Vec2): Vec2">fract(a: Vec2): Vec2</a></li>
+<li><a class="reference" href="#fract%2CVec3" title="fract(a: Vec3): Vec3">fract(a: Vec3): Vec3</a></li>
+<li><a class="reference" href="#fract%2CVec4" title="fract(a: Vec4): Vec4">fract(a: Vec4): Vec4</a></li>
+
+</ul>
 <ul class="simple nested-toc-section">fwidth
-  <li><a class="reference" href="#fwidth%2CVec2" title="fwidth(a: Vec2): Vec2">fwidth(a: Vec2): Vec2</a></li>
+  <li><a class="reference" href="#fwidth%2Cfloat32" title="fwidth(a: float32): float32">fwidth(a: float32): float32</a></li>
+<li><a class="reference" href="#fwidth%2CVec2" title="fwidth(a: Vec2): Vec2">fwidth(a: Vec2): Vec2</a></li>
+<li><a class="reference" href="#fwidth%2CVec3" title="fwidth(a: Vec3): Vec3">fwidth(a: Vec3): Vec3</a></li>
+<li><a class="reference" href="#fwidth%2CVec4" title="fwidth(a: Vec4): Vec4">fwidth(a: Vec4): Vec4</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">imageLoad
@@ -185,8 +211,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L856" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L856" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L972" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L972" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -196,8 +222,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L861" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L861" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L977" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L977" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -207,8 +233,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L867" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L867" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L983" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L983" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -218,8 +244,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L873" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L873" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L989" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L989" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -229,8 +255,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L858" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L858" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L974" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L974" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -240,8 +266,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L864" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L864" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L980" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L980" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -250,8 +276,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L854" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L854" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L970" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L970" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -260,8 +286,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L855" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L855" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L971" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L971" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -271,8 +297,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L870" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L870" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L986" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L986" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -287,18 +313,18 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L878" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L878" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L994" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L994" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="gl_VertexID">
-  <dt><pre><a href="shady.html#gl_VertexID"><span class="Identifier">gl_VertexID</span></a><span class="Other">:</span> <span class="Identifier">uint32</span></pre></dt>
+  <dt><pre><a href="shady.html#gl_VertexID"><span class="Identifier">gl_VertexID</span></a><span class="Other">:</span> <span class="Identifier">int32</span></pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L879" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L879" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L995" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L995" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -309,26 +335,86 @@
   <h1><a class="toc-backref" href="#12">Procs</a></h1>
   <dl class="item">
     <div id="dFdx-procs-all">
-  <div id="dFdx,Vec2">
+  <div id="dFdx,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#dFdx%2Cfloat32"><span class="Identifier">dFdx</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1047" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1047" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="dFdx,Vec2">
   <dt><pre><span class="Keyword">proc</span> <a href="#dFdx%2CVec2"><span class="Identifier">dFdx</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L931" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L931" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1050" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1050" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="dFdx,Vec3">
+  <dt><pre><span class="Keyword">proc</span> <a href="#dFdx%2CVec3"><span class="Identifier">dFdx</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1053" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1053" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="dFdx,Vec4">
+  <dt><pre><span class="Keyword">proc</span> <a href="#dFdx%2CVec4"><span class="Identifier">dFdx</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1056" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1056" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="dFdy-procs-all">
-  <div id="dFdy,Vec2">
+  <div id="dFdy,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#dFdy%2Cfloat32"><span class="Identifier">dFdy</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1059" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1059" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="dFdy,Vec2">
   <dt><pre><span class="Keyword">proc</span> <a href="#dFdy%2CVec2"><span class="Identifier">dFdy</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L934" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L934" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1062" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1062" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="dFdy,Vec3">
+  <dt><pre><span class="Keyword">proc</span> <a href="#dFdy%2CVec3"><span class="Identifier">dFdy</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1065" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1065" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="dFdy,Vec4">
+  <dt><pre><span class="Keyword">proc</span> <a href="#dFdy%2CVec4"><span class="Identifier">dFdy</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1068" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1068" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -340,21 +426,167 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L979" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L979" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1156" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1156" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+
+</div>
+<div id="fmod-procs-all">
+  <div id="fmod,float32,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fmod%2Cfloat32%2Cfloat32"><span class="Identifier">fmod</span></a><span class="Other">(</span><span class="Identifier">x</span><span class="Other">,</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1083" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1083" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fmod,Vec2,Vec2">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fmod%2CVec2%2CVec2"><span class="Identifier">fmod</span></a><span class="Other">(</span><span class="Identifier">x</span><span class="Other">,</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1095" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1095" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fmod,Vec3,Vec3">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fmod%2CVec3%2CVec3"><span class="Identifier">fmod</span></a><span class="Other">(</span><span class="Identifier">x</span><span class="Other">,</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1098" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1098" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fmod,Vec4,Vec4">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fmod%2CVec4%2CVec4"><span class="Identifier">fmod</span></a><span class="Other">(</span><span class="Identifier">x</span><span class="Other">,</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1101" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1101" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fmod,Vec2,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fmod%2CVec2%2Cfloat32"><span class="Identifier">fmod</span></a><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">;</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1086" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1086" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fmod,Vec3,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fmod%2CVec3%2Cfloat32"><span class="Identifier">fmod</span></a><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">;</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1089" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1089" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fmod,Vec4,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fmod%2CVec4%2Cfloat32"><span class="Identifier">fmod</span></a><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">;</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1092" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1092" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+
+</div>
+<div id="fract-procs-all">
+  <div id="fract,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fract%2Cfloat32"><span class="Identifier">fract</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1104" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1104" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fract,Vec2">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fract%2CVec2"><span class="Identifier">fract</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1107" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1107" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fract,Vec3">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fract%2CVec3"><span class="Identifier">fract</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1110" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1110" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fract,Vec4">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fract%2CVec4"><span class="Identifier">fract</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1113" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1113" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 
 </div>
 <div id="fwidth-procs-all">
-  <div id="fwidth,Vec2">
+  <div id="fwidth,float32">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fwidth%2Cfloat32"><span class="Identifier">fwidth</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1071" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1071" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fwidth,Vec2">
   <dt><pre><span class="Keyword">proc</span> <a href="#fwidth%2CVec2"><span class="Identifier">fwidth</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L937" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L937" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1074" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1074" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fwidth,Vec3">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fwidth%2CVec3"><span class="Identifier">fwidth</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1077" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1077" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+
+  </dd>
+</div>
+<div id="fwidth,Vec4">
+  <dt><pre><span class="Keyword">proc</span> <a href="#fwidth%2CVec4"><span class="Identifier">fwidth</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dd>
+    
+    
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1080" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1080" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -367,8 +599,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L892" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L892" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1008" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1008" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -381,8 +613,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L914" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L914" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1030" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1030" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -392,8 +624,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L907" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L907" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1023" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1023" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -403,8 +635,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L900" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L900" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1016" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1016" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -412,46 +644,42 @@
 </div>
 <div id="smoothstep-procs-all">
   <div id="smoothstep,float32,float32,float32">
-  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2Cfloat32%2Cfloat32%2Cfloat32"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
-    <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2Cfloat32%2Cfloat32%2Cfloat32"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">float32</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float32</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L949" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L949" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1116" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1116" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="smoothstep,Vec2,Vec2,Vec2">
-  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec2%2CVec2%2CVec2"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
-                                       <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec2%2CVec2%2CVec2"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec2</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec2</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L940" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L940" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1120" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1120" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="smoothstep,Vec3,Vec3,Vec3">
-  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec3%2CVec3%2CVec3"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
-                                       <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec3%2CVec3%2CVec3"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec3</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec3</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L943" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L943" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1123" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1123" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="smoothstep,Vec4,Vec4,Vec4">
-  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec4%2CVec4%2CVec4"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">Exception</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
-                                       <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+  <dt><pre><span class="Keyword">proc</span> <a href="#smoothstep%2CVec4%2CVec4%2CVec4"><span class="Identifier">smoothstep</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">,</span> <span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">Vec4</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Vec4</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L946" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L946" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1126" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1126" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -464,8 +692,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L884" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L884" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1000" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1000" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -474,8 +702,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L881" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L881" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L997" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L997" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -485,8 +713,8 @@
   <dd>
     
     CPU stub for usampler2D; not used at runtime. Returns zeros.
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L888" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L888" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1004" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1004" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -499,8 +727,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L952" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L952" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1129" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1129" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -513,8 +741,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L963" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L963" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1140" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1140" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -524,8 +752,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L971" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L971" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1148" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1148" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -538,8 +766,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L960" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L960" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1137" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1137" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -552,8 +780,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L798" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L798" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L906" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L906" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -565,8 +793,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L923" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L923" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L1039" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L1039" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -584,8 +812,8 @@
   <dd>
     
     Converts proc to a glsl string.
-    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L843" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L843" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady.nim#L959" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady.nim#L959" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -601,7 +829,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2025-12-10 23:29:20 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2025-12-24 16:31:19 UTC</small>
       </div>
     </div>
   </div>
