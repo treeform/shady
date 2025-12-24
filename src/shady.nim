@@ -1108,17 +1108,18 @@ proc fract*(a: Vec3): Vec3 =
 proc fract*(a: Vec4): Vec4 =
   vec4(fract(a.x), fract(a.y), fract(a.z), fract(a.w))
 
+proc smoothstep*(a, b, x: float32): float32 =
+  let t = clamp((x - a) / (b - a), 0.0, 1.0)
+  t * t * (3.0 - 2.0 * t)
+
 proc smoothstep*(a, b, x: Vec2): Vec2 =
-  raise newException(Exception, "smoothstep is not implemented")
+  vec2(smoothstep(a.x, b.x, x.x), smoothstep(a.y, b.y, x.y))
 
 proc smoothstep*(a, b, x: Vec3): Vec3 =
-  raise newException(Exception, "smoothstep is not implemented")
+  vec3(smoothstep(a.x, b.x, x.x), smoothstep(a.y, b.y, x.y), smoothstep(a.z, b.z, x.z))
 
 proc smoothstep*(a, b, x: Vec4): Vec4 =
-  raise newException(Exception, "smoothstep is not implemented")
-
-proc smoothstep*(a, b, x: float32): float32 =
-  raise newException(Exception, "smoothstep is not implemented")
+  vec4(smoothstep(a.x, b.x, x.x), smoothstep(a.y, b.y, x.y), smoothstep(a.z, b.z, x.z), smoothstep(a.w, b.w, x.w))
 
 proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
   let pos = pos - vec2(0.5 / buffer.image.width.float32, 0.5 /
