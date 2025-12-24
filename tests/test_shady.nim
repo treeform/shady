@@ -269,6 +269,8 @@ block:
   log toGLSL(mathExtraShader)
   assert fmod(1.5.float32, 1.0.float32) == 0.5.float32
   assert fmod(-0.5.float32, 1.0.float32) == 0.5.float32
+  assert fract(1.5.float32) == 0.5.float32
+  assert fract(-0.5.float32) == 0.5.float32
 
 block:
   log "--------------------------------------------------"

@@ -1097,16 +1097,16 @@ proc fmod*(x, y: Vec4): Vec4 =
   vec4(fmod(x.x, y.x), fmod(x.y, y.y), fmod(x.z, y.z), fmod(x.w, y.w))
 
 proc fract*(a: float32): float32 =
-  raise newException(Exception, "fract is not implemented")
+  a - floor(a)
 
 proc fract*(a: Vec2): Vec2 =
-  raise newException(Exception, "fract is not implemented")
+  vec2(fract(a.x), fract(a.y))
 
 proc fract*(a: Vec3): Vec3 =
-  raise newException(Exception, "fract is not implemented")
+  vec3(fract(a.x), fract(a.y), fract(a.z))
 
 proc fract*(a: Vec4): Vec4 =
-  raise newException(Exception, "fract is not implemented")
+  vec4(fract(a.x), fract(a.y), fract(a.z), fract(a.w))
 
 proc smoothstep*(a, b, x: Vec2): Vec2 =
   raise newException(Exception, "smoothstep is not implemented")
