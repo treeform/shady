@@ -39,6 +39,7 @@ proc typeRename(t: string): string =
   of "Uniform": "uniform"
   of "UniformWriteOnly": "writeonly uniform"
   of "Attribute": "attribute"
+  of "ColorRGBX": "vec4"
 
   of "SamplerBuffer": "samplerBuffer"
   of "Sampler2d": "sampler2D"
@@ -73,6 +74,33 @@ proc typeString(n: NimNode): string =
     of "Uniform[float32]": "float"
     of "Uniform[int]": "int"
     else:
+      if n[0].repr == "array":
+        var length = 0
+        if n[1].kind == nnkIntLit:
+          length = n[1].intVal.int
+        elif n[1].kind == nnkBracketExpr and n[1].len == 3 and n[1][0].repr == "..":
+           # array[0..1, T] case
+           length = n[1][2].intVal.int - n[1][1].intVal.int + 1
+        elif n[1].kind == nnkInfix and n[1].len == 3 and n[1][0].repr == "..":
+           # array[0..1, T] case
+           length = n[1][2].intVal.int - n[1][1].intVal.int + 1
+        
+        if length == 2:
+          if n[2].repr == "uint16": return "vec2"
+          if n[2].repr in ["uint32"]: return "uvec2"
+          if n[2].repr in ["int16", "int32"]: return "ivec2"
+          if n[2].repr in ["float32", "float64"]: return "vec2"
+        elif length == 3:
+          if n[2].repr == "uint16": return "vec3"
+          if n[2].repr in ["uint32"]: return "uvec3"
+          if n[2].repr in ["int16", "int32"]: return "ivec3"
+          if n[2].repr in ["float32", "float64"]: return "vec3"
+        elif length == 4:
+          if n[2].repr == "uint16": return "vec4"
+          if n[2].repr in ["uint32"]: return "uvec4"
+          if n[2].repr in ["int16", "int32"]: return "ivec4"
+          if n[2].repr in ["float32", "float64"]: return "vec4"
+      
       err "can't figure out type: " & n.repr, n
 
 ## Default constructor for different GLSL types.
@@ -733,10 +761,50 @@ proc procDef(topLevelNode: NimNode): string =
           result.add "return result;\n"
       result.add "}"
 
+proc gatherTypes(
+  typeInst: NimNode,
+  types: var Table[string, string]
+) =
+  ## Looks for types used and gathers their struct definitions.
+  var typeInst = typeInst
+  if typeInst.kind == nnkVarTy:
+    typeInst = typeInst[0]
+  if typeInst.kind == nnkBracketExpr:
+    for i in 1 ..< typeInst.len:
+      gatherTypes(typeInst[i], types)
+    return
+
+  if typeInst.kind == nnkSym:
+    let name = typeInst.strVal
+    if name in types: return
+    if typeRename(name) != name: return
+    if name in ["ColorRGBX"]:
+      # Special case for ColorRGBX which is handled as vec4.
+      return
+
+    let impl = typeInst.getImpl()
+    if impl.kind == nnkTypeDef and impl[2].kind == nnkObjectTy:
+      var def = "struct " & name & " {\n"
+      let obj = impl[2]
+      let reclist = obj[2]
+      for field in reclist:
+        if field.kind == nnkIdentDefs:
+          let fieldTypeNode = field[^2]
+          let fieldType = fieldTypeNode.getTypeInst()
+          gatherTypes(fieldType, types)
+          for i in 0 ..< field.len - 2:
+            var fieldName = field[i].repr
+            if fieldName.endsWith("*"):
+              fieldName = fieldName[0 .. ^2]
+            def.add "  " & typeString(fieldType) & " " & fieldName & ";\n"
+      def.add "};"
+      types[name] = def
+
 proc gatherFunction(
   topLevelNode: NimNode,
   functions: var Table[string, string],
-  globals: var Table[string, string]
+  globals: var Table[string, string],
+  types: var Table[string, string]
 ) =
 
   ## Looks for functions this function calls and brings them up
@@ -755,14 +823,15 @@ proc gatherFunction(
             } and impl.kind != nnkNilLit:
             var defStr = ""
             let typeInst = n.getTypeInst
+            gatherTypes(typeInst, types)
             if typeInst.kind == nnkBracketExpr:
               # might be a uniform
               if typeInst[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
                 defStr.add typeRename(typeInst[0].repr)
                 defStr.add " "
-                defStr.add typeRename(typeInst[1].repr)
+                defStr.add typeString(typeInst[1])
               elif typeInst[0].repr == "array":
-                defStr.add typeRename(typeInst[2].repr)
+                defStr.add typeString(typeInst[2])
                 defStr.add "["
                 defStr.add typeRename(typeInst[1][2].repr)
                 defStr.add "]"
@@ -790,10 +859,16 @@ proc gatherFunction(
         not isVectorAccess(procName):
         ## If its not a builtin proc, we need to bring definition.
         let impl = n[0].getImpl()
-        gatherFunction(impl, functions, globals)
+        gatherFunction(impl, functions, globals, types)
         functions[procName] = procDef(impl)
 
-    gatherFunction(n, functions, globals)
+    if n.kind == nnkFormalParams:
+      for i in 1 ..< n.len:
+        let paramDef = n[i]
+        let paramType = paramDef[^2].getTypeInst()
+        gatherTypes(paramType, types)
+
+    gatherFunction(n, functions, globals, types)
 
 proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
@@ -809,9 +884,15 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   # Gather all globals and functions, and globals and functions they use.
   var functions: Table[string, string]
   var globals: Table[string, string]
-  gatherFunction(n, functions, globals)
+  var types: Table[string, string]
+  gatherFunction(n, functions, globals, types)
 
-  # Put globals first.
+  # Put types first.
+  for k, v in types:
+    code.add(v)
+    code.add "\n"
+
+  # Put globals next.
   for k, v in globals:
     code.add(v)
     code.add "\n"

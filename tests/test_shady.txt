@@ -1,0 +1,148 @@
+--------------------------------------------------
+Basic fragment shader:
+#version 410
+precision highp float;
+// from basicFrag
+
+
+
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+--------------------------------------------------
+Fragment with a function:
+#version 410
+precision highp float;
+// from functionFrag
+
+
+void vec3Fun(inout vec3 output);
+
+
+void vec3Fun(
+  inout vec3 output
+) {
+  output = vec3(0.5, 0.3, 0.1);
+}
+out vec4 fragColor;
+
+void main() {
+  vec3 v = vec3(0.0);
+  vec3Fun(v);
+  fragColor.x = v.x;
+  fragColor.y = v.y;
+  fragColor.z = v.z;
+}
+
+--------------------------------------------------
+Using var, let and math operators.
+#version 410
+precision highp float;
+// from mathFrag
+
+
+
+in vec2 uv;
+in vec4 color;
+in vec3 normal;
+flat in int texelOffset;
+out vec4 fragColor;
+
+void main() {
+  vec3 a = vec3(0.5, 0.5, 0.5);
+  vec3 b = vec3(0.5, 0.5, 0.5);
+  vec3 c = vec3(1.0, 1.0, 1.0);
+  vec3 d = vec3(1.0, 0.0, 1.0);
+  vec3 e = vec3(1.0, 0.0, 0.0);
+  vec3 f = color.xyz * dot(normal, normalize(vec3(1.0, 1.0, 1.0)));
+  fragColor.x = f.x;
+  fragColor.y = f.y;
+  fragColor.z = f.z;
+  fragColor.w = 1.0;
+}
+
+--------------------------------------------------
+Using data buffer and texelFetch.
+#version 410
+precision highp float;
+// from bufferFrag
+
+uniform samplerBuffer dataBuffer;
+
+
+out vec4 fragColor;
+
+void main() {
+  if (texelFetch(dataBuffer, 0).x == 0.0) {
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  } else {
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  }
+}
+
+--------------------------------------------------
+Using textures.
+#version 410
+precision highp float;
+// from textureFrag
+
+uniform sampler2D textureAtlasSampler;
+vec2 uv = vec2(0.5, 0.5);
+
+
+out vec4 fragColor;
+
+void main() {
+  fragColor = texture(textureAtlasSampler, uv);
+}
+
+--------------------------------------------------
+https://github.com/treeform/shady/issues/4
+#version 300 es
+precision highp float;
+// from vertexShade
+
+
+
+in vec3 position;
+in vec4 in_color;
+out vec4 color;
+
+void main() {
+  color = in_color;
+  gl_Position = position;
+}
+
+--------------------------------------------------
+Ternary operator.
+#version 410
+precision highp float;
+// from ternaryOperator
+
+
+
+out vec4 fragColor;
+in vec3 normal;
+
+void main() {
+  fragColor = vec4(float(((normal.x <= 0.0) ? (0) : (1))), float(((normal.y <= 0.0) ? (0) : (1))), float(((float(normal.z) < -0.5) ? (-0.5) : (normal.z < 0.0) ? (0.0) : (1.0))), 1.0);
+}
+
+--------------------------------------------------
+Testin +*() presedence.
+#version 410
+precision highp float;
+// from presedence
+
+
+
+in r y;
+out float a;
+
+void main() {
+  a = exp((- (float(y * y)) / (r * r)) * 2.0);
+}
+
