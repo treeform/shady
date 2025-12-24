@@ -151,7 +151,7 @@ const glslFunctions = [
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",
   "dFdx", "dFdy", "fract", "fwidth",
-  "smoothstep"
+  "smoothstep", "inc", "dec"
 ]
 
 ## Simply SKIP these functions.
@@ -298,6 +298,22 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       # Because both Nim discard and GLSL discard are keywords that do different things.
       res.add "discard"
       return
+    if n[0].strVal == "inc":
+      n[1].toCode(res)
+      if n.len == 3:
+        res.add " += "
+        n[2].toCode(res)
+      else:
+        res.add "++"
+      return
+    if n[0].strVal == "dec":
+      n[1].toCode(res)
+      if n.len == 3:
+        res.add " -= "
+        n[2].toCode(res)
+      else:
+        res.add "--"
+      return
     var procName = procRename(n[0].strVal)
     if procName in ignoreFunctions:
       return
@@ -369,7 +385,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
 
   of nnkStmtList:
     for j in 0 ..< n.len:
-      if n[j].kind in [nnkCall]:
+      if n[j].kind in [nnkCall, nnkCommand]:
         res.addIndent level
       n[j].toCode(res, level)
       if n[j].kind notin [nnkLetSection, nnkVarSection, nnkCommentStmt]:

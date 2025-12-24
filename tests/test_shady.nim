@@ -190,7 +190,12 @@ block:
     var j = 0
     while j < 5:
       sum += 0.01
-      j += 1
+      inc j
+    inc(j, 2)
+    var k = 10
+    while k > 0:
+      sum += 0.001
+      dec k
     fragColor = vec4(sum, 0.0, 0.0, 1.0)
   log toGLSL(loops)
 

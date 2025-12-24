@@ -188,6 +188,12 @@ void main() {
     sum += 0.01;
     j += 1;
   }
+  j += 2;
+  int k = 10;
+  while(0 < k) {
+    sum += 0.001;
+    k -= 1;
+  }
   fragColor = vec4(float(sum), 0.0, 0.0, 1.0);
 }
 
