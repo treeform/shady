@@ -1,63 +1,63 @@
 nimTitle	shady	shady.html	module src/shady		0
-nim	toGLSLInner	shady.html#toGLSLInner,NimNode,string,string	proc toGLSLInner(s: NimNode; version, extra: string): string		906
-nim	toGLSL	shady.html#toGLSL.m,typed,string,string	macro toGLSL(s: typed; version = "410"; extra = "precision highp float;\n"): string		959
-nim	Uniform	shady.html#Uniform	type Uniform		970
-nim	UniformWriteOnly	shady.html#UniformWriteOnly	type UniformWriteOnly		971
-nim	Attribute	shady.html#Attribute	type Attribute		972
-nim	SamplerBuffer	shady.html#SamplerBuffer	object SamplerBuffer		974
-nim	ImageBuffer	shady.html#ImageBuffer	object ImageBuffer		977
-nim	UImageBuffer	shady.html#UImageBuffer	object UImageBuffer		980
-nim	Sampler2d	shady.html#Sampler2d	object Sampler2d		983
-nim	USampler2d	shady.html#USampler2d	object USampler2d		986
-nim	Sampler2dArray	shady.html#Sampler2dArray	object Sampler2dArray		989
-nim	gl_Position	shady.html#gl_Position	var gl_Position		994
-nim	gl_VertexID	shady.html#gl_VertexID	var gl_VertexID		995
-nim	texelFetch	shady.html#texelFetch,Uniform[SamplerBuffer],SomeInteger	proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4		997
-nim	texelFetch	shady.html#texelFetch,Uniform[Sampler2d],IVec2,int	proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4		1000
-nim	texelFetch	shady.html#texelFetch,Uniform[USampler2d],IVec2,int	proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4		1004
-nim	imageLoad	shady.html#imageLoad,UniformWriteOnly[UImageBuffer],int32	proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4		1008
-nim	imageStore	shady.html#imageStore,UniformWriteOnly[UImageBuffer],int32,UVec4	proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;\n           color: UVec4)		1016
-nim	imageStore	shady.html#imageStore,UniformWriteOnly[ImageBuffer],int32,Vec4	proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)		1023
-nim	imageStore	shady.html#imageStore,Uniform[Sampler2d],IVec2,Vec4	proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)		1030
-nim	vec4	shady.html#vec4,ColorRGBX	proc vec4(c: ColorRGBX): Vec4		1039
-nim	dFdx	shady.html#dFdx,float32	proc dFdx(a: float32): float32		1047
-nim	dFdx	shady.html#dFdx,Vec2	proc dFdx(a: Vec2): Vec2		1050
-nim	dFdx	shady.html#dFdx,Vec3	proc dFdx(a: Vec3): Vec3		1053
-nim	dFdx	shady.html#dFdx,Vec4	proc dFdx(a: Vec4): Vec4		1056
-nim	dFdy	shady.html#dFdy,float32	proc dFdy(a: float32): float32		1059
-nim	dFdy	shady.html#dFdy,Vec2	proc dFdy(a: Vec2): Vec2		1062
-nim	dFdy	shady.html#dFdy,Vec3	proc dFdy(a: Vec3): Vec3		1065
-nim	dFdy	shady.html#dFdy,Vec4	proc dFdy(a: Vec4): Vec4		1068
-nim	fwidth	shady.html#fwidth,float32	proc fwidth(a: float32): float32		1071
-nim	fwidth	shady.html#fwidth,Vec2	proc fwidth(a: Vec2): Vec2		1074
-nim	fwidth	shady.html#fwidth,Vec3	proc fwidth(a: Vec3): Vec3		1077
-nim	fwidth	shady.html#fwidth,Vec4	proc fwidth(a: Vec4): Vec4		1080
-nim	fmod	shady.html#fmod,float32,float32	proc fmod(x, y: float32): float32		1083
-nim	fmod	shady.html#fmod,Vec2,float32	proc fmod(x: Vec2; y: float32): Vec2		1086
-nim	fmod	shady.html#fmod,Vec3,float32	proc fmod(x: Vec3; y: float32): Vec3		1089
-nim	fmod	shady.html#fmod,Vec4,float32	proc fmod(x: Vec4; y: float32): Vec4		1092
-nim	fmod	shady.html#fmod,Vec2,Vec2	proc fmod(x, y: Vec2): Vec2		1095
-nim	fmod	shady.html#fmod,Vec3,Vec3	proc fmod(x, y: Vec3): Vec3		1098
-nim	fmod	shady.html#fmod,Vec4,Vec4	proc fmod(x, y: Vec4): Vec4		1101
-nim	fract	shady.html#fract,float32	proc fract(a: float32): float32		1104
-nim	fract	shady.html#fract,Vec2	proc fract(a: Vec2): Vec2		1107
-nim	fract	shady.html#fract,Vec3	proc fract(a: Vec3): Vec3		1110
-nim	fract	shady.html#fract,Vec4	proc fract(a: Vec4): Vec4		1113
-nim	smoothstep	shady.html#smoothstep,float32,float32,float32	proc smoothstep(a, b, x: float32): float32		1116
-nim	smoothstep	shady.html#smoothstep,Vec2,Vec2,Vec2	proc smoothstep(a, b, x: Vec2): Vec2		1120
-nim	smoothstep	shady.html#smoothstep,Vec3,Vec3,Vec3	proc smoothstep(a, b, x: Vec3): Vec3		1123
-nim	smoothstep	shady.html#smoothstep,Vec4,Vec4,Vec4	proc smoothstep(a, b, x: Vec4): Vec4		1126
-nim	texture	shady.html#texture,Uniform[Sampler2d],Vec2	proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4		1129
-nim	textureSize	shady.html#textureSize,Uniform[Sampler2d],int	proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2		1137
-nim	textureGrad	shady.html#textureGrad,Uniform[Sampler2d],Vec3,Vec2,Vec2	proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4		1140
-nim	textureGrad	shady.html#textureGrad,Uniform[Sampler2dArray],Vec3,Vec2,Vec2	proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4		1148
-nim	discardFragment	shady.html#discardFragment	proc discardFragment()		1156
-nimgrp	dfdx	shady.html#dFdx-procs-all	proc		1047
-nimgrp	fract	shady.html#fract-procs-all	proc		1104
-nimgrp	fmod	shady.html#fmod-procs-all	proc		1083
-nimgrp	smoothstep	shady.html#smoothstep-procs-all	proc		1116
-nimgrp	dfdy	shady.html#dFdy-procs-all	proc		1059
-nimgrp	texelfetch	shady.html#texelFetch-procs-all	proc		997
-nimgrp	fwidth	shady.html#fwidth-procs-all	proc		1071
-nimgrp	imagestore	shady.html#imageStore-procs-all	proc		1016
-nimgrp	texturegrad	shady.html#textureGrad-procs-all	proc		1140
+nim	toGLSLInner	shady.html#toGLSLInner,NimNode,string,string	proc toGLSLInner(s: NimNode; version, extra: string): string		905
+nim	toGLSL	shady.html#toGLSL.m,typed,string,string	macro toGLSL(s: typed; version = "410"; extra = "precision highp float;\n"): string		958
+nim	Uniform	shady.html#Uniform	type Uniform		969
+nim	UniformWriteOnly	shady.html#UniformWriteOnly	type UniformWriteOnly		970
+nim	Attribute	shady.html#Attribute	type Attribute		971
+nim	SamplerBuffer	shady.html#SamplerBuffer	object SamplerBuffer		973
+nim	ImageBuffer	shady.html#ImageBuffer	object ImageBuffer		976
+nim	UImageBuffer	shady.html#UImageBuffer	object UImageBuffer		979
+nim	Sampler2d	shady.html#Sampler2d	object Sampler2d		982
+nim	USampler2d	shady.html#USampler2d	object USampler2d		985
+nim	Sampler2dArray	shady.html#Sampler2dArray	object Sampler2dArray		988
+nim	gl_Position	shady.html#gl_Position	var gl_Position		993
+nim	gl_VertexID	shady.html#gl_VertexID	var gl_VertexID		994
+nim	texelFetch	shady.html#texelFetch,Uniform[SamplerBuffer],SomeInteger	proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4		996
+nim	texelFetch	shady.html#texelFetch,Uniform[Sampler2d],IVec2,int	proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4		999
+nim	texelFetch	shady.html#texelFetch,Uniform[USampler2d],IVec2,int	proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4		1003
+nim	imageLoad	shady.html#imageLoad,UniformWriteOnly[UImageBuffer],int32	proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4		1007
+nim	imageStore	shady.html#imageStore,UniformWriteOnly[UImageBuffer],int32,UVec4	proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;\n           color: UVec4)		1015
+nim	imageStore	shady.html#imageStore,UniformWriteOnly[ImageBuffer],int32,Vec4	proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)		1022
+nim	imageStore	shady.html#imageStore,Uniform[Sampler2d],IVec2,Vec4	proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)		1029
+nim	vec4	shady.html#vec4,ColorRGBX	proc vec4(c: ColorRGBX): Vec4		1038
+nim	dFdx	shady.html#dFdx,float32	proc dFdx(a: float32): float32		1046
+nim	dFdx	shady.html#dFdx,Vec2	proc dFdx(a: Vec2): Vec2		1049
+nim	dFdx	shady.html#dFdx,Vec3	proc dFdx(a: Vec3): Vec3		1052
+nim	dFdx	shady.html#dFdx,Vec4	proc dFdx(a: Vec4): Vec4		1055
+nim	dFdy	shady.html#dFdy,float32	proc dFdy(a: float32): float32		1058
+nim	dFdy	shady.html#dFdy,Vec2	proc dFdy(a: Vec2): Vec2		1061
+nim	dFdy	shady.html#dFdy,Vec3	proc dFdy(a: Vec3): Vec3		1064
+nim	dFdy	shady.html#dFdy,Vec4	proc dFdy(a: Vec4): Vec4		1067
+nim	fwidth	shady.html#fwidth,float32	proc fwidth(a: float32): float32		1070
+nim	fwidth	shady.html#fwidth,Vec2	proc fwidth(a: Vec2): Vec2		1073
+nim	fwidth	shady.html#fwidth,Vec3	proc fwidth(a: Vec3): Vec3		1076
+nim	fwidth	shady.html#fwidth,Vec4	proc fwidth(a: Vec4): Vec4		1079
+nim	fmod	shady.html#fmod,float32,float32	proc fmod(x, y: float32): float32		1082
+nim	fmod	shady.html#fmod,Vec2,float32	proc fmod(x: Vec2; y: float32): Vec2		1085
+nim	fmod	shady.html#fmod,Vec3,float32	proc fmod(x: Vec3; y: float32): Vec3		1088
+nim	fmod	shady.html#fmod,Vec4,float32	proc fmod(x: Vec4; y: float32): Vec4		1091
+nim	fmod	shady.html#fmod,Vec2,Vec2	proc fmod(x, y: Vec2): Vec2		1094
+nim	fmod	shady.html#fmod,Vec3,Vec3	proc fmod(x, y: Vec3): Vec3		1097
+nim	fmod	shady.html#fmod,Vec4,Vec4	proc fmod(x, y: Vec4): Vec4		1100
+nim	fract	shady.html#fract,float32	proc fract(a: float32): float32		1103
+nim	fract	shady.html#fract,Vec2	proc fract(a: Vec2): Vec2		1106
+nim	fract	shady.html#fract,Vec3	proc fract(a: Vec3): Vec3		1109
+nim	fract	shady.html#fract,Vec4	proc fract(a: Vec4): Vec4		1112
+nim	smoothstep	shady.html#smoothstep,float32,float32,float32	proc smoothstep(a, b, x: float32): float32		1115
+nim	smoothstep	shady.html#smoothstep,Vec2,Vec2,Vec2	proc smoothstep(a, b, x: Vec2): Vec2		1119
+nim	smoothstep	shady.html#smoothstep,Vec3,Vec3,Vec3	proc smoothstep(a, b, x: Vec3): Vec3		1122
+nim	smoothstep	shady.html#smoothstep,Vec4,Vec4,Vec4	proc smoothstep(a, b, x: Vec4): Vec4		1125
+nim	texture	shady.html#texture,Uniform[Sampler2d],Vec2	proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4		1128
+nim	textureSize	shady.html#textureSize,Uniform[Sampler2d],int	proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2		1136
+nim	textureGrad	shady.html#textureGrad,Uniform[Sampler2d],Vec3,Vec2,Vec2	proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4		1139
+nim	textureGrad	shady.html#textureGrad,Uniform[Sampler2dArray],Vec3,Vec2,Vec2	proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4		1147
+nim	discardFragment	shady.html#discardFragment	proc discardFragment()		1155
+nimgrp	dfdx	shady.html#dFdx-procs-all	proc		1046
+nimgrp	fract	shady.html#fract-procs-all	proc		1103
+nimgrp	fmod	shady.html#fmod-procs-all	proc		1082
+nimgrp	smoothstep	shady.html#smoothstep-procs-all	proc		1115
+nimgrp	dfdy	shady.html#dFdy-procs-all	proc		1058
+nimgrp	texelfetch	shady.html#texelFetch-procs-all	proc		996
+nimgrp	fwidth	shady.html#fwidth-procs-all	proc		1070
+nimgrp	imagestore	shady.html#imageStore-procs-all	proc		1015
+nimgrp	texturegrad	shady.html#textureGrad-procs-all	proc		1139
