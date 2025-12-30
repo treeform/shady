@@ -322,6 +322,19 @@ block:
     fragColor = vec4(float32(m), 0, 0, 1)
   log toGLSL(uintModTest)
 
+block:
+  log "--------------------------------------------------"
+  log "BracketExpr input parameter:"
+
+  proc bracketInputShader(uvPos: array[2, uint16], fragColor: var Vec4) =
+    fragColor = vec4(float32(uvPos[0]), float32(uvPos[1]), 0.0, 1.0)
+
+  log toGLSL(bracketInputShader)
+
+  var c: Vec4
+  bracketInputShader([1'u16, 2'u16], c)
+  assert c == vec4(1.0, 2.0, 0.0, 1.0)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:
