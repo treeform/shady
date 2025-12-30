@@ -85,7 +85,7 @@ proc typeString(n: NimNode): string =
         elif n[1].kind == nnkInfix and n[1].len == 3 and n[1][0].repr == "..":
            # array[0..1, T] case
            length = n[1][2].intVal.int - n[1][1].intVal.int + 1
-        
+
         if length == 2:
           if n[2].repr == "uint16": return "vec2"
           if n[2].repr in ["uint32"]: return "uvec2"
@@ -101,7 +101,7 @@ proc typeString(n: NimNode): string =
           if n[2].repr in ["uint32"]: return "uvec4"
           if n[2].repr in ["int16", "int32"]: return "ivec4"
           if n[2].repr in ["float32", "float64"]: return "vec4"
-      
+
       err "can't figure out type: " & n.repr, n
 
 ## Default constructor for different GLSL types.
@@ -704,9 +704,8 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
               res.add typeRename(typeNode[0].strVal)
             else:
               if typeNode.kind == nnkBracketExpr:
-                res.add typeRename(typeNode[0].strVal)
-                res.add " "
-                res.add typeRename(typeNode[1].strVal)
+                res.add "in "
+                res.add typeString(typeNode)
               else:
                 if param.strVal == "gl_FragCoord":
                   res.add "layout(origin_upper_left) "

@@ -415,3 +415,16 @@ void main() {
   fragColor = vec4(float(m), 0.0, 0.0, 1.0);
 }
 
+--------------------------------------------------
+BracketExpr input parameter:
+#version 410
+precision highp float;
+// from bracketInputShader
+
+in vec2 uvPos;
+out vec4 fragColor;
+
+void main() {
+  fragColor = vec4(float(uvPos[0]), float(uvPos[1]), 0.0, 1.0);
+}
+
