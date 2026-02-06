@@ -3,7 +3,13 @@
 import macros, pixie, strutils, tables, vmath
 from chroma import ColorRGBX
 
+type
+  GlslTarget* = enum
+    glslDesktop  ## OpenGL 4.1+ (Mac, Linux, Windows)
+    glslES3      ## OpenGL ES 3.0 / WebGL 2.0 (Emscripten)
+
 var useResult {.compiletime.}: bool
+var glslTarget* {.compiletime.}: GlslTarget
 
 proc err(msg: string, n: NimNode) {.noreturn.} =
   error("[GLSL] " & msg, n)
@@ -707,7 +713,7 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
                 res.add "in "
                 res.add typeString(typeNode)
               else:
-                if param.strVal == "gl_FragCoord":
+                if glslTarget != glslES3 and param.strVal == "gl_FragCoord":
                   res.add "layout(origin_upper_left) "
                 if typeNode.strVal == "int":
                   res.add "flat "
@@ -955,12 +961,30 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
   return code
 
+proc toGLSLInner*(s: NimNode, target: GlslTarget): string =
+  ## Converts proc to a GLSL string for the given target.
+  glslTarget = target
+  case target
+  of glslDesktop:
+    toGLSLInner(s, "410", "")
+  of glslES3:
+    toGLSLInner(s, "300 es", "precision highp float;\n")
+
+macro toGLSL*(
+  s: typed,
+  target: static[GlslTarget]
+): string =
+  ## Converts proc to a GLSL string for the given target.
+  newLit(toGLSLInner(s, target))
+
 macro toGLSL*(
   s: typed,
   version = "410",
   extra = "precision highp float;\n"
 ): string =
   ## Converts proc to a glsl string.
+  ## For target-aware compilation, use the GlslTarget overload instead.
+  glslTarget = if "es" in version.strVal: glslES3 else: glslDesktop
   newLit(toGLSLInner(s, version.strVal, extra.strVal))
 
 ## GLSL helper functions

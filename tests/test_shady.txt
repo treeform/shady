@@ -428,3 +428,51 @@ void main() {
   fragColor = vec4(float(uvPos[0]), float(uvPos[1]), 0.0, 1.0);
 }
 
+--------------------------------------------------
+GlslTarget: Desktop with gl_FragCoord:
+#version 410
+// from desktopFragCoord
+
+layout(origin_upper_left) in vec4 gl_FragCoord;
+out vec4 fragColor;
+
+void main() {
+  fragColor = gl_FragCoord;
+}
+
+--------------------------------------------------
+GlslTarget: ES3 with gl_FragCoord:
+#version 300 es
+precision highp float;
+// from es3FragCoord
+
+in vec4 gl_FragCoord;
+out vec4 fragColor;
+
+void main() {
+  fragColor = gl_FragCoord;
+}
+
+--------------------------------------------------
+GlslTarget: ES3 vertex shader with integer mod:
+#version 300 es
+precision highp float;
+// from es3VertShader
+
+uniform vec2 atlasSizeE;
+uniform mat4 mvpE;
+
+in uvec2 vertexPos;
+in uvec4 uv;
+out vec2 fragmentUv;
+
+void main() {
+  ivec2 corner = ivec2((gl_VertexID) % (2), (gl_VertexID) / (2));
+  float dx = float(vertexPos.x) + (float(corner.x) - 0.5) * float(uv.z);
+  float dy = float(vertexPos.y) + (float(corner.y) - 0.5) * float(uv.w);
+  gl_Position = mvpE * vec4(float(dx), float(dy), 0.0, 1.0);
+  float sx = float(uv.x) + float(corner.x) * float(uv.z);
+  float sy = float(uv.y) + float(corner.y) * float(uv.w);
+  fragmentUv = vec2(float(sx), float(sy)) / atlasSizeE;
+}
+
