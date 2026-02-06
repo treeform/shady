@@ -335,6 +335,55 @@ block:
   bracketInputShader([1'u16, 2'u16], c)
   assert c == vec4(1.0, 2.0, 0.0, 1.0)
 
+block:
+  log "--------------------------------------------------"
+  log "GlslTarget: Desktop with gl_FragCoord:"
+  proc desktopFragCoord(gl_FragCoord: Vec4, fragColor: var Vec4) =
+    fragColor = gl_FragCoord
+  log toGLSL(desktopFragCoord, glslDesktop)
+
+block:
+  log "--------------------------------------------------"
+  log "GlslTarget: ES3 with gl_FragCoord:"
+  proc es3FragCoord(gl_FragCoord: Vec4, fragColor: var Vec4) =
+    fragColor = gl_FragCoord
+  log toGLSL(es3FragCoord, glslES3)
+
+block:
+  log "--------------------------------------------------"
+  log "GlslTarget: ES3 vertex shader with integer mod:"
+  var mvpE: Uniform[Mat4]
+  var atlasSizeE: Uniform[Vec2]
+  proc es3VertShader(vertexPos: UVec2, uv: UVec4, fragmentUv: var Vec2) =
+    let corner = ivec2(gl_VertexID mod 2, gl_VertexID div 2)
+    let dx = float(vertexPos.x) + (float(corner.x) - 0.5) * float(uv.z)
+    let dy = float(vertexPos.y) + (float(corner.y) - 0.5) * float(uv.w)
+    gl_Position = mvpE * vec4(dx, dy, 0.0, 1.0)
+    let sx = float(uv.x) + float(corner.x) * float(uv.z)
+    let sy = float(uv.y) + float(corner.y) * float(uv.w)
+    fragmentUv = vec2(sx, sy) / atlasSizeE
+  log toGLSL(es3VertShader, glslES3)
+
+block:
+  log "--------------------------------------------------"
+  log "GlslTarget: ES3 sampler uniforms get highp:"
+  var tileData: Uniform[USampler2d]
+  var tileAtlas: Uniform[Sampler2dArray]
+  proc es3SamplerFrag(uv: Vec2, fragColor: var Vec4) =
+    let tile = texelFetch(tileData, ivec2(0, 0), 0)
+    fragColor = vec4(float(tile.x), 0.0, 0.0, 1.0)
+  log toGLSL(es3SamplerFrag, glslES3)
+
+block:
+  log "--------------------------------------------------"
+  log "GlslTarget: Desktop sampler uniforms no highp:"
+  var tileDataD: Uniform[USampler2d]
+  var tileAtlasD: Uniform[Sampler2dArray]
+  proc desktopSamplerFrag(uv: Vec2, fragColor: var Vec4) =
+    let tile = texelFetch(tileDataD, ivec2(0, 0), 0)
+    fragColor = vec4(float(tile.x), 0.0, 0.0, 1.0)
+  log toGLSL(desktopSamplerFrag, glslDesktop)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:
