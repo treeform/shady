@@ -476,3 +476,34 @@ void main() {
   fragmentUv = vec2(float(sx), float(sy)) / atlasSizeE;
 }
 
+--------------------------------------------------
+GlslTarget: ES3 sampler uniforms get highp:
+#version 300 es
+precision highp float;
+// from es3SamplerFrag
+
+uniform highp usampler2D tileData;
+
+in vec2 uv;
+out vec4 fragColor;
+
+void main() {
+  uvec4 tile = texelFetch(tileData, ivec2(0, 0), 0);
+  fragColor = vec4(float(float(tile.x)), 0.0, 0.0, 1.0);
+}
+
+--------------------------------------------------
+GlslTarget: Desktop sampler uniforms no highp:
+#version 410
+// from desktopSamplerFrag
+
+uniform usampler2D tileDataD;
+
+in vec2 uv;
+out vec4 fragColor;
+
+void main() {
+  uvec4 tile = texelFetch(tileDataD, ivec2(0, 0), 0);
+  fragColor = vec4(float(float(tile.x)), 0.0, 0.0, 1.0);
+}
+

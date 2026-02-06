@@ -364,6 +364,26 @@ block:
     fragmentUv = vec2(sx, sy) / atlasSizeE
   log toGLSL(es3VertShader, glslES3)
 
+block:
+  log "--------------------------------------------------"
+  log "GlslTarget: ES3 sampler uniforms get highp:"
+  var tileData: Uniform[USampler2d]
+  var tileAtlas: Uniform[Sampler2dArray]
+  proc es3SamplerFrag(uv: Vec2, fragColor: var Vec4) =
+    let tile = texelFetch(tileData, ivec2(0, 0), 0)
+    fragColor = vec4(float(tile.x), 0.0, 0.0, 1.0)
+  log toGLSL(es3SamplerFrag, glslES3)
+
+block:
+  log "--------------------------------------------------"
+  log "GlslTarget: Desktop sampler uniforms no highp:"
+  var tileDataD: Uniform[USampler2d]
+  var tileAtlasD: Uniform[Sampler2dArray]
+  proc desktopSamplerFrag(uv: Vec2, fragColor: var Vec4) =
+    let tile = texelFetch(tileDataD, ivec2(0, 0), 0)
+    fragColor = vec4(float(tile.x), 0.0, 0.0, 1.0)
+  log toGLSL(desktopSamplerFrag, glslDesktop)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:

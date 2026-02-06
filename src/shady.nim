@@ -867,7 +867,12 @@ proc gatherFunction(
               if typeInst[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
                 defStr.add typeRename(typeInst[0].repr)
                 defStr.add " "
-                defStr.add typeString(typeInst[1])
+                let samplerType = typeString(typeInst[1])
+                if glslTarget == glslES3 and samplerType in [
+                    "sampler2D", "usampler2D", "sampler2DArray",
+                    "samplerBuffer", "imageBuffer", "uimageBuffer"]:
+                  defStr.add "highp "
+                defStr.add samplerType
               elif typeInst[0].repr == "array":
                 defStr.add typeString(typeInst[2])
                 defStr.add "["
