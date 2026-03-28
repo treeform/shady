@@ -1,4 +1,4 @@
-version     = "0.1.4"
+version     = "0.1.5"
 author      = "Andre von Houck"
 description = "Nim to GPU shader language compiler and supporting utilities."
 license     = "MIT"
