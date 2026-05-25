@@ -19,10 +19,27 @@ Currently supported shader types:
 * Vertex shaders paired with fragment shaders for the traditional graphics pipeline.
 * Compute shaders for GPU data processing.
 
-Current GLSL targets:
+Current shader targets:
 
-* Desktop GLSL via `glslDesktop` for OpenGL 4.1+.
-* GLSL ES 3.0 via `glslES3` for OpenGL ES 3.0 / WebGL 2.0.
+* Desktop GLSL 4.10 via `glsl4Desktop` / `glslDesktop` for OpenGL 4.1+.
+* Desktop GLSL 3.30 via `glsl3Desktop` for older desktop OpenGL tests.
+* GLSL ES 3.0 via `glsl3WebGL` / `glslES3` for OpenGL ES 3.0 / WebGL 2.0.
+* HLSL via `hlslDX12` for DirectX 12.
+* Metal Shading Language via `metalMSL`.
+
+Use `toShader(shaderProc, target, stage)` for the general backend switch, or
+`toGLSL`, `toHLSL`, and `toMSL` for language-specific helpers.
+
+Runtime backend tests are separate so platform graphics dependencies stay
+optional:
+
+```sh
+nimble test
+nim c -r -d:shadyRunOpenGL tests/test_opengl_glsl3.nim
+nim c -r -d:shadyRunOpenGL tests/test_opengl_glsl4.nim
+nim c -r --path:C:\p\dx12\src -d:shadyRunDx12 tests/test_directx.nim
+nim c -r --path:/path/to/metal4/src -d:shadyRunMetal tests/test_metal.nim
+```
 
 Shady uses:
 * `pixie` library for image operations.
