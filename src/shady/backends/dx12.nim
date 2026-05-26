@@ -146,6 +146,9 @@ proc nextSemanticIndex(
 proc hlslOutputFieldName*(name: string): string =
   if name == "gl_Position": "pos" else: name
 
+proc hlslInputFieldName*(name: string): string =
+  if name == "gl_FragCoord": "pos" else: name
+
 proc hlslTextureDecl*(name, typ: string, register: int): string =
   typ & " " & name & " : register(t" & $register & ");"
 
@@ -163,7 +166,9 @@ proc emitHlslUniformBuffer*(
 ): string =
   if uniforms.len == 0:
     return ""
-  result.add "cbuffer ShadyUniforms : register(b"
+  result.add "cbuffer ShadyUniforms"
+  result.add $register
+  result.add " : register(b"
   result.add $register
   result.add ") {\n"
   for uniform in uniforms:
@@ -304,43 +309,45 @@ proc emitHlslEntry*(
   of 2:
     let outputIndex = firstOutput(params)
     let returnType = if outputIndex >= 0: params[outputIndex].typ else: "void"
-    result.add "\n"
-    result.add returnType
-    result.add " PSMain("
-    var inputSemanticCounts: Table[string, int]
-    var first = true
+    var inputs: seq[EntryParam]
     if not params.hasParam("gl_FragCoord"):
-      result.add "\n  float4 gl_FragCoord : SV_POSITION"
-      first = false
-    if not params.hasParam("gl_FrontFacing") and "gl_FrontFacing" in bodyCode:
-      if first:
-        result.add "\n"
-        first = false
-      else:
-        result.add ",\n"
-      result.add "  bool gl_FrontFacing : SV_IsFrontFace"
+      inputs.add (name: "gl_FragCoord", typ: "float4", isOut: false)
     for p in params:
       if not p.isOut:
-        if first:
-          result.add "\n"
-          first = false
-        else:
-          result.add ",\n"
-        result.add "  "
-        result.add p.typ
-        result.add " "
-        result.add p.name
-        result.add hlslSemantic(
-          p.name,
-          nextSemanticIndex(p.name, inputSemanticCounts),
-          false
-        )
-    if not first:
-      result.add "\n"
-    result.add ")"
+        inputs.add p
+    if not params.hasParam("gl_FrontFacing") and "gl_FrontFacing" in bodyCode:
+      inputs.add (name: "gl_FrontFacing", typ: "bool", isOut: false)
+
+    result.add "\nstruct PSInput {\n"
+    var inputSemanticCounts: Table[string, int]
+    for p in inputs:
+      result.add "  "
+      result.add p.typ
+      result.add " "
+      result.add hlslInputFieldName(p.name)
+      result.add hlslSemantic(
+        p.name,
+        nextSemanticIndex(p.name, inputSemanticCounts),
+        false
+      )
+      result.add ";\n"
+    result.add "};\n\n"
+
+    result.add returnType
+    result.add " PSMain(PSInput input)"
     if outputIndex >= 0:
       result.add hlslSemantic(params[outputIndex].name, 0, true)
     result.add " {\n"
+    for p in inputs:
+      if p.name == "gl_FragCoord" and not params.hasParam("gl_FragCoord"):
+        continue
+      result.add "  "
+      result.add p.typ
+      result.add " "
+      result.add p.name
+      result.add " = input."
+      result.add hlslInputFieldName(p.name)
+      result.add ";\n"
     result.add outputLocals(params, 1)
     result.add bodyCode
     if outputIndex >= 0:

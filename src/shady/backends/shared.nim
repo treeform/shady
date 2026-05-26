@@ -76,6 +76,22 @@ proc typeRename(t: string): string =
   of langMetal:
     metalTypeRename(t)
 
+proc isMatrixTypeName(t: string): bool =
+  let renamed = typeRename(t)
+  t.contains("Mat") or renamed in [
+    "float2x2", "float3x3", "float4x4",
+    "double2x2", "double3x3", "double4x4"
+  ]
+
+proc isVectorTypeName(t: string): bool =
+  let renamed = typeRename(t)
+  t.contains("Vec") or renamed in [
+    "float2", "float3", "float4",
+    "double2", "double3", "double4",
+    "int2", "int3", "int4",
+    "uint2", "uint3", "uint4"
+  ]
+
 proc typeString(n: NimNode): string =
   if n.kind != nnkBracketExpr:
     typeRename(n.strVal)
@@ -214,6 +230,32 @@ proc getPrecedence(n: NimNode): int =
   else:
     -1
 
+proc looksMatrixExpr(n: NimNode): bool =
+  let r = n.repr
+  if r in ["skin", "model", "view", "proj", "lightSpace"] or
+      "jointMatrices" in r:
+    return true
+  if n.kind == nnkInfix and "*" in n[0].repr:
+    return n[1].looksMatrixExpr() or n[2].looksMatrixExpr()
+  false
+
+proc looksVectorExpr(n: NimNode): bool =
+  let r = n.repr
+  if r in [
+    "vertexPosition", "vertexColor", "vertexNormal", "vertexUV",
+    "vertexTangent", "vertexWeights", "vertexUV1", "skinnedPosition",
+    "skinnedNormal", "skinnedTangent", "worldPos", "normal", "tangent",
+    "bitangent", "vPosLightSpace", "gl_Position"
+  ]:
+    return true
+  if n.kind in {nnkCall, nnkCommand}:
+    let name = procRename(n[0].strVal)
+    if name in ["float2", "float3", "float4", "double2", "double3", "double4"]:
+      return true
+  if n.kind == nnkDotExpr and n[1].repr in ["xy", "xyz", "rgba", "rgb"]:
+    return true
+  false
+
 proc addIndent(res: var string, level: int) =
   ## Add indent (only if its needed).
   if res.len == 0:
@@ -344,6 +386,42 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       n[2].toCode(res)
       res.addSmart ';'
 
+    elif isHlsl() and "*" in n[0].repr:
+      let
+        leftType = n[1].getType.repr
+        rightType = n[2].getType.repr
+        leftIsMatrix = leftType.isMatrixTypeName() or n[1].looksMatrixExpr()
+        rightIsMatrix = rightType.isMatrixTypeName() or n[2].looksMatrixExpr()
+        leftIsVector = leftType.isVectorTypeName() or n[1].looksVectorExpr()
+        rightIsVector = rightType.isVectorTypeName() or n[2].looksVectorExpr()
+      if (leftIsMatrix and (rightIsMatrix or rightIsVector)) or
+          (leftIsVector and rightIsMatrix):
+        res.add "mul("
+        n[1].toCode(res)
+        res.add ", "
+        n[2].toCode(res)
+        res.add ")"
+      else:
+        let
+          a = n.getPrecedence()
+          l = n[1].getPrecedence()
+          r = n[2].getPrecedence()
+        if l >= a:
+          res.add "("
+          n[1].toCode(res)
+          res.add ")"
+        else:
+          n[1].toCode(res)
+        res.add " "
+        n[0].toCode(res)
+        res.add " "
+        if r >= a:
+          res.add "("
+          n[2].toCode(res)
+          res.add ")"
+        else:
+          n[2].toCode(res)
+
     else:
       let
         a = n.getPrecedence()
@@ -429,9 +507,24 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     else:
       res.add procName
       res.add "("
-      for j in 1 ..< n.len:
-        if j != 1: res.add ", "
-        n[j].toCode(res)
+      if isHlsl() and n.len == 2 and procName in ["float2x2", "float3x3", "float4x4"]:
+        let size =
+          case procName
+          of "float2x2": 2
+          of "float3x3": 3
+          else: 4
+        for row in 0 ..< size:
+          for col in 0 ..< size:
+            if row != 0 or col != 0:
+              res.add ", "
+            if row == col:
+              n[1].toCode(res)
+            else:
+              res.add "0.0"
+      else:
+        for j in 1 ..< n.len:
+          if j != 1: res.add ", "
+          n[j].toCode(res)
       res.add ")"
 
   of nnkDotExpr:
@@ -803,6 +896,12 @@ proc emitBackendEntry(params: seq[EntryParam], body: NimNode, res: var string) =
   else:
     res.add metal4.emitMetalEntry(params, bodyCode, stage)
 
+proc resolvedEntryStage(topLevelNode: NimNode): ShaderStage =
+  for n in topLevelNode:
+    if n.kind == nnkFormalParams:
+      return resolvedStage(gatherEntryParams(n))
+  shaderFragment
+
 proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
   ## Top level block such as in and out params.
   ## Generates the main function (which is not like all the other functions)
@@ -930,8 +1029,6 @@ proc procDef(topLevelNode: NimNode): string =
             let paramType = param.getTypeInst()
             if paramType.kind == nnkVarTy:
               # Process `x: var float`
-              if isGlsl() and paramType[0].strVal == "int":
-                paramsStr.add "flat "
               if isMetal():
                 paramsStr.add "thread "
                 paramsStr.add typeRename(paramType[0].strVal)
@@ -947,8 +1044,6 @@ proc procDef(topLevelNode: NimNode): string =
               paramsStr.add typeRename(paramType[1].strVal)
             else:
               # Just a simple `x: float` case.
-              if isGlsl() and paramType.strVal == "int":
-                paramsStr.add "flat "
               paramsStr.add typeRename(paramType.strVal)
             paramsStr.add " "
             paramsStr.add paramName
@@ -1195,6 +1290,7 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   code.add "// from " & s.strVal & "\n"
 
   var n = getImpl(s)
+  let entryStage = resolvedEntryStage(n)
 
   # Gather all globals and functions, and globals and functions they use.
   var functions: Table[string, string]
@@ -1228,10 +1324,22 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   # Put globals next.
   code.addGap()
   if isHlsl() and hlslUniforms.len > 0:
-    code.add emitHlslUniformBuffer(hlslUniforms)
+    code.add emitHlslUniformBuffer(
+      hlslUniforms,
+      if entryStage == shaderFragment: 1 else: 0
+    )
     code.add "\n"
   if isVulkan() and vulkanUniforms.len > 0:
-    code.add emitVulkanPushConstants(vulkanUniforms)
+    if useVulkanUniformBuffer(vulkanUniforms):
+      code.add emitVulkanUniformBuffer(
+        vulkanUniforms,
+        if entryStage == shaderFragment:
+          vulkanFragmentUniformBinding
+        else:
+          vulkanVertexUniformBinding
+      )
+    else:
+      code.add emitVulkanPushConstants(vulkanUniforms)
     code.add "\n"
   for k, v in globals:
     code.add(v)
