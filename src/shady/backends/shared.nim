@@ -943,7 +943,10 @@ proc gatherFunction(
   topLevelNode: NimNode,
   functions: var Table[string, string],
   globals: var Table[string, string],
-  types: var Table[string, string]
+  types: var Table[string, string],
+  hlslUniforms: var seq[dx12.UniformParam],
+  hlslUniformNames: var Table[string, bool],
+  hlslTextures: var Table[string, int]
 ) =
 
   ## Looks for functions this function calls and brings them up
@@ -963,6 +966,7 @@ proc gatherFunction(
             var defStr = ""
             let typeInst = n.getTypeInst
             gatherTypes(typeInst, types)
+            var addGlobal = true
             if typeInst.kind == nnkBracketExpr:
               # might be a uniform
               if typeInst[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
@@ -974,7 +978,24 @@ proc gatherFunction(
                     defStr.add "highp "
                   defStr.add samplerType
                 elif isHlsl():
-                  defStr.add samplerType
+                  if typeInst[0].repr == "Uniform" and
+                      typeInst[1].repr in ["Sampler2d", "USampler2d", "Sampler2dArray"]:
+                    let textureRegister =
+                      if name in hlslTextures:
+                        hlslTextures[name]
+                      else:
+                        let nextRegister = hlslTextures.len
+                        hlslTextures[name] = nextRegister
+                        nextRegister
+                    defStr.add hlslTextureDecl(name, samplerType, textureRegister)
+                    globals[name & "Sampler"] = hlslSamplerDecl(name, textureRegister)
+                  elif typeInst[0].repr == "Uniform":
+                    if name notin hlslUniformNames:
+                      hlslUniformNames[name] = true
+                      hlslUniforms.add (name: name, typ: samplerType)
+                    addGlobal = false
+                  else:
+                    defStr.add samplerType
                 else:
                   if typeInst[0].repr == "Uniform":
                     defStr.add "constant "
@@ -992,17 +1013,17 @@ proc gatherFunction(
                 err "Invalid x[y].", n
             else:
               defStr.add typeRename(typeInst.repr)
-            defStr.add " " & name
-            if impl[2].kind != nnkEmpty:
-              defStr.add " = " & repr(impl[2])
-            defStr.addSmart ';'
-            if defStr notin ["uniform Uniform = T;",
+            if addGlobal:
+              if not (isHlsl() and typeInst.kind == nnkBracketExpr and
+                  typeInst[0].repr == "Uniform" and
+                  typeInst[1].repr in ["Sampler2d", "USampler2d", "Sampler2dArray"]):
+                defStr.add " " & name
+              if impl[2].kind != nnkEmpty:
+                defStr.add " = " & repr(impl[2])
+              defStr.addSmart ';'
+            if addGlobal and defStr notin ["uniform Uniform = T;",
                 "attribute Attribute = T;"]:
               globals[name] = defStr
-              if isHlsl() and typeInst.kind == nnkBracketExpr and
-                  typeInst[0].repr == "Uniform" and
-                  typeInst[1].repr in ["Sampler2d", "USampler2d", "Sampler2dArray"]:
-                globals[name & "Sampler"] = hlslSamplerDecl(name)
 
     if n.kind == nnkCall:
       # Looking for functions.
@@ -1016,7 +1037,15 @@ proc gatherFunction(
         not isVectorAccess(procName):
         ## If its not a builtin proc, we need to bring definition.
         let impl = n[0].getImpl()
-        gatherFunction(impl, functions, globals, types)
+        gatherFunction(
+          impl,
+          functions,
+          globals,
+          types,
+          hlslUniforms,
+          hlslUniformNames,
+          hlslTextures
+        )
         functions[procName] = procDef(impl)
 
     if n.kind == nnkFormalParams:
@@ -1025,7 +1054,15 @@ proc gatherFunction(
         let paramType = paramDef[^2].getTypeInst()
         gatherTypes(paramType, types)
 
-    gatherFunction(n, functions, globals, types)
+    gatherFunction(
+      n,
+      functions,
+      globals,
+      types,
+      hlslUniforms,
+      hlslUniformNames,
+      hlslTextures
+    )
 
 proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
@@ -1048,7 +1085,18 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   var functions: Table[string, string]
   var globals: Table[string, string]
   var types: Table[string, string]
-  gatherFunction(n, functions, globals, types)
+  var hlslUniforms: seq[dx12.UniformParam]
+  var hlslUniformNames: Table[string, bool]
+  var hlslTextures: Table[string, int]
+  gatherFunction(
+    n,
+    functions,
+    globals,
+    types,
+    hlslUniforms,
+    hlslUniformNames,
+    hlslTextures
+  )
 
   # Put types first.
   code.addGap()
@@ -1058,6 +1106,9 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
   # Put globals next.
   code.addGap()
+  if isHlsl() and hlslUniforms.len > 0:
+    code.add emitHlslUniformBuffer(hlslUniforms)
+    code.add "\n"
   for k, v in globals:
     code.add(v)
     code.add "\n"

@@ -1,6 +1,8 @@
 import strutils, tables
 
-type EntryParam* = tuple[name, typ: string, isOut: bool]
+type
+  EntryParam* = tuple[name, typ: string, isOut: bool]
+  UniformParam* = tuple[name, typ: string]
 
 const hlslHeader* = "// target hlsl dx12\n"
 
@@ -92,7 +94,7 @@ proc hlslTypeDefault*(t: string): string =
 
 proc semanticBase(name: string): string =
   let lower = name.toLowerAscii()
-  if name in ["gl_Position", "position"] or lower.endsWith("position"):
+  if name in ["gl_Position", "position", "pos"] or lower.endsWith("position"):
     "POSITION"
   elif name in ["gl_FragCoord"]:
     "SV_POSITION"
@@ -137,8 +139,28 @@ proc nextSemanticIndex(
 proc hlslOutputFieldName*(name: string): string =
   if name == "gl_Position": "pos" else: name
 
-proc hlslSamplerDecl*(name: string): string =
-  "SamplerState " & name & "Sampler;"
+proc hlslTextureDecl*(name, typ: string, register: int): string =
+  typ & " " & name & " : register(t" & $register & ");"
+
+proc hlslSamplerDecl*(name: string, register: int): string =
+  "SamplerState " & name & "Sampler : register(s" & $register & ");"
+
+proc emitHlslUniformBuffer*(
+  uniforms: openArray[UniformParam],
+  register = 0
+): string =
+  if uniforms.len == 0:
+    return ""
+  result.add "cbuffer ShadyUniforms : register(b"
+  result.add $register
+  result.add ") {\n"
+  for uniform in uniforms:
+    result.add "  "
+    result.add uniform.typ
+    result.add " "
+    result.add uniform.name
+    result.add ";\n"
+  result.add "};\n"
 
 proc hlslResourceCall*(
   name: string,
@@ -264,6 +286,9 @@ proc emitHlslEntry*(
     result.add " PSMain("
     var inputSemanticCounts: Table[string, int]
     var first = true
+    if not params.hasParam("gl_FragCoord"):
+      result.add "\n  float4 gl_FragCoord : SV_POSITION"
+      first = false
     for p in params:
       if not p.isOut:
         if first:

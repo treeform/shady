@@ -18,7 +18,8 @@ block:
   doAssert "out vec4 fragColor;" in glsl4
 
   let hlsl = toHLSL(fragmentConstant, shaderFragment)
-  doAssert "float4 PSMain()" in hlsl
+  doAssert "float4 PSMain(" in hlsl
+  doAssert "float4 gl_FragCoord : SV_POSITION" in hlsl
   doAssert ": SV_TARGET" in hlsl
   doAssert "float4 fragColor = float4(0.0, 0.0, 0.0, 0.0);" in hlsl
   doAssert "return fragColor;" in hlsl
@@ -58,8 +59,8 @@ block:
     fragColor = texture(atlas, uv)
 
   let hlsl = toHLSL(sampledTexture, shaderFragment)
-  doAssert "Texture2D<float4> atlas;" in hlsl
-  doAssert "SamplerState atlasSampler;" in hlsl
+  doAssert "Texture2D<float4> atlas : register(t0);" in hlsl
+  doAssert "SamplerState atlasSampler : register(s0);" in hlsl
   doAssert "atlas.Sample(atlasSampler, uv)" in hlsl
 
   let msl = toMSL(sampledTexture, shaderFragment)
@@ -68,6 +69,7 @@ block:
 
 block:
   var atlas: Uniform[Sampler2d]
+  var viewportSize: Uniform[Vec2]
 
   func controlTint(texColor, vertexColor: Vec4): Vec4 =
     result = vec4(
@@ -132,7 +134,7 @@ block:
   doAssert "float4 fragmentColor : COLOR0" in hlslVertex
 
   let hlslFragment = toHLSL(layoutFragment, shaderFragment)
-  doAssert "Texture2D<float4> atlas;" in hlslFragment
+  doAssert "Texture2D<float4> atlas : register(t0);" in hlslFragment
   doAssert "atlas.Sample(atlasSampler, fragmentUv)" in hlslFragment
   doAssert "float4 controlTint" in hlslFragment
   doAssert "for(int i = 0; i < 2; i++)" in hlslFragment
@@ -153,5 +155,17 @@ block:
   doAssert "for(int i = 0; i < 2; i++)" in mslFragment
   doAssert "while(steps < 2)" in mslFragment
   doAssert "if (" in mslFragment
+
+  proc uniformVertex(
+    pos: Vec2,
+    gl_Position: var Vec4
+  ) =
+    let clip = pos / viewportSize
+    gl_Position = vec4(clip.x, clip.y, 0.0, 1.0)
+
+  let hlslUniformVertex = toHLSL(uniformVertex, shaderVertex)
+  doAssert "cbuffer ShadyUniforms : register(b0)" in hlslUniformVertex
+  doAssert "float2 viewportSize;" in hlslUniformVertex
+  doAssert "float2 pos : POSITION0" in hlslUniformVertex
 
 echo "Backend codegen tests passed"
