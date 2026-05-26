@@ -1,7 +1,7 @@
 ## Shader macro, converts Nim code into shader source.
 
 import macros, pixie, strutils, tables, vmath
-import shady/backends/[glsl, glsl3, glsl4, dx12, metal4]
+import shady/backends/[glsl, glsl3, glsl4, dx12, metal4, vulkan]
 from chroma import ColorRGBX
 
 type
@@ -9,6 +9,7 @@ type
     glsl3WebGL    ## OpenGL ES 3.0 / WebGL 2.0 compatibility profile.
     glsl3Desktop  ## Desktop GLSL 3.30 / OpenGL 3.3 compatibility profile.
     glsl4Desktop  ## Explicit desktop GLSL for OpenGL 4.1+.
+    vulkanGlsl450 ## GLSL 4.50 source shaped for Vulkan/SPIR-V.
     hlslDX12      ## HLSL for DirectX 12.
     metalMSL      ## Metal Shading Language.
 
@@ -33,6 +34,11 @@ var useResult {.compiletime.}: bool
 var shaderTarget* {.compiletime.}: ShaderTarget
 var shaderStage* {.compiletime.}: ShaderStage
 
+const shaderSamplerTypes = [
+  "Sampler2d", "SamplerCube", "Sampler2dShadow", "USampler2d",
+  "Sampler2dArray"
+]
+
 template glslTarget*(): untyped =
   shaderTarget
 
@@ -41,7 +47,7 @@ proc err(msg: string, n: NimNode) {.noreturn.} =
 
 proc language(target: ShaderTarget): ShaderLanguage =
   case target
-  of glsl3WebGL, glsl3Desktop, glsl4Desktop:
+  of glsl3WebGL, glsl3Desktop, glsl4Desktop, vulkanGlsl450:
     langGlsl
   of hlslDX12:
     langHlsl
@@ -50,6 +56,9 @@ proc language(target: ShaderTarget): ShaderLanguage =
 
 proc isGlsl(): bool =
   shaderTarget.language == langGlsl
+
+proc isVulkan(): bool =
+  shaderTarget == vulkanGlsl450
 
 proc isHlsl(): bool =
   shaderTarget.language == langHlsl
@@ -121,6 +130,26 @@ proc typeString(n: NimNode): string =
           if n[2].repr in ["float32", "float64"]: return typeRename("Vec4")
 
       err "can't figure out type: " & n.repr, n
+
+proc arrayLength(n: NimNode): int =
+  if n.kind != nnkBracketExpr or n[0].repr != "array":
+    return 0
+  if n[1].kind == nnkIntLit:
+    return n[1].intVal.int
+  if n[1].kind == nnkBracketExpr and n[1].len == 3 and n[1][0].repr == "..":
+    return n[1][2].intVal.int - n[1][1].intVal.int + 1
+  if n[1].kind == nnkInfix and n[1].len == 3 and n[1][0].repr == "..":
+    return n[1][2].intVal.int - n[1][1].intVal.int + 1
+  err "can't figure out array length: " & n.repr, n
+
+proc splitArrayType(n: NimNode): tuple[baseType, suffix: string] =
+  if n.kind == nnkBracketExpr and n[0].repr == "array":
+    let length = n.arrayLength()
+    result.baseType = typeString(n[2])
+    result.suffix = "[" & $length & "]"
+  else:
+    result.baseType = typeString(n)
+    result.suffix = ""
 
 ## Default constructor for different shader types.
 proc typeDefault(t: string, n: NimNode): string =
@@ -248,7 +277,10 @@ proc emitBackendCall(n: NimNode, res: var string): bool =
     return false
 
   let name = n[0].strVal
-  if name notin ["texture", "texelFetch", "imageLoad", "imageStore"]:
+  if name notin [
+    "texture", "textureLod", "textureSize", "texelFetch", "imageLoad",
+    "imageStore"
+  ]:
     return false
   var args: seq[string]
   for i in 1 ..< n.len:
@@ -666,7 +698,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.add "("
     for subn in n:
       case subn.kind
-      of nnkElifExpr:
+      of nnkElifExpr, nnkElifBranch:
         if gotElse:
           echo n.treeRepr
           err "Cannot have elif after else", n
@@ -675,7 +707,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
         res.add ") ? ("
         subn[1].toCode(res)
         res.add ") : "
-      of nnkElseExpr:
+      of nnkElseExpr, nnkElse:
         gotElse = true
         res.add "("
         subn[0].toCode(res)
@@ -779,6 +811,7 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
     emitBackendEntry(params, body, res)
     return
 
+  var entryStage = shaderAuto
   for n in topLevelNode:
     case n.kind
     of nnkEmpty:
@@ -788,6 +821,9 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
     of nnkFormalParams:
       ## Main function parameters are different in they they go in as globals.
       res.addGap()
+      entryStage = resolvedStage(gatherEntryParams(n))
+      var inLocation = 0
+      var outLocation = 0
       for paramDefs in n:
         if paramDefs.kind == nnkIdentDefs:
           let typeNode = paramDefs[^2]
@@ -802,10 +838,20 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
                 continue
               elif typeNode[0].repr == "int":
                 res.add "flat "
+              if isVulkan():
+                res.add "layout(location = "
+                res.add $outLocation
+                res.add ") "
+                inc outLocation
               res.add "out "
               res.add typeRename(typeNode[0].strVal)
             else:
               if typeNode.kind == nnkBracketExpr:
+                if isVulkan():
+                  res.add "layout(location = "
+                  res.add $inLocation
+                  res.add ") "
+                  inc inLocation
                 res.add "in "
                 res.add typeString(typeNode)
               else:
@@ -813,6 +859,11 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
                   res.add "layout(origin_upper_left) "
                 if typeNode.strVal == "int":
                   res.add "flat "
+                if isVulkan():
+                  res.add "layout(location = "
+                  res.add $inLocation
+                  res.add ") "
+                  inc inLocation
                 res.add "in "
                 res.add typeRename(typeNode.strVal)
             res.add " "
@@ -822,7 +873,12 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
     else:
       res.addGap()
       res.add "void main() {\n"
+      let oldUseResult = useResult
+      useResult = false
       n.toCodeStmts(res, level+1)
+      useResult = oldUseResult
+      if isVulkan() and entryStage == shaderVertex:
+        res.add "  gl_Position.y = -gl_Position.y;\n"
       res.add "}\n"
 
 proc hasResult(node: NimNode): bool =
@@ -946,7 +1002,10 @@ proc gatherFunction(
   types: var Table[string, string],
   hlslUniforms: var seq[dx12.UniformParam],
   hlslUniformNames: var Table[string, bool],
-  hlslTextures: var Table[string, int]
+  hlslTextures: var Table[string, int],
+  vulkanUniforms: var seq[vulkan.UniformParam],
+  vulkanUniformNames: var Table[string, bool],
+  vulkanTextures: var Table[string, int]
 ) =
 
   ## Looks for functions this function calls and brings them up
@@ -970,8 +1029,29 @@ proc gatherFunction(
             if typeInst.kind == nnkBracketExpr:
               # might be a uniform
               if typeInst[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
-                let samplerType = typeString(typeInst[1])
-                if isGlsl():
+                let (samplerType, arraySuffix) = splitArrayType(typeInst[1])
+                if isVulkan():
+                  if typeInst[0].repr == "Uniform" and
+                      typeInst[1].repr in shaderSamplerTypes:
+                    let textureBinding =
+                      if name in vulkanTextures:
+                        vulkanTextures[name]
+                      else:
+                        let nextBinding = vulkanTextures.len
+                        vulkanTextures[name] = nextBinding
+                        nextBinding
+                    defStr.add vulkanSamplerDecl(name, samplerType, textureBinding)
+                  elif typeInst[0].repr == "Uniform":
+                    if name notin vulkanUniformNames:
+                      vulkanUniformNames[name] = true
+                      vulkanUniforms.add (
+                        name: name & arraySuffix,
+                        typ: samplerType
+                      )
+                    addGlobal = false
+                  else:
+                    defStr.add samplerType
+                elif isGlsl():
                   defStr.add typeRename(typeInst[0].repr)
                   defStr.add " "
                   if shaderTarget == glslES3 and glsl3NeedsHighp(samplerType):
@@ -979,7 +1059,7 @@ proc gatherFunction(
                   defStr.add samplerType
                 elif isHlsl():
                   if typeInst[0].repr == "Uniform" and
-                      typeInst[1].repr in ["Sampler2d", "USampler2d", "Sampler2dArray"]:
+                      typeInst[1].repr in shaderSamplerTypes:
                     let textureRegister =
                       if name in hlslTextures:
                         hlslTextures[name]
@@ -992,7 +1072,10 @@ proc gatherFunction(
                   elif typeInst[0].repr == "Uniform":
                     if name notin hlslUniformNames:
                       hlslUniformNames[name] = true
-                      hlslUniforms.add (name: name, typ: samplerType)
+                      hlslUniforms.add (
+                        name: name & arraySuffix,
+                        typ: samplerType
+                      )
                     addGlobal = false
                   else:
                     defStr.add samplerType
@@ -1005,10 +1088,12 @@ proc gatherFunction(
                   else:
                     defStr.add samplerType
               elif typeInst[0].repr == "array":
-                defStr.add typeString(typeInst[2])
-                defStr.add "["
-                defStr.add typeRename(typeInst[1][2].repr)
-                defStr.add "]"
+                let (baseType, arraySuffix) = splitArrayType(typeInst)
+                defStr.add baseType
+                defStr.add " "
+                defStr.add name
+                defStr.add arraySuffix
+                addGlobal = false
               else:
                 err "Invalid x[y].", n
             else:
@@ -1016,8 +1101,15 @@ proc gatherFunction(
             if addGlobal:
               if not (isHlsl() and typeInst.kind == nnkBracketExpr and
                   typeInst[0].repr == "Uniform" and
-                  typeInst[1].repr in ["Sampler2d", "USampler2d", "Sampler2dArray"]):
+                  typeInst[1].repr in shaderSamplerTypes) and
+                  not (isVulkan() and typeInst.kind == nnkBracketExpr and
+                  typeInst[0].repr == "Uniform" and
+                  typeInst[1].repr in shaderSamplerTypes):
                 defStr.add " " & name
+                if typeInst.kind == nnkBracketExpr and
+                    typeInst[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
+                  let (_, arraySuffix) = splitArrayType(typeInst[1])
+                  defStr.add arraySuffix
               if impl[2].kind != nnkEmpty:
                 defStr.add " = " & repr(impl[2])
               defStr.addSmart ';'
@@ -1044,7 +1136,10 @@ proc gatherFunction(
           types,
           hlslUniforms,
           hlslUniformNames,
-          hlslTextures
+          hlslTextures,
+          vulkanUniforms,
+          vulkanUniformNames,
+          vulkanTextures
         )
         functions[procName] = procDef(impl)
 
@@ -1061,7 +1156,10 @@ proc gatherFunction(
       types,
       hlslUniforms,
       hlslUniformNames,
-      hlslTextures
+      hlslTextures,
+      vulkanUniforms,
+      vulkanUniformNames,
+      vulkanTextures
     )
 
 proc toGLSLInner*(s: NimNode, version, extra: string): string =
@@ -1088,6 +1186,9 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   var hlslUniforms: seq[dx12.UniformParam]
   var hlslUniformNames: Table[string, bool]
   var hlslTextures: Table[string, int]
+  var vulkanUniforms: seq[vulkan.UniformParam]
+  var vulkanUniformNames: Table[string, bool]
+  var vulkanTextures: Table[string, int]
   gatherFunction(
     n,
     functions,
@@ -1095,7 +1196,10 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     types,
     hlslUniforms,
     hlslUniformNames,
-    hlslTextures
+    hlslTextures,
+    vulkanUniforms,
+    vulkanUniformNames,
+    vulkanTextures
   )
 
   # Put types first.
@@ -1108,6 +1212,9 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   code.addGap()
   if isHlsl() and hlslUniforms.len > 0:
     code.add emitHlslUniformBuffer(hlslUniforms)
+    code.add "\n"
+  if isVulkan() and vulkanUniforms.len > 0:
+    code.add emitVulkanPushConstants(vulkanUniforms)
     code.add "\n"
   for k, v in globals:
     code.add(v)
@@ -1144,6 +1251,8 @@ proc toGLSLInner*(s: NimNode, target: GlslTarget): string =
   case target
   of glsl4Desktop:
     toGLSLInner(s, glsl4DesktopVersion, glsl4DesktopExtra)
+  of vulkanGlsl450:
+    toGLSLInner(s, vulkanGlsl450Version, vulkanGlsl450Extra)
   of glsl3Desktop:
     toGLSLInner(s, glsl3DesktopVersion, glsl3DesktopExtra)
   of glsl3WebGL:
@@ -1164,6 +1273,8 @@ proc toShaderInner*(
   case target
   of glsl4Desktop:
     toGLSLInner(s, glsl4DesktopVersion, glsl4DesktopExtra)
+  of vulkanGlsl450:
+    toGLSLInner(s, vulkanGlsl450Version, vulkanGlsl450Extra)
   of glsl3Desktop:
     toGLSLInner(s, glsl3DesktopVersion, glsl3DesktopExtra)
   of glsl3WebGL:
@@ -1230,6 +1341,12 @@ type
   Sampler2d* = object
     image*: Image
 
+  SamplerCube* = object
+    faces*: array[6, Image]
+
+  Sampler2dShadow* = object
+    image*: Image
+
   USampler2d* = object
     image*: Image
 
@@ -1240,6 +1357,37 @@ var
   ## GLSL globals.
   gl_Position*: Vec4
   gl_VertexID*: int32
+  gl_FrontFacing*: bool
+
+proc mat3*(m: Mat4): Mat3 =
+  result[0, 0] = m[0, 0]
+  result[0, 1] = m[0, 1]
+  result[0, 2] = m[0, 2]
+  result[1, 0] = m[1, 0]
+  result[1, 1] = m[1, 1]
+  result[1, 2] = m[1, 2]
+  result[2, 0] = m[2, 0]
+  result[2, 1] = m[2, 1]
+  result[2, 2] = m[2, 2]
+
+proc mat4*(diagonal: float32): Mat4 =
+  result[0, 0] = diagonal
+  result[1, 1] = diagonal
+  result[2, 2] = diagonal
+  result[3, 3] = diagonal
+
+proc `*`*(m: Mat4, s: float32): Mat4 =
+  for i in 0 ..< 4:
+    for j in 0 ..< 4:
+      result[i, j] = m[i, j] * s
+
+proc `*`*(s: float32, m: Mat4): Mat4 =
+  m * s
+
+proc `+`*(a, b: Mat4): Mat4 =
+  for i in 0 ..< 4:
+    for j in 0 ..< 4:
+      result[i, j] = a[i, j] + b[i, j]
 
 proc texelFetch*(buffer: Uniform[SamplerBuffer], index: SomeInteger): Vec4 =
   vec4(buffer.data[index.int], 0, 0, 0)
@@ -1381,7 +1529,29 @@ proc texture*(buffer: Uniform[Sampler2D], pos: Vec2): Vec4 =
     ((pos.y mod 1.0) * buffer.image.height.float32)
   ).vec4()
 
+proc texture*(buffer: Uniform[SamplerCube], pos: Vec3): Vec4 =
+  ## CPU stub for samplerCube; not used at runtime. Returns opaque black.
+  vec4(0, 0, 0, 1)
+
+proc texture*(buffer: Uniform[Sampler2dShadow], pos: Vec3): float32 =
+  ## CPU stub for sampler2DShadow; not used at runtime. Returns fully lit.
+  1.0
+
+proc textureLod*(buffer: Uniform[SamplerCube], pos: Vec3, lod: float32): Vec4 =
+  ## CPU stub for samplerCube textureLod; not used at runtime.
+  texture(buffer, pos)
+
+proc reflect*(incident, normal: Vec3): Vec3 =
+  incident - 2.0'f32 * dot(normal, incident) * normal
+
 proc textureSize*(buffer: Uniform[Sampler2D], level: int): Vec2 =
+  vec2(buffer.image.width.float32, buffer.image.height.float32)
+
+proc textureSize*(buffer: Uniform[SamplerCube], level: int): Vec2 =
+  let image = buffer.faces[0]
+  vec2(image.width.float32, image.height.float32)
+
+proc textureSize*(buffer: Uniform[Sampler2dShadow], level: int): Vec2 =
   vec2(buffer.image.width.float32, buffer.image.height.float32)
 
 proc textureGrad*(

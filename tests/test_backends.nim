@@ -126,6 +126,15 @@ block:
   doAssert "#version 410" in glsl4Vertex
   doAssert "in vec3 position;" in glsl4Vertex
 
+  let vulkanVertex = toShader(layoutVertex, vulkanGlsl450, shaderVertex)
+  doAssert "#version 450" in vulkanVertex
+  doAssert "layout(location = 0) in vec3 position;" in vulkanVertex
+  doAssert "layout(location = 1) in vec2 uv;" in vulkanVertex
+  doAssert "layout(location = 2) in vec4 vertexColor;" in vulkanVertex
+  doAssert "layout(location = 0) out vec2 fragmentUv;" in vulkanVertex
+  doAssert "layout(location = 1) out vec4 fragmentColor;" in vulkanVertex
+  doAssert "gl_Position.y = -gl_Position.y;" in vulkanVertex
+
   let hlslVertex = toHLSL(layoutVertex, shaderVertex)
   doAssert "float3 position : POSITION0" in hlslVertex
   doAssert "float2 uv : TEXCOORD0" in hlslVertex
@@ -167,5 +176,17 @@ block:
   doAssert "cbuffer ShadyUniforms : register(b0)" in hlslUniformVertex
   doAssert "float2 viewportSize;" in hlslUniformVertex
   doAssert "float2 pos : POSITION0" in hlslUniformVertex
+
+  let vulkanUniformVertex = toShader(uniformVertex, vulkanGlsl450, shaderVertex)
+  doAssert "layout(push_constant) uniform ShadyPushConstants" in vulkanUniformVertex
+  doAssert "vec2 viewportSize;" in vulkanUniformVertex
+  doAssert "#define viewportSize shadyPushConstants.viewportSize" in vulkanUniformVertex
+  doAssert "layout(location = 0) in vec2 pos;" in vulkanUniformVertex
+
+  let vulkanFragment = toShader(layoutFragment, vulkanGlsl450, shaderFragment)
+  doAssert "layout(set = 0, binding = 0) uniform sampler2D atlas;" in vulkanFragment
+  doAssert "layout(location = 0) in vec2 fragmentUv;" in vulkanFragment
+  doAssert "layout(location = 1) in vec4 fragmentColor;" in vulkanFragment
+  doAssert "layout(location = 0) out vec4 fragColor;" in vulkanFragment
 
 echo "Backend codegen tests passed"
