@@ -268,6 +268,9 @@ proc typeInstRepr(n: NimNode): string =
 proc isSamplerBufferExpr(n: NimNode): bool =
   "SamplerBuffer" in n.typeInstRepr()
 
+proc isShadowSamplerExpr(n: NimNode): bool =
+  "Sampler2dShadow" in n.typeInstRepr()
+
 proc codeExpr(n: NimNode): string =
   n.toCode(result)
 
@@ -288,9 +291,19 @@ proc emitBackendCall(n: NimNode, res: var string): bool =
 
   let call =
     if isHlsl():
-      hlslResourceCall(name, args, n.len > 1 and n[1].isSamplerBufferExpr)
+      hlslResourceCall(
+        name,
+        args,
+        n.len > 1 and n[1].isSamplerBufferExpr,
+        n.len > 1 and n[1].isShadowSamplerExpr
+      )
     else:
-      metalResourceCall(name, args, n.len > 1 and n[1].isSamplerBufferExpr)
+      metalResourceCall(
+        name,
+        args,
+        n.len > 1 and n[1].isSamplerBufferExpr,
+        n.len > 1 and n[1].isShadowSamplerExpr
+      )
   if call.len == 0:
     return false
   res.add call
@@ -1068,7 +1081,11 @@ proc gatherFunction(
                         hlslTextures[name] = nextRegister
                         nextRegister
                     defStr.add hlslTextureDecl(name, samplerType, textureRegister)
-                    globals[name & "Sampler"] = hlslSamplerDecl(name, textureRegister)
+                    globals[name & "Sampler"] = hlslSamplerDecl(
+                      name,
+                      textureRegister,
+                      typeInst[1].repr
+                    )
                   elif typeInst[0].repr == "Uniform":
                     if name notin hlslUniformNames:
                       hlslUniformNames[name] = true

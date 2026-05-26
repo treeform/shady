@@ -34,6 +34,8 @@ proc glslTypeRename*(t: string): string =
 
   of "SamplerBuffer": "samplerBuffer"
   of "Sampler2d": "sampler2D"
+  of "SamplerCube": "samplerCube"
+  of "Sampler2dShadow": "sampler2DShadow"
   of "USampler2d": "usampler2D"
   of "Sampler2dArray": "sampler2DArray"
   of "ImageBuffer": "imageBuffer"
@@ -73,7 +75,7 @@ proc glslTypeDefault*(t: string): string =
 
 const glslGlobals* = [
   "gl_Position", "gl_FragCoord", "gl_GlobalInvocationID",
-  "gl_VertexID",
+  "gl_VertexID", "gl_FrontFacing",
 ]
 
 const glslFunctions* = [
@@ -86,13 +88,15 @@ const glslFunctions* = [
   "IVec2", "IVec3", "IVec4",
 
   "abs", "clamp", "min", "max", "dot", "sqrt", "mix", "length",
-  "texelFetch", "imageStore", "imageLoad", "texture", "textureSize",
+  "cross", "reflect", "log2",
+  "texelFetch", "imageStore", "imageLoad", "texture", "textureLod",
+  "textureSize",
   "textureGrad",
   "normalize",
   "floor", "ceil", "round", "exp", "inversesqrt",
   "[]", "[]=",
   "inverse",
-  "sin", "cos", "tan", "pow",
+  "sin", "cos", "tan", "acos", "atan", "pow",
   "fmod",
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",

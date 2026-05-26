@@ -35,6 +35,8 @@ proc metalTypeRename*(t: string): string =
 
   of "SamplerBuffer": "texture_buffer<float>"
   of "Sampler2d": "texture2d<float>"
+  of "SamplerCube": "texturecube<float>"
+  of "Sampler2dShadow": "depth2d<float>"
   of "USampler2d": "texture2d<uint>"
   of "Sampler2dArray": "texture2d_array<float>"
   of "ImageBuffer": "device float4*"
@@ -58,6 +60,8 @@ proc metalProcRename*(t: string): string =
   of "ivec2": "int2"
   of "ivec3": "int3"
   of "ivec4": "int4"
+  of "mix": "mix"
+  of "atan": "atan2"
   of "dFdx": "dfdx"
   of "dFdy": "dfdy"
   of "fmod": "fmod"
@@ -95,6 +99,8 @@ proc metalAttribute*(name: string, index: int, isOutput: bool): string =
     " [[position]]"
   of "gl_VertexID":
     " [[vertex_id]]"
+  of "gl_FrontFacing":
+    " [[front_facing]]"
   else:
     if isOutput:
       ""
@@ -107,12 +113,23 @@ proc metalOutputFieldName*(name: string): string =
 proc metalResourceCall*(
   name: string,
   args: openArray[string],
-  firstArgIsSamplerBuffer: bool
+  firstArgIsSamplerBuffer: bool,
+  firstArgIsShadowSampler: bool
 ): string =
   case name
   of "texture":
     if args.len != 2: return ""
-    args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ")"
+    if firstArgIsShadowSampler:
+      args[0] & ".sample_compare(" & args[0] & "Sampler, " &
+        args[1] & ".xy, " & args[1] & ".z)"
+    else:
+      args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ")"
+  of "textureLod":
+    if args.len != 3: return ""
+    args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ", level(" & args[2] & "))"
+  of "textureSize":
+    if args.len < 1: return ""
+    args[0] & ".get_width()"
   of "texelFetch":
     if args.len < 2: return ""
     if firstArgIsSamplerBuffer:
@@ -233,6 +250,13 @@ proc emitMetalEntry*(
         result.add p.name
         result.add metalAttribute(p.name, inputIndex, false)
         inc inputIndex
+    if not params.hasParam("gl_FrontFacing") and "gl_FrontFacing" in bodyCode:
+      if first:
+        result.add "\n"
+        first = false
+      else:
+        result.add ",\n"
+      result.add "  bool gl_FrontFacing [[front_facing]]"
     if not first:
       result.add "\n"
     result.add ") {\n"

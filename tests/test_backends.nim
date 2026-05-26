@@ -68,6 +68,26 @@ block:
   doAssert "atlas.sample(atlasSampler, uv)" in msl
 
 block:
+  var shadowMap: Uniform[Sampler2dShadow]
+
+  proc sampledShadow(uvz: Vec3, fragColor: var Vec4) =
+    let lit = texture(shadowMap, uvz)
+    fragColor = vec4(lit, lit, lit, 1.0)
+
+  let glsl = toShader(sampledShadow, glsl4Desktop, shaderFragment)
+  doAssert "uniform sampler2DShadow shadowMap;" in glsl
+  doAssert "texture(shadowMap, uvz)" in glsl
+
+  let hlsl = toHLSL(sampledShadow, shaderFragment)
+  doAssert "Texture2D<float> shadowMap : register(t0);" in hlsl
+  doAssert "SamplerComparisonState shadowMapSampler : register(s0);" in hlsl
+  doAssert "shadowMap.SampleCmpLevelZero(shadowMapSampler, uvz.xy, uvz.z)" in hlsl
+
+  let msl = toMSL(sampledShadow, shaderFragment)
+  doAssert "depth2d<float> shadowMap;" in msl
+  doAssert "shadowMap.sample_compare(shadowMapSampler, uvz.xy, uvz.z)" in msl
+
+block:
   var atlas: Uniform[Sampler2d]
   var viewportSize: Uniform[Vec2]
 

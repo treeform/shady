@@ -37,6 +37,8 @@ proc hlslTypeRename*(t: string): string =
 
   of "SamplerBuffer": "Buffer<float>"
   of "Sampler2d": "Texture2D<float4>"
+  of "SamplerCube": "TextureCube<float4>"
+  of "Sampler2dShadow": "Texture2D<float>"
   of "USampler2d": "Texture2D<uint4>"
   of "Sampler2dArray": "Texture2DArray<float4>"
   of "ImageBuffer": "RWBuffer<float4>"
@@ -62,12 +64,14 @@ proc hlslProcRename*(t: string): string =
   of "ivec4": "int4"
   of "mix": "lerp"
   of "fract": "frac"
+  of "atan": "atan2"
   of "dFdx": "ddx"
   of "dFdy": "ddy"
   of "fmod": "fmod"
   of "mod": "%"
   of "div": "/"
   of "gl_Position": "gl_Position"
+  of "gl_FrontFacing": "gl_FrontFacing"
   else: t.replace("`", "_")
 
 proc hlslTypeDefault*(t: string): string =
@@ -113,6 +117,8 @@ proc hlslSemantic*(name: string, index: int, isOutput: bool): string =
     " : SV_POSITION"
   of "gl_FragCoord":
     " : SV_POSITION"
+  of "gl_FrontFacing":
+    " : SV_IsFrontFace"
   of "gl_VertexID":
     " : SV_VertexID"
   else:
@@ -127,7 +133,8 @@ proc nextSemanticIndex(
   counts: var Table[string, int]
 ): int =
   case name
-  of "fragColor", "gl_FragColor", "gl_Position", "gl_FragCoord", "gl_VertexID":
+  of "fragColor", "gl_FragColor", "gl_Position", "gl_FragCoord", "gl_VertexID",
+      "gl_FrontFacing":
     return 0
   else:
     let base = semanticBase(name)
@@ -142,8 +149,13 @@ proc hlslOutputFieldName*(name: string): string =
 proc hlslTextureDecl*(name, typ: string, register: int): string =
   typ & " " & name & " : register(t" & $register & ");"
 
-proc hlslSamplerDecl*(name: string, register: int): string =
-  "SamplerState " & name & "Sampler : register(s" & $register & ");"
+proc hlslSamplerDecl*(name: string, register: int, nimType = ""): string =
+  let samplerType =
+    if nimType == "Sampler2dShadow":
+      "SamplerComparisonState"
+    else:
+      "SamplerState"
+  samplerType & " " & name & "Sampler : register(s" & $register & ");"
 
 proc emitHlslUniformBuffer*(
   uniforms: openArray[UniformParam],
@@ -165,12 +177,23 @@ proc emitHlslUniformBuffer*(
 proc hlslResourceCall*(
   name: string,
   args: openArray[string],
-  firstArgIsSamplerBuffer: bool
+  firstArgIsSamplerBuffer: bool,
+  firstArgIsShadowSampler: bool
 ): string =
   case name
   of "texture":
     if args.len != 2: return ""
-    args[0] & ".Sample(" & args[0] & "Sampler, " & args[1] & ")"
+    if firstArgIsShadowSampler:
+      args[0] & ".SampleCmpLevelZero(" & args[0] & "Sampler, " &
+        args[1] & ".xy, " & args[1] & ".z)"
+    else:
+      args[0] & ".Sample(" & args[0] & "Sampler, " & args[1] & ")"
+  of "textureLod":
+    if args.len != 3: return ""
+    args[0] & ".SampleLevel(" & args[0] & "Sampler, " & args[1] & ", " & args[2] & ")"
+  of "textureSize":
+    if args.len < 1: return ""
+    args[0] & ".GetDimensions()"
   of "texelFetch":
     if args.len < 2: return ""
     if firstArgIsSamplerBuffer:
@@ -289,6 +312,13 @@ proc emitHlslEntry*(
     if not params.hasParam("gl_FragCoord"):
       result.add "\n  float4 gl_FragCoord : SV_POSITION"
       first = false
+    if not params.hasParam("gl_FrontFacing") and "gl_FrontFacing" in bodyCode:
+      if first:
+        result.add "\n"
+        first = false
+      else:
+        result.add ",\n"
+      result.add "  bool gl_FrontFacing : SV_IsFrontFace"
     for p in params:
       if not p.isOut:
         if first:
