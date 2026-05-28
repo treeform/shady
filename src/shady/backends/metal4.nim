@@ -1,6 +1,9 @@
-import strutils
+import algorithm, strutils
 
-type EntryParam* = tuple[name, typ: string, isOut: bool]
+type
+  EntryParam* = tuple[name, typ: string, isOut: bool]
+  UniformParam* = tuple[name, typ: string]
+  TextureParam* = tuple[name, typ: string, binding: int, samplerBinding: int]
 
 const metalHeader* = "#include <metal_stdlib>\nusing namespace metal;\n"
 
@@ -63,7 +66,7 @@ proc metalProcRename*(t: string): string =
   of "mix": "mix"
   of "atan": "atan2"
   of "dFdx": "dfdx"
-  of "dFdy": "dfdy"
+  of "dFdy": "-dfdy"
   of "fmod": "fmod"
   of "mod": "%"
   of "div": "/"
@@ -109,6 +112,41 @@ proc metalAttribute*(name: string, index: int, isOutput: bool): string =
 
 proc metalOutputFieldName*(name: string): string =
   if name == "gl_Position": "position" else: name
+
+proc metalTextureDecl*(
+  name,
+  typ: string,
+  binding,
+  samplerBinding: int
+): string =
+  typ & " " & name & " [[texture(" & $binding & ")]],\n" &
+    "  sampler " & name & "Sampler [[sampler(" & $samplerBinding & ")]]"
+
+proc emitMetalUniformBuffer*(
+  uniforms: openArray[UniformParam],
+  bufferIndex: int
+): string =
+  if uniforms.len == 0:
+    return ""
+  result.add "struct ShadyUniforms"
+  result.add $bufferIndex
+  result.add " {\n"
+  for uniform in uniforms:
+    result.add "  "
+    result.add uniform.typ
+    result.add " "
+    result.add uniform.name
+    result.add ";\n"
+  result.add "};\n"
+  for uniform in uniforms:
+    let defineName = uniform.name.split("[", 1)[0]
+    result.add "#define "
+    result.add defineName
+    result.add " shadyUniforms"
+    result.add $bufferIndex
+    result.add "."
+    result.add defineName
+    result.add "\n"
 
 proc metalResourceCall*(
   name: string,
@@ -157,6 +195,9 @@ proc hasParam(params: openArray[EntryParam], name: string): bool =
     if p.name == name:
       return true
 
+proc isSpecialInput(p: EntryParam): bool =
+  p.name in ["gl_VertexID", "gl_FrontFacing"]
+
 proc outputLocals(params: openArray[EntryParam], level: int): string =
   let indent = repeat("  ", level)
   for p in params:
@@ -169,10 +210,90 @@ proc outputLocals(params: openArray[EntryParam], level: int): string =
       result.add metalTypeDefault(p.typ)
       result.add ";\n"
 
+proc inputParams(params: openArray[EntryParam]): seq[EntryParam] =
+  for p in params:
+    if not p.isOut and not p.isSpecialInput():
+      result.add p
+
+proc inputStruct(
+  name: string,
+  params: openArray[EntryParam],
+  stage: int
+): string =
+  let inputs = params.inputParams()
+  if inputs.len == 0:
+    return ""
+  result.add "\nstruct "
+  result.add name
+  result.add " {\n"
+  for i, p in inputs:
+    result.add "  "
+    result.add p.typ
+    result.add " "
+    result.add p.name
+    if stage == 1:
+      result.add metalAttribute(p.name, i, false)
+    result.add ";\n"
+  result.add "};\n"
+
+proc inputLocals(
+  params: openArray[EntryParam],
+  inputName: string,
+  level: int
+): string =
+  let indent = repeat("  ", level)
+  for p in params.inputParams():
+    result.add indent
+    result.add p.typ
+    result.add " "
+    result.add p.name
+    result.add " = "
+    result.add inputName
+    result.add "."
+    result.add p.name
+    result.add ";\n"
+
+proc addComma(result: var string, first: var bool) =
+  if first:
+    result.add "\n"
+    first = false
+  else:
+    result.add ",\n"
+
+proc resourceParams(
+  uniforms: openArray[UniformParam],
+  textures: openArray[TextureParam],
+  stage: int
+): seq[string] =
+  let uniformBuffer =
+    if stage == 2:
+      1
+    else:
+      0
+  if uniforms.len > 0:
+    result.add "constant ShadyUniforms" & $uniformBuffer &
+      " &shadyUniforms" & $uniformBuffer &
+      " [[buffer(" & $uniformBuffer & ")]]"
+
+  var textureList = @textures
+  textureList.sort(
+    proc(a, b: TextureParam): int =
+      cmp(a.binding, b.binding)
+  )
+  for texture in textureList:
+    result.add metalTextureDecl(
+      texture.name,
+      texture.typ,
+      texture.binding,
+      texture.samplerBinding
+    )
+
 proc emitMetalEntry*(
   params: openArray[EntryParam],
   bodyCode: string,
-  stage: int
+  stage: int,
+  uniforms: openArray[UniformParam] = [],
+  textures: openArray[TextureParam] = []
 ): string =
   case stage
   of 1:
@@ -190,34 +311,25 @@ proc emitMetalEntry*(
       result.add metalAttribute(p.name, 0, true)
       result.add ";\n"
     result.add "};\n\n"
+    result.add inputStruct("VertexIn", params, stage)
 
     result.add "vertex VertexOut vertexMain("
-    var inputIndex = 0
     var first = true
-    for p in params:
-      if not p.isOut:
-        if first:
-          result.add "\n"
-          first = false
-        else:
-          result.add ",\n"
-        result.add "  "
-        result.add p.typ
-        result.add " "
-        result.add p.name
-        result.add metalAttribute(p.name, inputIndex, false)
-        inc inputIndex
+    if params.inputParams().len > 0:
+      result.addComma(first)
+      result.add "  VertexIn input [[stage_in]]"
     if not params.hasParam("gl_VertexID") and "gl_VertexID" in bodyCode:
-      if first:
-        result.add "\n"
-        first = false
-      else:
-        result.add ",\n"
+      result.addComma(first)
       result.add "  uint gl_VertexID [[vertex_id]]"
+    for resource in resourceParams(uniforms, textures, stage):
+      result.addComma(first)
+      result.add "  "
+      result.add resource
     if not first:
       result.add "\n"
     result.add ") {\n"
     result.add "  VertexOut output;\n"
+    result.add inputLocals(params, "input", 1)
     result.add outputLocals(params, 1)
     result.add bodyCode
     for p in outputs:
@@ -226,40 +338,34 @@ proc emitMetalEntry*(
       result.add " = "
       result.add p.name
       result.add ";\n"
+      if p.name == "gl_Position":
+        result.add "  output.position.z = "
+        result.add "(output.position.z + output.position.w) * 0.5;\n"
     result.add "  return output;\n"
     result.add "}\n"
 
   of 2:
     let outputIndex = firstOutput(params)
     let returnType = if outputIndex >= 0: params[outputIndex].typ else: "void"
+    result.add inputStruct("FragmentIn", params, stage)
     result.add "\nfragment "
     result.add returnType
     result.add " fragmentMain("
-    var inputIndex = 0
     var first = true
-    for p in params:
-      if not p.isOut:
-        if first:
-          result.add "\n"
-          first = false
-        else:
-          result.add ",\n"
-        result.add "  "
-        result.add p.typ
-        result.add " "
-        result.add p.name
-        result.add metalAttribute(p.name, inputIndex, false)
-        inc inputIndex
+    if params.inputParams().len > 0:
+      result.addComma(first)
+      result.add "  FragmentIn input [[stage_in]]"
     if not params.hasParam("gl_FrontFacing") and "gl_FrontFacing" in bodyCode:
-      if first:
-        result.add "\n"
-        first = false
-      else:
-        result.add ",\n"
+      result.addComma(first)
       result.add "  bool gl_FrontFacing [[front_facing]]"
+    for resource in resourceParams(uniforms, textures, stage):
+      result.addComma(first)
+      result.add "  "
+      result.add resource
     if not first:
       result.add "\n"
     result.add ") {\n"
+    result.add inputLocals(params, "input", 1)
     result.add outputLocals(params, 1)
     result.add bodyCode
     if outputIndex >= 0:

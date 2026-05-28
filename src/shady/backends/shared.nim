@@ -887,14 +887,26 @@ proc stageId(stage: ShaderStage): int =
   of shaderCompute: 3
   of shaderAuto: 0
 
-proc emitBackendEntry(params: seq[EntryParam], body: NimNode, res: var string) =
+proc emitBackendEntry(
+  params: seq[EntryParam],
+  body: NimNode,
+  res: var string,
+  metalUniforms: seq[metal4.UniformParam],
+  metalTextures: seq[metal4.TextureParam]
+) =
   var bodyCode = ""
   body.toCodeStmts(bodyCode, 1)
   let stage = resolvedStage(params).stageId()
   if isHlsl():
     res.add dx12.emitHlslEntry(params, bodyCode, stage)
   else:
-    res.add metal4.emitMetalEntry(params, bodyCode, stage)
+    res.add metal4.emitMetalEntry(
+      params,
+      bodyCode,
+      stage,
+      metalUniforms,
+      metalTextures
+    )
 
 proc resolvedEntryStage(topLevelNode: NimNode): ShaderStage =
   for n in topLevelNode:
@@ -902,7 +914,13 @@ proc resolvedEntryStage(topLevelNode: NimNode): ShaderStage =
       return resolvedStage(gatherEntryParams(n))
   shaderFragment
 
-proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
+proc toCodeTopLevel(
+  topLevelNode: NimNode,
+  res: var string,
+  level = 0,
+  metalUniforms: seq[metal4.UniformParam] = @[],
+  metalTextures: seq[metal4.TextureParam] = @[]
+) =
   ## Top level block such as in and out params.
   ## Generates the main function (which is not like all the other functions)
 
@@ -920,7 +938,7 @@ proc toCodeTopLevel(topLevelNode: NimNode, res: var string, level = 0) =
       else:
         body = n
     let params = gatherEntryParams(formalParams)
-    emitBackendEntry(params, body, res)
+    emitBackendEntry(params, body, res, metalUniforms, metalTextures)
     return
 
   var entryStage = shaderAuto
@@ -1113,7 +1131,11 @@ proc gatherFunction(
   hlslTextures: var Table[string, int],
   vulkanUniforms: var seq[vulkan.UniformParam],
   vulkanUniformNames: var Table[string, bool],
-  vulkanTextures: var Table[string, int]
+  vulkanTextures: var Table[string, int],
+  metalUniforms: var seq[metal4.UniformParam],
+  metalUniformNames: var Table[string, bool],
+  metalTextures: var seq[metal4.TextureParam],
+  metalTextureNames: var Table[string, int]
 ) =
 
   ## Looks for functions this function calls and brings them up
@@ -1191,6 +1213,31 @@ proc gatherFunction(
                     addGlobal = false
                   else:
                     defStr.add samplerType
+                elif isMetal():
+                  if typeInst[0].repr == "Uniform" and
+                      typeInst[1].repr in shaderSamplerTypes:
+                    if name notin metalTextureNames:
+                      let binding = metalTextures.len
+                      metalTextureNames[name] = binding
+                      metalTextures.add (
+                        name: name,
+                        typ: samplerType,
+                        binding: binding,
+                        samplerBinding: binding
+                      )
+                    addGlobal = false
+                  elif typeInst[0].repr == "Uniform":
+                    if name notin metalUniformNames:
+                      metalUniformNames[name] = true
+                      metalUniforms.add (
+                        name: name & arraySuffix,
+                        typ: samplerType
+                      )
+                    addGlobal = false
+                  elif typeInst[0].repr == "UniformWriteOnly":
+                    defStr.add samplerType
+                  else:
+                    defStr.add samplerType
                 else:
                   if typeInst[0].repr == "Uniform":
                     defStr.add "constant "
@@ -1251,7 +1298,11 @@ proc gatherFunction(
           hlslTextures,
           vulkanUniforms,
           vulkanUniformNames,
-          vulkanTextures
+          vulkanTextures,
+          metalUniforms,
+          metalUniformNames,
+          metalTextures,
+          metalTextureNames
         )
         functions[procName] = procDef(impl)
 
@@ -1271,7 +1322,11 @@ proc gatherFunction(
       hlslTextures,
       vulkanUniforms,
       vulkanUniformNames,
-      vulkanTextures
+      vulkanTextures,
+      metalUniforms,
+      metalUniformNames,
+      metalTextures,
+      metalTextureNames
     )
 
 proc toGLSLInner*(s: NimNode, version, extra: string): string =
@@ -1302,6 +1357,10 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   var vulkanUniforms: seq[vulkan.UniformParam]
   var vulkanUniformNames: Table[string, bool]
   var vulkanTextures: Table[string, int]
+  var metalUniforms: seq[metal4.UniformParam]
+  var metalUniformNames: Table[string, bool]
+  var metalTextures: seq[metal4.TextureParam]
+  var metalTextureNames: Table[string, int]
   gatherFunction(
     n,
     functions,
@@ -1312,7 +1371,11 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     hlslTextures,
     vulkanUniforms,
     vulkanUniformNames,
-    vulkanTextures
+    vulkanTextures,
+    metalUniforms,
+    metalUniformNames,
+    metalTextures,
+    metalTextureNames
   )
 
   # Put types first.
@@ -1341,6 +1404,12 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     else:
       code.add emitVulkanPushConstants(vulkanUniforms)
     code.add "\n"
+  if isMetal() and metalUniforms.len > 0:
+    code.add emitMetalUniformBuffer(
+      metalUniforms,
+      if entryStage == shaderFragment: 1 else: 0
+    )
+    code.add "\n"
   for k, v in globals:
     code.add(v)
     code.add "\n"
@@ -1365,7 +1434,7 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     code.add "\n"
 
   # Put the main function last.
-  toCodeTopLevel(n, code)
+  toCodeTopLevel(n, code, 0, metalUniforms, metalTextures)
 
   return code
 
@@ -1667,7 +1736,7 @@ proc textureLod*(buffer: Uniform[SamplerCube], pos: Vec3, lod: float32): Vec4 =
   texture(buffer, pos)
 
 proc reflect*(incident, normal: Vec3): Vec3 =
-  incident - 2.0'f32 * dot(normal, incident) * normal
+  incident - 2.0'f * dot(normal, incident) * normal
 
 proc textureSize*(buffer: Uniform[Sampler2D], level: int): Vec2 =
   vec2(buffer.image.width.float32, buffer.image.height.float32)
