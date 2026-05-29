@@ -19,7 +19,7 @@ block:
 
   let hlsl = toHLSL(fragmentConstant, shaderFragment)
   doAssert "float4 PSMain(" in hlsl
-  doAssert "float4 gl_FragCoord : SV_POSITION" in hlsl
+  doAssert "float4 pos : SV_POSITION;" in hlsl
   doAssert ": SV_TARGET" in hlsl
   doAssert "float4 fragColor = float4(0.0, 0.0, 0.0, 0.0);" in hlsl
   doAssert "return fragColor;" in hlsl
@@ -49,6 +49,8 @@ block:
   let msl = toMSL(vertexPass, shaderVertex)
   doAssert "struct VertexOut" in msl
   doAssert "vertex VertexOut vertexMain(" in msl
+  doAssert "float pointSize [[point_size]];" in msl
+  doAssert "output.pointSize = 1.0;" in msl
   doAssert "float4 position [[position]];" in msl
   doAssert "output.position = gl_Position;" in msl
 
@@ -64,7 +66,7 @@ block:
   doAssert "atlas.Sample(atlasSampler, uv)" in hlsl
 
   let msl = toMSL(sampledTexture, shaderFragment)
-  doAssert "texture2d<float> atlas;" in msl
+  doAssert "texture2d<float> atlas [[texture(0)]]" in msl
   doAssert "atlas.sample(atlasSampler, uv)" in msl
 
 block:
@@ -84,7 +86,7 @@ block:
   doAssert "shadowMap.SampleCmpLevelZero(shadowMapSampler, uvz.xy, uvz.z)" in hlsl
 
   let msl = toMSL(sampledShadow, shaderFragment)
-  doAssert "depth2d<float> shadowMap;" in msl
+  doAssert "depth2d<float> shadowMap [[texture(0)]]" in msl
   doAssert "shadowMap.sample_compare(shadowMapSampler, uvz.xy, uvz.z)" in msl
 
 block:
@@ -178,7 +180,7 @@ block:
   doAssert "float4 fragmentColor;" in mslVertex
 
   let mslFragment = toMSL(layoutFragment, shaderFragment)
-  doAssert "texture2d<float> atlas;" in mslFragment
+  doAssert "texture2d<float> atlas [[texture(0)]]" in mslFragment
   doAssert "atlas.sample(atlasSampler, fragmentUv)" in mslFragment
   doAssert "float4 controlTint" in mslFragment
   doAssert "for(int i = 0; i < 2; i++)" in mslFragment
@@ -193,7 +195,7 @@ block:
     gl_Position = vec4(clip.x, clip.y, 0.0, 1.0)
 
   let hlslUniformVertex = toHLSL(uniformVertex, shaderVertex)
-  doAssert "cbuffer ShadyUniforms : register(b0)" in hlslUniformVertex
+  doAssert "cbuffer ShadyUniforms0 : register(b0)" in hlslUniformVertex
   doAssert "float2 viewportSize;" in hlslUniformVertex
   doAssert "float2 pos : POSITION0" in hlslUniformVertex
 

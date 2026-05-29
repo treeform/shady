@@ -303,6 +303,7 @@ proc emitMetalEntry*(
         outputs.add p
 
     result.add "\nstruct VertexOut {\n"
+    result.add "  float pointSize [[point_size]];\n"
     for p in outputs:
       result.add "  "
       result.add p.typ
@@ -329,6 +330,7 @@ proc emitMetalEntry*(
       result.add "\n"
     result.add ") {\n"
     result.add "  VertexOut output;\n"
+    result.add "  output.pointSize = 1.0;\n"
     result.add inputLocals(params, "input", 1)
     result.add outputLocals(params, 1)
     result.add bodyCode
