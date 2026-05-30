@@ -1,0 +1,106 @@
+nimTitle	shared	shady/backends/shared.html	module shady/backends/shared		0
+nim	glsl3WebGL	shady/backends/shared.html#glsl3WebGL	ShaderTarget.glsl3WebGL		8
+nim	glsl3Desktop	shady/backends/shared.html#glsl3Desktop	ShaderTarget.glsl3Desktop		8
+nim	glsl4Desktop	shady/backends/shared.html#glsl4Desktop	ShaderTarget.glsl4Desktop		8
+nim	vulkanGlsl450	shady/backends/shared.html#vulkanGlsl450	ShaderTarget.vulkanGlsl450		8
+nim	hlslDX12	shady/backends/shared.html#hlslDX12	ShaderTarget.hlslDX12		8
+nim	metalMSL	shady/backends/shared.html#metalMSL	ShaderTarget.metalMSL		8
+nim	ShaderTarget	shady/backends/shared.html#ShaderTarget	enum ShaderTarget		8
+nim	GlslTarget	shady/backends/shared.html#GlslTarget	type GlslTarget		16
+nim	shaderAuto	shady/backends/shared.html#shaderAuto	ShaderStage.shaderAuto		18
+nim	shaderVertex	shady/backends/shared.html#shaderVertex	ShaderStage.shaderVertex		18
+nim	shaderFragment	shady/backends/shared.html#shaderFragment	ShaderStage.shaderFragment		18
+nim	shaderCompute	shady/backends/shared.html#shaderCompute	ShaderStage.shaderCompute		18
+nim	ShaderStage	shady/backends/shared.html#ShaderStage	enum ShaderStage		18
+nim	glslDesktop	shady/backends/shared.html#glslDesktop	const glslDesktop		30
+nim	glslES3	shady/backends/shared.html#glslES3	const glslES3		31
+nim	shaderTarget	shady/backends/shared.html#shaderTarget_2	var shaderTarget		34
+nim	shaderStage	shady/backends/shared.html#shaderStage_2	var shaderStage		35
+nim	glslTarget	shady/backends/shared.html#glslTarget.t	template glslTarget(): untyped		42
+nim	toGLSLInner	shady/backends/shared.html#toGLSLInner,NimNode,string,string	proc toGLSLInner(s: NimNode; version, extra: string): string		1332
+nim	toGLSLInner	shady/backends/shared.html#toGLSLInner,NimNode,ShaderTarget	proc toGLSLInner(s: NimNode; target: GlslTarget): string		1441
+nim	toShaderInner	shady/backends/shared.html#toShaderInner,NimNode,ShaderTarget	proc toShaderInner(s: NimNode; target: ShaderTarget; stage = shaderAuto): string		1459
+nim	toGLSL	shady/backends/shared.html#toGLSL.m,typed,static[ShaderTarget]	macro toGLSL(s: typed; target: static[GlslTarget]): string		1479
+nim	toGLSL	shady/backends/shared.html#toGLSL.m,typed,string,string	macro toGLSL(s: typed; version = "410"; extra = "precision highp float;\n"): string		1486
+nim	toShader	shady/backends/shared.html#toShader.m,typed,static[ShaderTarget],static[ShaderStage]	macro toShader(s: typed; target: static[ShaderTarget];\n         stage: static[ShaderStage] = shaderAuto): string		1497
+nim	toHLSL	shady/backends/shared.html#toHLSL.m,typed,static[ShaderStage]	macro toHLSL(s: typed; stage: static[ShaderStage] = shaderAuto): string		1505
+nim	toMSL	shady/backends/shared.html#toMSL.m,typed,static[ShaderStage]	macro toMSL(s: typed; stage: static[ShaderStage] = shaderAuto): string		1512
+nim	Uniform	shady/backends/shared.html#Uniform	type Uniform		1522
+nim	UniformWriteOnly	shady/backends/shared.html#UniformWriteOnly	type UniformWriteOnly		1523
+nim	Attribute	shady/backends/shared.html#Attribute	type Attribute		1524
+nim	SamplerBuffer	shady/backends/shared.html#SamplerBuffer	object SamplerBuffer		1526
+nim	ImageBuffer	shady/backends/shared.html#ImageBuffer	object ImageBuffer		1529
+nim	UImageBuffer	shady/backends/shared.html#UImageBuffer	object UImageBuffer		1532
+nim	Sampler2d	shady/backends/shared.html#Sampler2d	object Sampler2d		1535
+nim	SamplerCube	shady/backends/shared.html#SamplerCube	object SamplerCube		1538
+nim	Sampler2dShadow	shady/backends/shared.html#Sampler2dShadow	object Sampler2dShadow		1541
+nim	USampler2d	shady/backends/shared.html#USampler2d	object USampler2d		1544
+nim	Sampler2dArray	shady/backends/shared.html#Sampler2dArray	object Sampler2dArray		1547
+nim	gl_Position	shady/backends/shared.html#gl_Position	var gl_Position		1552
+nim	gl_VertexID	shady/backends/shared.html#gl_VertexID	var gl_VertexID		1553
+nim	gl_FrontFacing	shady/backends/shared.html#gl_FrontFacing	var gl_FrontFacing		1554
+nim	mat3	shady/backends/shared.html#mat3,Mat4	proc mat3(m: Mat4): Mat3		1556
+nim	mat4	shady/backends/shared.html#mat4,float32	proc mat4(diagonal: float32): Mat4		1567
+nim	`*`	shady/backends/shared.html#*,Mat4,float32	proc `*`(m: Mat4; s: float32): Mat4		1573
+nim	`*`	shady/backends/shared.html#*,float32,Mat4	proc `*`(s: float32; m: Mat4): Mat4		1578
+nim	`+`	shady/backends/shared.html#+,Mat4,Mat4	proc `+`(a, b: Mat4): Mat4		1581
+nim	texelFetch	shady/backends/shared.html#texelFetch,Uniform[SamplerBuffer],SomeInteger	proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4		1586
+nim	texelFetch	shady/backends/shared.html#texelFetch,Uniform[Sampler2d],IVec2,int	proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4		1589
+nim	texelFetch	shady/backends/shared.html#texelFetch,Uniform[USampler2d],IVec2,int	proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4		1593
+nim	imageLoad	shady/backends/shared.html#imageLoad,UniformWriteOnly[UImageBuffer],int32	proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4		1597
+nim	imageStore	shady/backends/shared.html#imageStore,UniformWriteOnly[UImageBuffer],int32,UVec4	proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;\n           color: UVec4)		1605
+nim	imageStore	shady/backends/shared.html#imageStore,UniformWriteOnly[ImageBuffer],int32,Vec4	proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)		1612
+nim	imageStore	shady/backends/shared.html#imageStore,Uniform[Sampler2d],IVec2,Vec4	proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)		1619
+nim	vec4	shady/backends/shared.html#vec4,ColorRGBX	proc vec4(c: ColorRGBX): Vec4		1628
+nim	dFdx	shady/backends/shared.html#dFdx,float32	proc dFdx(a: float32): float32		1636
+nim	dFdx	shady/backends/shared.html#dFdx,Vec2	proc dFdx(a: Vec2): Vec2		1639
+nim	dFdx	shady/backends/shared.html#dFdx,Vec3	proc dFdx(a: Vec3): Vec3		1642
+nim	dFdx	shady/backends/shared.html#dFdx,Vec4	proc dFdx(a: Vec4): Vec4		1645
+nim	dFdy	shady/backends/shared.html#dFdy,float32	proc dFdy(a: float32): float32		1648
+nim	dFdy	shady/backends/shared.html#dFdy,Vec2	proc dFdy(a: Vec2): Vec2		1651
+nim	dFdy	shady/backends/shared.html#dFdy,Vec3	proc dFdy(a: Vec3): Vec3		1654
+nim	dFdy	shady/backends/shared.html#dFdy,Vec4	proc dFdy(a: Vec4): Vec4		1657
+nim	fwidth	shady/backends/shared.html#fwidth,float32	proc fwidth(a: float32): float32		1660
+nim	fwidth	shady/backends/shared.html#fwidth,Vec2	proc fwidth(a: Vec2): Vec2		1663
+nim	fwidth	shady/backends/shared.html#fwidth,Vec3	proc fwidth(a: Vec3): Vec3		1666
+nim	fwidth	shady/backends/shared.html#fwidth,Vec4	proc fwidth(a: Vec4): Vec4		1669
+nim	fmod	shady/backends/shared.html#fmod,float32,float32	proc fmod(x, y: float32): float32		1672
+nim	fmod	shady/backends/shared.html#fmod,Vec2,float32	proc fmod(x: Vec2; y: float32): Vec2		1675
+nim	fmod	shady/backends/shared.html#fmod,Vec3,float32	proc fmod(x: Vec3; y: float32): Vec3		1678
+nim	fmod	shady/backends/shared.html#fmod,Vec4,float32	proc fmod(x: Vec4; y: float32): Vec4		1681
+nim	fmod	shady/backends/shared.html#fmod,Vec2,Vec2	proc fmod(x, y: Vec2): Vec2		1684
+nim	fmod	shady/backends/shared.html#fmod,Vec3,Vec3	proc fmod(x, y: Vec3): Vec3		1687
+nim	fmod	shady/backends/shared.html#fmod,Vec4,Vec4	proc fmod(x, y: Vec4): Vec4		1690
+nim	fract	shady/backends/shared.html#fract,float32	proc fract(a: float32): float32		1693
+nim	fract	shady/backends/shared.html#fract,Vec2	proc fract(a: Vec2): Vec2		1696
+nim	fract	shady/backends/shared.html#fract,Vec3	proc fract(a: Vec3): Vec3		1699
+nim	fract	shady/backends/shared.html#fract,Vec4	proc fract(a: Vec4): Vec4		1702
+nim	smoothstep	shady/backends/shared.html#smoothstep,float32,float32,float32	proc smoothstep(a, b, x: float32): float32		1705
+nim	smoothstep	shady/backends/shared.html#smoothstep,Vec2,Vec2,Vec2	proc smoothstep(a, b, x: Vec2): Vec2		1709
+nim	smoothstep	shady/backends/shared.html#smoothstep,Vec3,Vec3,Vec3	proc smoothstep(a, b, x: Vec3): Vec3		1712
+nim	smoothstep	shady/backends/shared.html#smoothstep,Vec4,Vec4,Vec4	proc smoothstep(a, b, x: Vec4): Vec4		1715
+nim	texture	shady/backends/shared.html#texture,Uniform[Sampler2d],Vec2	proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4		1718
+nim	texture	shady/backends/shared.html#texture,Uniform[SamplerCube],Vec3	proc texture(buffer: Uniform[SamplerCube]; pos: Vec3): Vec4		1726
+nim	texture	shady/backends/shared.html#texture,Uniform[Sampler2dShadow],Vec3	proc texture(buffer: Uniform[Sampler2dShadow]; pos: Vec3): float32		1730
+nim	textureLod	shady/backends/shared.html#textureLod,Uniform[SamplerCube],Vec3,float32	proc textureLod(buffer: Uniform[SamplerCube]; pos: Vec3; lod: float32): Vec4		1734
+nim	reflect	shady/backends/shared.html#reflect,Vec3,Vec3	proc reflect(incident, normal: Vec3): Vec3		1738
+nim	textureSize	shady/backends/shared.html#textureSize,Uniform[Sampler2d],int	proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2		1741
+nim	textureSize	shady/backends/shared.html#textureSize,Uniform[SamplerCube],int	proc textureSize(buffer: Uniform[SamplerCube]; level: int): Vec2		1744
+nim	textureSize	shady/backends/shared.html#textureSize,Uniform[Sampler2dShadow],int	proc textureSize(buffer: Uniform[Sampler2dShadow]; level: int): Vec2		1748
+nim	textureGrad	shady/backends/shared.html#textureGrad,Uniform[Sampler2d],Vec3,Vec2,Vec2	proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4		1751
+nim	textureGrad	shady/backends/shared.html#textureGrad,Uniform[Sampler2dArray],Vec3,Vec2,Vec2	proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4		1759
+nim	discardFragment	shady/backends/shared.html#discardFragment	proc discardFragment()		1767
+nimgrp	dfdx	shady/backends/shared.html#dFdx-procs-all	proc		1636
+nimgrp	fract	shady/backends/shared.html#fract-procs-all	proc		1693
+nimgrp	fmod	shady/backends/shared.html#fmod-procs-all	proc		1672
+nimgrp	texturesize	shady/backends/shared.html#textureSize-procs-all	proc		1741
+nimgrp	smoothstep	shady/backends/shared.html#smoothstep-procs-all	proc		1705
+nimgrp	texture	shady/backends/shared.html#texture-procs-all	proc		1718
+nimgrp	*	shady/backends/shared.html#*-procs-all	proc		1573
+nimgrp	toglslinner	shady/backends/shared.html#toGLSLInner-procs-all	proc		1332
+nimgrp	dfdy	shady/backends/shared.html#dFdy-procs-all	proc		1648
+nimgrp	texelfetch	shady/backends/shared.html#texelFetch-procs-all	proc		1586
+nimgrp	fwidth	shady/backends/shared.html#fwidth-procs-all	proc		1660
+nimgrp	imagestore	shady/backends/shared.html#imageStore-procs-all	proc		1605
+nimgrp	texturegrad	shady/backends/shared.html#textureGrad-procs-all	proc		1751
+nimgrp	toglsl	shady/backends/shared.html#toGLSL-macros-all	macro		1479

@@ -16,205 +16,564 @@
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4QQQEwksSS9ZWwAAAk1JREFUWMPtll2ITVEUx39nn/O7Y5qR8f05wtCUUr6ZIS++8pEnkZInPImneaCQ5METNdOkeFBKUhMPRIkHKfEuUZSUlGlKPN2TrgfncpvmnntnmlEyq1Z7t89/rf9a6+y99oZxGZf/XeIq61EdtgKXgdXA0xrYAvBjOIF1AI9zvjcC74BSpndrJPkBWDScTF8Aa4E3wDlgHbASaANmVqlcCnwHvgDvgVfAJ+AikAAvgfVZwLnSVZHZaOuKoQi3ZOMi4NkYkpe1p4J7A8BpYAD49hfIy/oqG0+hLomiKP2L5L+1ubn5115S+3OAn4EnwBlgMzCjyt6ZAnQCJ4A7wOs88iRJHvw50HoujuPBoCKwHWiosy8MdfZnAdcHk8dxXFJ3VQbQlCTJvRBCGdRbD4M6uc5glpY3eAihpN5S5w12diSEcCCEcKUO4ljdr15T76ur1FDDLIQQ3qv71EdDOe3Kxj3leRXyk+pxdWnFWod6Wt2bY3de3aSuUHcPBVimHs7mK9WrmeOF6lR1o9qnzskh2ar2qm1qizpfXaPeVGdlmGN5pb09qMxz1Xb1kLqgzn1RyH7JUXW52lr5e/Kqi9qpto7V1atuUzfnARrV7jEib1T76gG2qxdGmXyiekkt1GswPTtek0aBfJp6YySGBfWg2tPQ0FAYgf1stUfdmdcjarbYJEniKIq6gY/Aw+zWHAC+p2labGpqiorFYgGYCEzN7oQdQClN07O1/EfDyGgC0ALMBdYAi4FyK+4H3gLPsxfR1zRNi+NP7nH5J+QntnXe5B5mpfQAAAAASUVORK5CYII=">
 
 <!-- CSS -->
-<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.8">
+<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.10">
 
 <!-- JS -->
-<script type="text/javascript" src="dochack.js?v=2.2.8"></script>
+<script type="text/javascript" src="dochack.js?v=2.2.10"></script>
 </head>
 <body>
   <div class="document" id="documentId">
+    <input type="checkbox" id="nav-toggle" hidden>
+    <label for="nav-toggle" id="nav-burger">&#9776;</label>
+    <label for="nav-toggle" id="nav-overlay"></label>
     <div class="container">
       <h1 class="title">Index</h1>
-      Modules: <a href="shady.html">shady</a>.<br/><p /><h2>API symbols</h2>
-<dl><dt><a name="Attribute" href="#Attribute"><span>Attribute:</span></a></dt><dd><ul class="simple">
+      Modules: <a href="shady.html">shady</a>, <a href="shady/backends/dx12.html">shady/backends/dx12</a>, <a href="shady/backends/glsl.html">shady/backends/glsl</a>, <a href="shady/backends/glsl3.html">shady/backends/glsl3</a>, <a href="shady/backends/glsl4.html">shady/backends/glsl4</a>, <a href="shady/backends/metal4.html">shady/backends/metal4</a>, <a href="shady/backends/shared.html">shady/backends/shared</a>, <a href="shady/backends/vulkan.html">shady/backends/vulkan</a>, <a href="shady/binary.html">shady/binary</a>.<br/><p /><h2>API symbols</h2>
+<dl><dt><a name="%60%2A%60" href="#%60%2A%60"><span>`*`:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: type Attribute" href="shady.html#Attribute">shady: type Attribute</a></li>
+          data-doc-search-tag="shared: proc `*`(s: float32; m: Mat4): Mat4" href="shady/backends/shared.html#%2A%2Cfloat32%2CMat4">shared: proc `*`(s: float32; m: Mat4): Mat4</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="shared: proc `*`(m: Mat4; s: float32): Mat4" href="shady/backends/shared.html#%2A%2CMat4%2Cfloat32">shared: proc `*`(m: Mat4; s: float32): Mat4</a></li>
+          </ul></dd>
+<dt><a name="%60%2B%60" href="#%60%2B%60"><span>`+`:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: proc `+`(a, b: Mat4): Mat4" href="shady/backends/shared.html#%2B%2CMat4%2CMat4">shared: proc `+`(a, b: Mat4): Mat4</a></li>
+          </ul></dd>
+<dt><a name="Attribute" href="#Attribute"><span>Attribute:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: type Attribute" href="shady/backends/shared.html#Attribute">shared: type Attribute</a></li>
+          </ul></dd>
+<dt><a name="binaryCompute" href="#binaryCompute"><span>binaryCompute:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="binary: BinaryShaderStage.binaryCompute" href="shady/binary.html#binaryCompute">binary: BinaryShaderStage.binaryCompute</a></li>
+          </ul></dd>
+<dt><a name="binaryFragment" href="#binaryFragment"><span>binaryFragment:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="binary: BinaryShaderStage.binaryFragment" href="shady/binary.html#binaryFragment">binary: BinaryShaderStage.binaryFragment</a></li>
+          </ul></dd>
+<dt><a name="BinaryShaderStage" href="#BinaryShaderStage"><span>BinaryShaderStage:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="binary: enum BinaryShaderStage" href="shady/binary.html#BinaryShaderStage">binary: enum BinaryShaderStage</a></li>
+          </ul></dd>
+<dt><a name="binaryVertex" href="#binaryVertex"><span>binaryVertex:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="binary: BinaryShaderStage.binaryVertex" href="shady/binary.html#binaryVertex">binary: BinaryShaderStage.binaryVertex</a></li>
+          </ul></dd>
+<dt><a name="compileHlslShader" href="#compileHlslShader"><span>compileHlslShader:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="binary: proc compileHlslShader(source, sourcePath, outputPath, entryPoint, target: string): string" href="shady/binary.html#compileHlslShader%2Cstring%2Cstring%2Cstring%2Cstring%2Cstring">binary: proc compileHlslShader(source, sourcePath, outputPath, entryPoint, target: string): string</a></li>
+          </ul></dd>
+<dt><a name="compileSpirvShader" href="#compileSpirvShader"><span>compileSpirvShader:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="binary: proc compileSpirvShader(source, sourcePath, outputPath: string;
+                   stage: BinaryShaderStage): string" href="shady/binary.html#compileSpirvShader%2Cstring%2Cstring%2Cstring%2CBinaryShaderStage">binary: proc compileSpirvShader(source, sourcePath, outputPath: string;
+                   stage: BinaryShaderStage): string</a></li>
           </ul></dd>
 <dt><a name="dFdx" href="#dFdx"><span>dFdx:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdx(a: float32): float32" href="shady.html#dFdx%2Cfloat32">shady: proc dFdx(a: float32): float32</a></li>
+          data-doc-search-tag="shared: proc dFdx(a: float32): float32" href="shady/backends/shared.html#dFdx%2Cfloat32">shared: proc dFdx(a: float32): float32</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdx(a: Vec2): Vec2" href="shady.html#dFdx%2CVec2">shady: proc dFdx(a: Vec2): Vec2</a></li>
+          data-doc-search-tag="shared: proc dFdx(a: Vec2): Vec2" href="shady/backends/shared.html#dFdx%2CVec2">shared: proc dFdx(a: Vec2): Vec2</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdx(a: Vec3): Vec3" href="shady.html#dFdx%2CVec3">shady: proc dFdx(a: Vec3): Vec3</a></li>
+          data-doc-search-tag="shared: proc dFdx(a: Vec3): Vec3" href="shady/backends/shared.html#dFdx%2CVec3">shared: proc dFdx(a: Vec3): Vec3</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdx(a: Vec4): Vec4" href="shady.html#dFdx%2CVec4">shady: proc dFdx(a: Vec4): Vec4</a></li>
+          data-doc-search-tag="shared: proc dFdx(a: Vec4): Vec4" href="shady/backends/shared.html#dFdx%2CVec4">shared: proc dFdx(a: Vec4): Vec4</a></li>
           </ul></dd>
 <dt><a name="dFdy" href="#dFdy"><span>dFdy:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdy(a: float32): float32" href="shady.html#dFdy%2Cfloat32">shady: proc dFdy(a: float32): float32</a></li>
+          data-doc-search-tag="shared: proc dFdy(a: float32): float32" href="shady/backends/shared.html#dFdy%2Cfloat32">shared: proc dFdy(a: float32): float32</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdy(a: Vec2): Vec2" href="shady.html#dFdy%2CVec2">shady: proc dFdy(a: Vec2): Vec2</a></li>
+          data-doc-search-tag="shared: proc dFdy(a: Vec2): Vec2" href="shady/backends/shared.html#dFdy%2CVec2">shared: proc dFdy(a: Vec2): Vec2</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdy(a: Vec3): Vec3" href="shady.html#dFdy%2CVec3">shady: proc dFdy(a: Vec3): Vec3</a></li>
+          data-doc-search-tag="shared: proc dFdy(a: Vec3): Vec3" href="shady/backends/shared.html#dFdy%2CVec3">shared: proc dFdy(a: Vec3): Vec3</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc dFdy(a: Vec4): Vec4" href="shady.html#dFdy%2CVec4">shady: proc dFdy(a: Vec4): Vec4</a></li>
+          data-doc-search-tag="shared: proc dFdy(a: Vec4): Vec4" href="shady/backends/shared.html#dFdy%2CVec4">shared: proc dFdy(a: Vec4): Vec4</a></li>
           </ul></dd>
 <dt><a name="discardFragment" href="#discardFragment"><span>discardFragment:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc discardFragment()" href="shady.html#discardFragment">shady: proc discardFragment()</a></li>
+          data-doc-search-tag="shared: proc discardFragment()" href="shady/backends/shared.html#discardFragment">shared: proc discardFragment()</a></li>
+          </ul></dd>
+<dt><a name="emitHlslEntry" href="#emitHlslEntry"><span>emitHlslEntry:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc emitHlslEntry(params: openArray[EntryParam]; bodyCode: string; stage: int): string" href="shady/backends/dx12.html#emitHlslEntry%2CopenArray%5BEntryParam%5D%2Cstring%2Cint">dx12: proc emitHlslEntry(params: openArray[EntryParam]; bodyCode: string; stage: int): string</a></li>
+          </ul></dd>
+<dt><a name="emitHlslUniformBuffer" href="#emitHlslUniformBuffer"><span>emitHlslUniformBuffer:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc emitHlslUniformBuffer(uniforms: openArray[UniformParam]; register = 0): string" href="shady/backends/dx12.html#emitHlslUniformBuffer%2CopenArray%5BUniformParam%5D%2Cint">dx12: proc emitHlslUniformBuffer(uniforms: openArray[UniformParam]; register = 0): string</a></li>
+          </ul></dd>
+<dt><a name="emitMetalEntry" href="#emitMetalEntry"><span>emitMetalEntry:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc emitMetalEntry(params: openArray[EntryParam]; bodyCode: string; stage: int;
+               uniforms: openArray[UniformParam] = [];
+               textures: openArray[TextureParam] = []): string" href="shady/backends/metal4.html#emitMetalEntry%2CopenArray%5BEntryParam%5D%2Cstring%2Cint%2CopenArray%5BUniformParam%5D%2CopenArray%5BTextureParam%5D">metal4: proc emitMetalEntry(params: openArray[EntryParam]; bodyCode: string; stage: int;
+               uniforms: openArray[UniformParam] = [];
+               textures: openArray[TextureParam] = []): string</a></li>
+          </ul></dd>
+<dt><a name="emitMetalUniformBuffer" href="#emitMetalUniformBuffer"><span>emitMetalUniformBuffer:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc emitMetalUniformBuffer(uniforms: openArray[UniformParam]; bufferIndex: int): string" href="shady/backends/metal4.html#emitMetalUniformBuffer%2CopenArray%5BUniformParam%5D%2Cint">metal4: proc emitMetalUniformBuffer(uniforms: openArray[UniformParam]; bufferIndex: int): string</a></li>
+          </ul></dd>
+<dt><a name="emitVulkanPushConstants" href="#emitVulkanPushConstants"><span>emitVulkanPushConstants:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: proc emitVulkanPushConstants(uniforms: openArray[UniformParam]): string" href="shady/backends/vulkan.html#emitVulkanPushConstants%2CopenArray%5BUniformParam%5D">vulkan: proc emitVulkanPushConstants(uniforms: openArray[UniformParam]): string</a></li>
+          </ul></dd>
+<dt><a name="emitVulkanUniformBuffer" href="#emitVulkanUniformBuffer"><span>emitVulkanUniformBuffer:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: proc emitVulkanUniformBuffer(uniforms: openArray[UniformParam]; binding: int): string" href="shady/backends/vulkan.html#emitVulkanUniformBuffer%2CopenArray%5BUniformParam%5D%2Cint">vulkan: proc emitVulkanUniformBuffer(uniforms: openArray[UniformParam]; binding: int): string</a></li>
+          </ul></dd>
+<dt><a name="EntryParam" href="#EntryParam"><span>EntryParam:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: tuple EntryParam" href="shady/backends/dx12.html#EntryParam">dx12: tuple EntryParam</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="metal4: tuple EntryParam" href="shady/backends/metal4.html#EntryParam">metal4: tuple EntryParam</a></li>
           </ul></dd>
 <dt><a name="fmod" href="#fmod"><span>fmod:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc fmod(x, y: float32): float32" href="shady.html#fmod%2Cfloat32%2Cfloat32">shady: proc fmod(x, y: float32): float32</a></li>
+          data-doc-search-tag="shared: proc fmod(x, y: float32): float32" href="shady/backends/shared.html#fmod%2Cfloat32%2Cfloat32">shared: proc fmod(x, y: float32): float32</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fmod(x: Vec2; y: float32): Vec2" href="shady.html#fmod%2CVec2%2Cfloat32">shady: proc fmod(x: Vec2; y: float32): Vec2</a></li>
+          data-doc-search-tag="shared: proc fmod(x: Vec2; y: float32): Vec2" href="shady/backends/shared.html#fmod%2CVec2%2Cfloat32">shared: proc fmod(x: Vec2; y: float32): Vec2</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fmod(x, y: Vec2): Vec2" href="shady.html#fmod%2CVec2%2CVec2">shady: proc fmod(x, y: Vec2): Vec2</a></li>
+          data-doc-search-tag="shared: proc fmod(x, y: Vec2): Vec2" href="shady/backends/shared.html#fmod%2CVec2%2CVec2">shared: proc fmod(x, y: Vec2): Vec2</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fmod(x: Vec3; y: float32): Vec3" href="shady.html#fmod%2CVec3%2Cfloat32">shady: proc fmod(x: Vec3; y: float32): Vec3</a></li>
+          data-doc-search-tag="shared: proc fmod(x: Vec3; y: float32): Vec3" href="shady/backends/shared.html#fmod%2CVec3%2Cfloat32">shared: proc fmod(x: Vec3; y: float32): Vec3</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fmod(x, y: Vec3): Vec3" href="shady.html#fmod%2CVec3%2CVec3">shady: proc fmod(x, y: Vec3): Vec3</a></li>
+          data-doc-search-tag="shared: proc fmod(x, y: Vec3): Vec3" href="shady/backends/shared.html#fmod%2CVec3%2CVec3">shared: proc fmod(x, y: Vec3): Vec3</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fmod(x: Vec4; y: float32): Vec4" href="shady.html#fmod%2CVec4%2Cfloat32">shady: proc fmod(x: Vec4; y: float32): Vec4</a></li>
+          data-doc-search-tag="shared: proc fmod(x: Vec4; y: float32): Vec4" href="shady/backends/shared.html#fmod%2CVec4%2Cfloat32">shared: proc fmod(x: Vec4; y: float32): Vec4</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fmod(x, y: Vec4): Vec4" href="shady.html#fmod%2CVec4%2CVec4">shady: proc fmod(x, y: Vec4): Vec4</a></li>
+          data-doc-search-tag="shared: proc fmod(x, y: Vec4): Vec4" href="shady/backends/shared.html#fmod%2CVec4%2CVec4">shared: proc fmod(x, y: Vec4): Vec4</a></li>
           </ul></dd>
 <dt><a name="fract" href="#fract"><span>fract:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc fract(a: float32): float32" href="shady.html#fract%2Cfloat32">shady: proc fract(a: float32): float32</a></li>
+          data-doc-search-tag="shared: proc fract(a: float32): float32" href="shady/backends/shared.html#fract%2Cfloat32">shared: proc fract(a: float32): float32</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fract(a: Vec2): Vec2" href="shady.html#fract%2CVec2">shady: proc fract(a: Vec2): Vec2</a></li>
+          data-doc-search-tag="shared: proc fract(a: Vec2): Vec2" href="shady/backends/shared.html#fract%2CVec2">shared: proc fract(a: Vec2): Vec2</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fract(a: Vec3): Vec3" href="shady.html#fract%2CVec3">shady: proc fract(a: Vec3): Vec3</a></li>
+          data-doc-search-tag="shared: proc fract(a: Vec3): Vec3" href="shady/backends/shared.html#fract%2CVec3">shared: proc fract(a: Vec3): Vec3</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fract(a: Vec4): Vec4" href="shady.html#fract%2CVec4">shady: proc fract(a: Vec4): Vec4</a></li>
+          data-doc-search-tag="shared: proc fract(a: Vec4): Vec4" href="shady/backends/shared.html#fract%2CVec4">shared: proc fract(a: Vec4): Vec4</a></li>
           </ul></dd>
 <dt><a name="fwidth" href="#fwidth"><span>fwidth:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc fwidth(a: float32): float32" href="shady.html#fwidth%2Cfloat32">shady: proc fwidth(a: float32): float32</a></li>
+          data-doc-search-tag="shared: proc fwidth(a: float32): float32" href="shady/backends/shared.html#fwidth%2Cfloat32">shared: proc fwidth(a: float32): float32</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fwidth(a: Vec2): Vec2" href="shady.html#fwidth%2CVec2">shady: proc fwidth(a: Vec2): Vec2</a></li>
+          data-doc-search-tag="shared: proc fwidth(a: Vec2): Vec2" href="shady/backends/shared.html#fwidth%2CVec2">shared: proc fwidth(a: Vec2): Vec2</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fwidth(a: Vec3): Vec3" href="shady.html#fwidth%2CVec3">shady: proc fwidth(a: Vec3): Vec3</a></li>
+          data-doc-search-tag="shared: proc fwidth(a: Vec3): Vec3" href="shady/backends/shared.html#fwidth%2CVec3">shared: proc fwidth(a: Vec3): Vec3</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc fwidth(a: Vec4): Vec4" href="shady.html#fwidth%2CVec4">shady: proc fwidth(a: Vec4): Vec4</a></li>
+          data-doc-search-tag="shared: proc fwidth(a: Vec4): Vec4" href="shady/backends/shared.html#fwidth%2CVec4">shared: proc fwidth(a: Vec4): Vec4</a></li>
+          </ul></dd>
+<dt><a name="gl_FrontFacing" href="#gl_FrontFacing"><span>gl_FrontFacing:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: var gl_FrontFacing" href="shady/backends/shared.html#gl_FrontFacing">shared: var gl_FrontFacing</a></li>
           </ul></dd>
 <dt><a name="gl_Position" href="#gl_Position"><span>gl_Position:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: var gl_Position" href="shady.html#gl_Position">shady: var gl_Position</a></li>
+          data-doc-search-tag="shared: var gl_Position" href="shady/backends/shared.html#gl_Position">shared: var gl_Position</a></li>
+          </ul></dd>
+<dt><a name="glsl3Desktop" href="#glsl3Desktop"><span>glsl3Desktop:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderTarget.glsl3Desktop" href="shady/backends/shared.html#glsl3Desktop">shared: ShaderTarget.glsl3Desktop</a></li>
+          </ul></dd>
+<dt><a name="glsl3DesktopExtra" href="#glsl3DesktopExtra"><span>glsl3DesktopExtra:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl3: const glsl3DesktopExtra" href="shady/backends/glsl3.html#glsl3DesktopExtra">glsl3: const glsl3DesktopExtra</a></li>
+          </ul></dd>
+<dt><a name="glsl3DesktopVersion" href="#glsl3DesktopVersion"><span>glsl3DesktopVersion:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl3: const glsl3DesktopVersion" href="shady/backends/glsl3.html#glsl3DesktopVersion">glsl3: const glsl3DesktopVersion</a></li>
+          </ul></dd>
+<dt><a name="glsl3NeedsHighp" href="#glsl3NeedsHighp"><span>glsl3NeedsHighp:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl3: proc glsl3NeedsHighp(samplerType: string): bool" href="shady/backends/glsl3.html#glsl3NeedsHighp%2Cstring">glsl3: proc glsl3NeedsHighp(samplerType: string): bool</a></li>
+          </ul></dd>
+<dt><a name="glsl3WebGL" href="#glsl3WebGL"><span>glsl3WebGL:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderTarget.glsl3WebGL" href="shady/backends/shared.html#glsl3WebGL">shared: ShaderTarget.glsl3WebGL</a></li>
+          </ul></dd>
+<dt><a name="glsl3WebGLExtra" href="#glsl3WebGLExtra"><span>glsl3WebGLExtra:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl3: const glsl3WebGLExtra" href="shady/backends/glsl3.html#glsl3WebGLExtra">glsl3: const glsl3WebGLExtra</a></li>
+          </ul></dd>
+<dt><a name="glsl3WebGLVersion" href="#glsl3WebGLVersion"><span>glsl3WebGLVersion:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl3: const glsl3WebGLVersion" href="shady/backends/glsl3.html#glsl3WebGLVersion">glsl3: const glsl3WebGLVersion</a></li>
+          </ul></dd>
+<dt><a name="glsl4Desktop" href="#glsl4Desktop"><span>glsl4Desktop:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderTarget.glsl4Desktop" href="shady/backends/shared.html#glsl4Desktop">shared: ShaderTarget.glsl4Desktop</a></li>
+          </ul></dd>
+<dt><a name="glsl4DesktopExtra" href="#glsl4DesktopExtra"><span>glsl4DesktopExtra:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl4: const glsl4DesktopExtra" href="shady/backends/glsl4.html#glsl4DesktopExtra">glsl4: const glsl4DesktopExtra</a></li>
+          </ul></dd>
+<dt><a name="glsl4DesktopVersion" href="#glsl4DesktopVersion"><span>glsl4DesktopVersion:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl4: const glsl4DesktopVersion" href="shady/backends/glsl4.html#glsl4DesktopVersion">glsl4: const glsl4DesktopVersion</a></li>
           </ul></dd>
 <dt><a name="glslDesktop" href="#glslDesktop"><span>glslDesktop:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: GlslTarget.glslDesktop" href="shady.html#glslDesktop">shady: GlslTarget.glslDesktop</a></li>
+          data-doc-search-tag="shared: const glslDesktop" href="shady/backends/shared.html#glslDesktop">shared: const glslDesktop</a></li>
           </ul></dd>
 <dt><a name="glslES3" href="#glslES3"><span>glslES3:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: GlslTarget.glslES3" href="shady.html#glslES3">shady: GlslTarget.glslES3</a></li>
+          data-doc-search-tag="shared: const glslES3" href="shady/backends/shared.html#glslES3">shared: const glslES3</a></li>
+          </ul></dd>
+<dt><a name="glslFunctions" href="#glslFunctions"><span>glslFunctions:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl: const glslFunctions" href="shady/backends/glsl.html#glslFunctions">glsl: const glslFunctions</a></li>
+          </ul></dd>
+<dt><a name="glslGlobals" href="#glslGlobals"><span>glslGlobals:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl: const glslGlobals" href="shady/backends/glsl.html#glslGlobals">glsl: const glslGlobals</a></li>
+          </ul></dd>
+<dt><a name="glslProcRename" href="#glslProcRename"><span>glslProcRename:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl: proc glslProcRename(t: string): string" href="shady/backends/glsl.html#glslProcRename%2Cstring">glsl: proc glslProcRename(t: string): string</a></li>
           </ul></dd>
 <dt><a name="GlslTarget" href="#GlslTarget"><span>GlslTarget:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: enum GlslTarget" href="shady.html#GlslTarget">shady: enum GlslTarget</a></li>
+          data-doc-search-tag="shared: type GlslTarget" href="shady/backends/shared.html#GlslTarget">shared: type GlslTarget</a></li>
           </ul></dd>
 <dt><a name="glslTarget" href="#glslTarget"><span>glslTarget:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: var glslTarget" href="shady.html#glslTarget_2">shady: var glslTarget</a></li>
+          data-doc-search-tag="shared: template glslTarget(): untyped" href="shady/backends/shared.html#glslTarget.t">shared: template glslTarget(): untyped</a></li>
+          </ul></dd>
+<dt><a name="glslTypeDefault" href="#glslTypeDefault"><span>glslTypeDefault:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl: proc glslTypeDefault(t: string): string" href="shady/backends/glsl.html#glslTypeDefault%2Cstring">glsl: proc glslTypeDefault(t: string): string</a></li>
+          </ul></dd>
+<dt><a name="glslTypeRename" href="#glslTypeRename"><span>glslTypeRename:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="glsl: proc glslTypeRename(t: string): string" href="shady/backends/glsl.html#glslTypeRename%2Cstring">glsl: proc glslTypeRename(t: string): string</a></li>
           </ul></dd>
 <dt><a name="gl_VertexID" href="#gl_VertexID"><span>gl_VertexID:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: var gl_VertexID" href="shady.html#gl_VertexID">shady: var gl_VertexID</a></li>
+          data-doc-search-tag="shared: var gl_VertexID" href="shady/backends/shared.html#gl_VertexID">shared: var gl_VertexID</a></li>
+          </ul></dd>
+<dt><a name="hlslDX12" href="#hlslDX12"><span>hlslDX12:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderTarget.hlslDX12" href="shady/backends/shared.html#hlslDX12">shared: ShaderTarget.hlslDX12</a></li>
+          </ul></dd>
+<dt><a name="hlslHeader" href="#hlslHeader"><span>hlslHeader:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: const hlslHeader" href="shady/backends/dx12.html#hlslHeader">dx12: const hlslHeader</a></li>
+          </ul></dd>
+<dt><a name="hlslInputFieldName" href="#hlslInputFieldName"><span>hlslInputFieldName:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslInputFieldName(name: string): string" href="shady/backends/dx12.html#hlslInputFieldName%2Cstring">dx12: proc hlslInputFieldName(name: string): string</a></li>
+          </ul></dd>
+<dt><a name="hlslOutputFieldName" href="#hlslOutputFieldName"><span>hlslOutputFieldName:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslOutputFieldName(name: string): string" href="shady/backends/dx12.html#hlslOutputFieldName%2Cstring">dx12: proc hlslOutputFieldName(name: string): string</a></li>
+          </ul></dd>
+<dt><a name="hlslProcRename" href="#hlslProcRename"><span>hlslProcRename:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslProcRename(t: string): string" href="shady/backends/dx12.html#hlslProcRename%2Cstring">dx12: proc hlslProcRename(t: string): string</a></li>
+          </ul></dd>
+<dt><a name="hlslResourceCall" href="#hlslResourceCall"><span>hlslResourceCall:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslResourceCall(name: string; args: openArray[string];
+                 firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string" href="shady/backends/dx12.html#hlslResourceCall%2Cstring%2CopenArray%5Bstring%5D%2Cbool%2Cbool">dx12: proc hlslResourceCall(name: string; args: openArray[string];
+                 firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string</a></li>
+          </ul></dd>
+<dt><a name="hlslSamplerDecl" href="#hlslSamplerDecl"><span>hlslSamplerDecl:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslSamplerDecl(name: string; register: int; nimType = &quot;&quot;): string" href="shady/backends/dx12.html#hlslSamplerDecl%2Cstring%2Cint%2Cstring">dx12: proc hlslSamplerDecl(name: string; register: int; nimType = &quot;&quot;): string</a></li>
+          </ul></dd>
+<dt><a name="hlslSemantic" href="#hlslSemantic"><span>hlslSemantic:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslSemantic(name: string; index: int; isOutput: bool): string" href="shady/backends/dx12.html#hlslSemantic%2Cstring%2Cint%2Cbool">dx12: proc hlslSemantic(name: string; index: int; isOutput: bool): string</a></li>
+          </ul></dd>
+<dt><a name="hlslTextureDecl" href="#hlslTextureDecl"><span>hlslTextureDecl:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslTextureDecl(name, typ: string; register: int): string" href="shady/backends/dx12.html#hlslTextureDecl%2Cstring%2Cstring%2Cint">dx12: proc hlslTextureDecl(name, typ: string; register: int): string</a></li>
+          </ul></dd>
+<dt><a name="hlslTypeDefault" href="#hlslTypeDefault"><span>hlslTypeDefault:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslTypeDefault(t: string): string" href="shady/backends/dx12.html#hlslTypeDefault%2Cstring">dx12: proc hlslTypeDefault(t: string): string</a></li>
+          </ul></dd>
+<dt><a name="hlslTypeRename" href="#hlslTypeRename"><span>hlslTypeRename:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc hlslTypeRename(t: string): string" href="shady/backends/dx12.html#hlslTypeRename%2Cstring">dx12: proc hlslTypeRename(t: string): string</a></li>
           </ul></dd>
 <dt><a name="ImageBuffer" href="#ImageBuffer"><span>ImageBuffer:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: object ImageBuffer" href="shady.html#ImageBuffer">shady: object ImageBuffer</a></li>
+          data-doc-search-tag="shared: object ImageBuffer" href="shady/backends/shared.html#ImageBuffer">shared: object ImageBuffer</a></li>
           </ul></dd>
 <dt><a name="imageLoad" href="#imageLoad"><span>imageLoad:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4" href="shady.html#imageLoad%2CUniformWriteOnly%5BUImageBuffer%5D%2Cint32">shady: proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4</a></li>
+          data-doc-search-tag="shared: proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4" href="shady/backends/shared.html#imageLoad%2CUniformWriteOnly%5BUImageBuffer%5D%2Cint32">shared: proc imageLoad(buffer: var UniformWriteOnly[UImageBuffer]; index: int32): UVec4</a></li>
           </ul></dd>
 <dt><a name="imageStore" href="#imageStore"><span>imageStore:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)" href="shady.html#imageStore%2CUniform%5BSampler2d%5D%2CIVec2%2CVec4">shady: proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)</a></li>
+          data-doc-search-tag="shared: proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)" href="shady/backends/shared.html#imageStore%2CUniform%5BSampler2d%5D%2CIVec2%2CVec4">shared: proc imageStore(buffer: var Uniform[Sampler2d]; pos: IVec2; color: Vec4)</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)" href="shady.html#imageStore%2CUniformWriteOnly%5BImageBuffer%5D%2Cint32%2CVec4">shady: proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)</a></li>
+          data-doc-search-tag="shared: proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)" href="shady/backends/shared.html#imageStore%2CUniformWriteOnly%5BImageBuffer%5D%2Cint32%2CVec4">shared: proc imageStore(buffer: var UniformWriteOnly[ImageBuffer]; index: int32; color: Vec4)</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;
-           color: UVec4)" href="shady.html#imageStore%2CUniformWriteOnly%5BUImageBuffer%5D%2Cint32%2CUVec4">shady: proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;
+          data-doc-search-tag="shared: proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;
+           color: UVec4)" href="shady/backends/shared.html#imageStore%2CUniformWriteOnly%5BUImageBuffer%5D%2Cint32%2CUVec4">shared: proc imageStore(buffer: var UniformWriteOnly[UImageBuffer]; index: int32;
            color: UVec4)</a></li>
+          </ul></dd>
+<dt><a name="mat3" href="#mat3"><span>mat3:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: proc mat3(m: Mat4): Mat3" href="shady/backends/shared.html#mat3%2CMat4">shared: proc mat3(m: Mat4): Mat3</a></li>
+          </ul></dd>
+<dt><a name="mat4" href="#mat4"><span>mat4:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: proc mat4(diagonal: float32): Mat4" href="shady/backends/shared.html#mat4%2Cfloat32">shared: proc mat4(diagonal: float32): Mat4</a></li>
+          </ul></dd>
+<dt><a name="metalAttribute" href="#metalAttribute"><span>metalAttribute:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc metalAttribute(name: string; index: int; isOutput: bool): string" href="shady/backends/metal4.html#metalAttribute%2Cstring%2Cint%2Cbool">metal4: proc metalAttribute(name: string; index: int; isOutput: bool): string</a></li>
+          </ul></dd>
+<dt><a name="metalHeader" href="#metalHeader"><span>metalHeader:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: const metalHeader" href="shady/backends/metal4.html#metalHeader">metal4: const metalHeader</a></li>
+          </ul></dd>
+<dt><a name="metalMSL" href="#metalMSL"><span>metalMSL:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderTarget.metalMSL" href="shady/backends/shared.html#metalMSL">shared: ShaderTarget.metalMSL</a></li>
+          </ul></dd>
+<dt><a name="metalOutputFieldName" href="#metalOutputFieldName"><span>metalOutputFieldName:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc metalOutputFieldName(name: string): string" href="shady/backends/metal4.html#metalOutputFieldName%2Cstring">metal4: proc metalOutputFieldName(name: string): string</a></li>
+          </ul></dd>
+<dt><a name="metalProcRename" href="#metalProcRename"><span>metalProcRename:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc metalProcRename(t: string): string" href="shady/backends/metal4.html#metalProcRename%2Cstring">metal4: proc metalProcRename(t: string): string</a></li>
+          </ul></dd>
+<dt><a name="metalResourceCall" href="#metalResourceCall"><span>metalResourceCall:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc metalResourceCall(name: string; args: openArray[string];
+                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string" href="shady/backends/metal4.html#metalResourceCall%2Cstring%2CopenArray%5Bstring%5D%2Cbool%2Cbool">metal4: proc metalResourceCall(name: string; args: openArray[string];
+                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string</a></li>
+          </ul></dd>
+<dt><a name="metalTextureDecl" href="#metalTextureDecl"><span>metalTextureDecl:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc metalTextureDecl(name, typ: string; binding, samplerBinding: int): string" href="shady/backends/metal4.html#metalTextureDecl%2Cstring%2Cstring%2Cint%2Cint">metal4: proc metalTextureDecl(name, typ: string; binding, samplerBinding: int): string</a></li>
+          </ul></dd>
+<dt><a name="metalTypeDefault" href="#metalTypeDefault"><span>metalTypeDefault:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc metalTypeDefault(t: string): string" href="shady/backends/metal4.html#metalTypeDefault%2Cstring">metal4: proc metalTypeDefault(t: string): string</a></li>
+          </ul></dd>
+<dt><a name="metalTypeRename" href="#metalTypeRename"><span>metalTypeRename:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc metalTypeRename(t: string): string" href="shady/backends/metal4.html#metalTypeRename%2Cstring">metal4: proc metalTypeRename(t: string): string</a></li>
+          </ul></dd>
+<dt><a name="reflect" href="#reflect"><span>reflect:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: proc reflect(incident, normal: Vec3): Vec3" href="shady/backends/shared.html#reflect%2CVec3%2CVec3">shared: proc reflect(incident, normal: Vec3): Vec3</a></li>
           </ul></dd>
 <dt><a name="Sampler2d" href="#Sampler2d"><span>Sampler2d:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: object Sampler2d" href="shady.html#Sampler2d">shady: object Sampler2d</a></li>
+          data-doc-search-tag="shared: object Sampler2d" href="shady/backends/shared.html#Sampler2d">shared: object Sampler2d</a></li>
           </ul></dd>
 <dt><a name="Sampler2dArray" href="#Sampler2dArray"><span>Sampler2dArray:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: object Sampler2dArray" href="shady.html#Sampler2dArray">shady: object Sampler2dArray</a></li>
+          data-doc-search-tag="shared: object Sampler2dArray" href="shady/backends/shared.html#Sampler2dArray">shared: object Sampler2dArray</a></li>
+          </ul></dd>
+<dt><a name="Sampler2dShadow" href="#Sampler2dShadow"><span>Sampler2dShadow:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: object Sampler2dShadow" href="shady/backends/shared.html#Sampler2dShadow">shared: object Sampler2dShadow</a></li>
           </ul></dd>
 <dt><a name="SamplerBuffer" href="#SamplerBuffer"><span>SamplerBuffer:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: object SamplerBuffer" href="shady.html#SamplerBuffer">shady: object SamplerBuffer</a></li>
+          data-doc-search-tag="shared: object SamplerBuffer" href="shady/backends/shared.html#SamplerBuffer">shared: object SamplerBuffer</a></li>
+          </ul></dd>
+<dt><a name="SamplerCube" href="#SamplerCube"><span>SamplerCube:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: object SamplerCube" href="shady/backends/shared.html#SamplerCube">shared: object SamplerCube</a></li>
+          </ul></dd>
+<dt><a name="shaderAuto" href="#shaderAuto"><span>shaderAuto:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderStage.shaderAuto" href="shady/backends/shared.html#shaderAuto">shared: ShaderStage.shaderAuto</a></li>
+          </ul></dd>
+<dt><a name="shaderCompute" href="#shaderCompute"><span>shaderCompute:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderStage.shaderCompute" href="shady/backends/shared.html#shaderCompute">shared: ShaderStage.shaderCompute</a></li>
+          </ul></dd>
+<dt><a name="shaderFragment" href="#shaderFragment"><span>shaderFragment:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderStage.shaderFragment" href="shady/backends/shared.html#shaderFragment">shared: ShaderStage.shaderFragment</a></li>
+          </ul></dd>
+<dt><a name="ShaderStage" href="#ShaderStage"><span>ShaderStage:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: enum ShaderStage" href="shady/backends/shared.html#ShaderStage">shared: enum ShaderStage</a></li>
+          </ul></dd>
+<dt><a name="shaderStage" href="#shaderStage"><span>shaderStage:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: var shaderStage" href="shady/backends/shared.html#shaderStage_2">shared: var shaderStage</a></li>
+          </ul></dd>
+<dt><a name="ShaderTarget" href="#ShaderTarget"><span>ShaderTarget:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: enum ShaderTarget" href="shady/backends/shared.html#ShaderTarget">shared: enum ShaderTarget</a></li>
+          </ul></dd>
+<dt><a name="shaderTarget" href="#shaderTarget"><span>shaderTarget:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: var shaderTarget" href="shady/backends/shared.html#shaderTarget_2">shared: var shaderTarget</a></li>
+          </ul></dd>
+<dt><a name="shaderVertex" href="#shaderVertex"><span>shaderVertex:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderStage.shaderVertex" href="shady/backends/shared.html#shaderVertex">shared: ShaderStage.shaderVertex</a></li>
           </ul></dd>
 <dt><a name="smoothstep" href="#smoothstep"><span>smoothstep:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc smoothstep(a, b, x: float32): float32" href="shady.html#smoothstep%2Cfloat32%2Cfloat32%2Cfloat32">shady: proc smoothstep(a, b, x: float32): float32</a></li>
+          data-doc-search-tag="shared: proc smoothstep(a, b, x: float32): float32" href="shady/backends/shared.html#smoothstep%2Cfloat32%2Cfloat32%2Cfloat32">shared: proc smoothstep(a, b, x: float32): float32</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc smoothstep(a, b, x: Vec2): Vec2" href="shady.html#smoothstep%2CVec2%2CVec2%2CVec2">shady: proc smoothstep(a, b, x: Vec2): Vec2</a></li>
+          data-doc-search-tag="shared: proc smoothstep(a, b, x: Vec2): Vec2" href="shady/backends/shared.html#smoothstep%2CVec2%2CVec2%2CVec2">shared: proc smoothstep(a, b, x: Vec2): Vec2</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc smoothstep(a, b, x: Vec3): Vec3" href="shady.html#smoothstep%2CVec3%2CVec3%2CVec3">shady: proc smoothstep(a, b, x: Vec3): Vec3</a></li>
+          data-doc-search-tag="shared: proc smoothstep(a, b, x: Vec3): Vec3" href="shady/backends/shared.html#smoothstep%2CVec3%2CVec3%2CVec3">shared: proc smoothstep(a, b, x: Vec3): Vec3</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc smoothstep(a, b, x: Vec4): Vec4" href="shady.html#smoothstep%2CVec4%2CVec4%2CVec4">shady: proc smoothstep(a, b, x: Vec4): Vec4</a></li>
+          data-doc-search-tag="shared: proc smoothstep(a, b, x: Vec4): Vec4" href="shady/backends/shared.html#smoothstep%2CVec4%2CVec4%2CVec4">shared: proc smoothstep(a, b, x: Vec4): Vec4</a></li>
           </ul></dd>
 <dt><a name="texelFetch" href="#texelFetch"><span>texelFetch:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4" href="shady.html#texelFetch%2CUniform%5BSampler2d%5D%2CIVec2%2Cint">shady: proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4</a></li>
+          data-doc-search-tag="shared: proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4" href="shady/backends/shared.html#texelFetch%2CUniform%5BSampler2d%5D%2CIVec2%2Cint">shared: proc texelFetch(buffer: Uniform[Sampler2d]; pos: IVec2; level: int): Vec4</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4" href="shady.html#texelFetch%2CUniform%5BSamplerBuffer%5D%2CSomeInteger">shady: proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4</a></li>
+          data-doc-search-tag="shared: proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4" href="shady/backends/shared.html#texelFetch%2CUniform%5BSamplerBuffer%5D%2CSomeInteger">shared: proc texelFetch(buffer: Uniform[SamplerBuffer]; index: SomeInteger): Vec4</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4" href="shady.html#texelFetch%2CUniform%5BUSampler2d%5D%2CIVec2%2Cint">shady: proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4</a></li>
+          data-doc-search-tag="shared: proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4" href="shady/backends/shared.html#texelFetch%2CUniform%5BUSampler2d%5D%2CIVec2%2Cint">shared: proc texelFetch(buffer: Uniform[USampler2d]; pos: IVec2; level: int): UVec4</a></li>
           </ul></dd>
 <dt><a name="texture" href="#texture"><span>texture:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4" href="shady.html#texture%2CUniform%5BSampler2d%5D%2CVec2">shady: proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4</a></li>
+          data-doc-search-tag="shared: proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4" href="shady/backends/shared.html#texture%2CUniform%5BSampler2d%5D%2CVec2">shared: proc texture(buffer: Uniform[Sampler2d]; pos: Vec2): Vec4</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="shared: proc texture(buffer: Uniform[Sampler2dShadow]; pos: Vec3): float32" href="shady/backends/shared.html#texture%2CUniform%5BSampler2dShadow%5D%2CVec3">shared: proc texture(buffer: Uniform[Sampler2dShadow]; pos: Vec3): float32</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="shared: proc texture(buffer: Uniform[SamplerCube]; pos: Vec3): Vec4" href="shady/backends/shared.html#texture%2CUniform%5BSamplerCube%5D%2CVec3">shared: proc texture(buffer: Uniform[SamplerCube]; pos: Vec3): Vec4</a></li>
           </ul></dd>
 <dt><a name="textureGrad" href="#textureGrad"><span>textureGrad:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady.html#textureGrad%2CUniform%5BSampler2d%5D%2CVec3%2CVec2%2CVec2">shady: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
+          data-doc-search-tag="shared: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady/backends/shared.html#textureGrad%2CUniform%5BSampler2d%5D%2CVec3%2CVec2%2CVec2">shared: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady.html#textureGrad%2CUniform%5BSampler2dArray%5D%2CVec3%2CVec2%2CVec2">shady: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
+          data-doc-search-tag="shared: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady/backends/shared.html#textureGrad%2CUniform%5BSampler2dArray%5D%2CVec3%2CVec2%2CVec2">shared: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
+          </ul></dd>
+<dt><a name="textureLod" href="#textureLod"><span>textureLod:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: proc textureLod(buffer: Uniform[SamplerCube]; pos: Vec3; lod: float32): Vec4" href="shady/backends/shared.html#textureLod%2CUniform%5BSamplerCube%5D%2CVec3%2Cfloat32">shared: proc textureLod(buffer: Uniform[SamplerCube]; pos: Vec3; lod: float32): Vec4</a></li>
+          </ul></dd>
+<dt><a name="TextureParam" href="#TextureParam"><span>TextureParam:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: tuple TextureParam" href="shady/backends/metal4.html#TextureParam">metal4: tuple TextureParam</a></li>
           </ul></dd>
 <dt><a name="textureSize" href="#textureSize"><span>textureSize:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2" href="shady.html#textureSize%2CUniform%5BSampler2d%5D%2Cint">shady: proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2</a></li>
+          data-doc-search-tag="shared: proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2" href="shady/backends/shared.html#textureSize%2CUniform%5BSampler2d%5D%2Cint">shared: proc textureSize(buffer: Uniform[Sampler2d]; level: int): Vec2</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="shared: proc textureSize(buffer: Uniform[Sampler2dShadow]; level: int): Vec2" href="shady/backends/shared.html#textureSize%2CUniform%5BSampler2dShadow%5D%2Cint">shared: proc textureSize(buffer: Uniform[Sampler2dShadow]; level: int): Vec2</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="shared: proc textureSize(buffer: Uniform[SamplerCube]; level: int): Vec2" href="shady/backends/shared.html#textureSize%2CUniform%5BSamplerCube%5D%2Cint">shared: proc textureSize(buffer: Uniform[SamplerCube]; level: int): Vec2</a></li>
           </ul></dd>
 <dt><a name="toGLSL" href="#toGLSL"><span>toGLSL:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: macro toGLSL(s: typed; target: static[GlslTarget]): string" href="shady.html#toGLSL.m%2Ctyped%2Cstatic%5BGlslTarget%5D">shady: macro toGLSL(s: typed; target: static[GlslTarget]): string</a></li>
+          data-doc-search-tag="shared: macro toGLSL(s: typed; target: static[GlslTarget]): string" href="shady/backends/shared.html#toGLSL.m%2Ctyped%2Cstatic%5BShaderTarget%5D">shared: macro toGLSL(s: typed; target: static[GlslTarget]): string</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: macro toGLSL(s: typed; version = &quot;410&quot;; extra = &quot;precision highp float;
-&quot;): string" href="shady.html#toGLSL.m%2Ctyped%2Cstring%2Cstring">shady: macro toGLSL(s: typed; version = &quot;410&quot;; extra = &quot;precision highp float;
+          data-doc-search-tag="shared: macro toGLSL(s: typed; version = &quot;410&quot;; extra = &quot;precision highp float;
+&quot;): string" href="shady/backends/shared.html#toGLSL.m%2Ctyped%2Cstring%2Cstring">shared: macro toGLSL(s: typed; version = &quot;410&quot;; extra = &quot;precision highp float;
 &quot;): string</a></li>
           </ul></dd>
 <dt><a name="toGLSLInner" href="#toGLSLInner"><span>toGLSLInner:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc toGLSLInner(s: NimNode; target: GlslTarget): string" href="shady.html#toGLSLInner%2CNimNode%2CGlslTarget">shady: proc toGLSLInner(s: NimNode; target: GlslTarget): string</a></li>
+          data-doc-search-tag="shared: proc toGLSLInner(s: NimNode; target: GlslTarget): string" href="shady/backends/shared.html#toGLSLInner%2CNimNode%2CShaderTarget">shared: proc toGLSLInner(s: NimNode; target: GlslTarget): string</a></li>
           <li><a class="reference external"
-          data-doc-search-tag="shady: proc toGLSLInner(s: NimNode; version, extra: string): string" href="shady.html#toGLSLInner%2CNimNode%2Cstring%2Cstring">shady: proc toGLSLInner(s: NimNode; version, extra: string): string</a></li>
+          data-doc-search-tag="shared: proc toGLSLInner(s: NimNode; version, extra: string): string" href="shady/backends/shared.html#toGLSLInner%2CNimNode%2Cstring%2Cstring">shared: proc toGLSLInner(s: NimNode; version, extra: string): string</a></li>
+          </ul></dd>
+<dt><a name="toHLSL" href="#toHLSL"><span>toHLSL:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: macro toHLSL(s: typed; stage: static[ShaderStage] = shaderAuto): string" href="shady/backends/shared.html#toHLSL.m%2Ctyped%2Cstatic%5BShaderStage%5D">shared: macro toHLSL(s: typed; stage: static[ShaderStage] = shaderAuto): string</a></li>
+          </ul></dd>
+<dt><a name="toMSL" href="#toMSL"><span>toMSL:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: macro toMSL(s: typed; stage: static[ShaderStage] = shaderAuto): string" href="shady/backends/shared.html#toMSL.m%2Ctyped%2Cstatic%5BShaderStage%5D">shared: macro toMSL(s: typed; stage: static[ShaderStage] = shaderAuto): string</a></li>
+          </ul></dd>
+<dt><a name="toShader" href="#toShader"><span>toShader:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: macro toShader(s: typed; target: static[ShaderTarget];
+         stage: static[ShaderStage] = shaderAuto): string" href="shady/backends/shared.html#toShader.m%2Ctyped%2Cstatic%5BShaderTarget%5D%2Cstatic%5BShaderStage%5D">shared: macro toShader(s: typed; target: static[ShaderTarget];
+         stage: static[ShaderStage] = shaderAuto): string</a></li>
+          </ul></dd>
+<dt><a name="toShaderInner" href="#toShaderInner"><span>toShaderInner:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: proc toShaderInner(s: NimNode; target: ShaderTarget; stage = shaderAuto): string" href="shady/backends/shared.html#toShaderInner%2CNimNode%2CShaderTarget">shared: proc toShaderInner(s: NimNode; target: ShaderTarget; stage = shaderAuto): string</a></li>
           </ul></dd>
 <dt><a name="UImageBuffer" href="#UImageBuffer"><span>UImageBuffer:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: object UImageBuffer" href="shady.html#UImageBuffer">shady: object UImageBuffer</a></li>
+          data-doc-search-tag="shared: object UImageBuffer" href="shady/backends/shared.html#UImageBuffer">shared: object UImageBuffer</a></li>
           </ul></dd>
 <dt><a name="Uniform" href="#Uniform"><span>Uniform:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: type Uniform" href="shady.html#Uniform">shady: type Uniform</a></li>
+          data-doc-search-tag="shared: type Uniform" href="shady/backends/shared.html#Uniform">shared: type Uniform</a></li>
+          </ul></dd>
+<dt><a name="UniformParam" href="#UniformParam"><span>UniformParam:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: tuple UniformParam" href="shady/backends/dx12.html#UniformParam">dx12: tuple UniformParam</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="metal4: tuple UniformParam" href="shady/backends/metal4.html#UniformParam">metal4: tuple UniformParam</a></li>
+          <li><a class="reference external"
+          data-doc-search-tag="vulkan: tuple UniformParam" href="shady/backends/vulkan.html#UniformParam">vulkan: tuple UniformParam</a></li>
           </ul></dd>
 <dt><a name="UniformWriteOnly" href="#UniformWriteOnly"><span>UniformWriteOnly:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: type UniformWriteOnly" href="shady.html#UniformWriteOnly">shady: type UniformWriteOnly</a></li>
+          data-doc-search-tag="shared: type UniformWriteOnly" href="shady/backends/shared.html#UniformWriteOnly">shared: type UniformWriteOnly</a></li>
           </ul></dd>
 <dt><a name="USampler2d" href="#USampler2d"><span>USampler2d:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: object USampler2d" href="shady.html#USampler2d">shady: object USampler2d</a></li>
+          data-doc-search-tag="shared: object USampler2d" href="shady/backends/shared.html#USampler2d">shared: object USampler2d</a></li>
+          </ul></dd>
+<dt><a name="useVulkanUniformBuffer" href="#useVulkanUniformBuffer"><span>useVulkanUniformBuffer:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: proc useVulkanUniformBuffer(uniforms: openArray[UniformParam]): bool" href="shady/backends/vulkan.html#useVulkanUniformBuffer%2CopenArray%5BUniformParam%5D">vulkan: proc useVulkanUniformBuffer(uniforms: openArray[UniformParam]): bool</a></li>
           </ul></dd>
 <dt><a name="vec4" href="#vec4"><span>vec4:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shady: proc vec4(c: ColorRGBX): Vec4" href="shady.html#vec4%2CColorRGBX">shady: proc vec4(c: ColorRGBX): Vec4</a></li>
+          data-doc-search-tag="shared: proc vec4(c: ColorRGBX): Vec4" href="shady/backends/shared.html#vec4%2CColorRGBX">shared: proc vec4(c: ColorRGBX): Vec4</a></li>
+          </ul></dd>
+<dt><a name="vulkanFragmentUniformBinding" href="#vulkanFragmentUniformBinding"><span>vulkanFragmentUniformBinding:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: const vulkanFragmentUniformBinding" href="shady/backends/vulkan.html#vulkanFragmentUniformBinding">vulkan: const vulkanFragmentUniformBinding</a></li>
+          </ul></dd>
+<dt><a name="vulkanGlsl450" href="#vulkanGlsl450"><span>vulkanGlsl450:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: ShaderTarget.vulkanGlsl450" href="shady/backends/shared.html#vulkanGlsl450">shared: ShaderTarget.vulkanGlsl450</a></li>
+          </ul></dd>
+<dt><a name="vulkanGlsl450Extra" href="#vulkanGlsl450Extra"><span>vulkanGlsl450Extra:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: const vulkanGlsl450Extra" href="shady/backends/vulkan.html#vulkanGlsl450Extra">vulkan: const vulkanGlsl450Extra</a></li>
+          </ul></dd>
+<dt><a name="vulkanGlsl450Version" href="#vulkanGlsl450Version"><span>vulkanGlsl450Version:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: const vulkanGlsl450Version" href="shady/backends/vulkan.html#vulkanGlsl450Version">vulkan: const vulkanGlsl450Version</a></li>
+          </ul></dd>
+<dt><a name="vulkanMaxPushConstantBytes" href="#vulkanMaxPushConstantBytes"><span>vulkanMaxPushConstantBytes:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: const vulkanMaxPushConstantBytes" href="shady/backends/vulkan.html#vulkanMaxPushConstantBytes">vulkan: const vulkanMaxPushConstantBytes</a></li>
+          </ul></dd>
+<dt><a name="vulkanSamplerDecl" href="#vulkanSamplerDecl"><span>vulkanSamplerDecl:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: proc vulkanSamplerDecl(name, typ: string; binding: int): string" href="shady/backends/vulkan.html#vulkanSamplerDecl%2Cstring%2Cstring%2Cint">vulkan: proc vulkanSamplerDecl(name, typ: string; binding: int): string</a></li>
+          </ul></dd>
+<dt><a name="vulkanUniformBytes" href="#vulkanUniformBytes"><span>vulkanUniformBytes:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: proc vulkanUniformBytes(uniforms: openArray[UniformParam]): int" href="shady/backends/vulkan.html#vulkanUniformBytes%2CopenArray%5BUniformParam%5D">vulkan: proc vulkanUniformBytes(uniforms: openArray[UniformParam]): int</a></li>
+          </ul></dd>
+<dt><a name="vulkanUniformSet" href="#vulkanUniformSet"><span>vulkanUniformSet:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: const vulkanUniformSet" href="shady/backends/vulkan.html#vulkanUniformSet">vulkan: const vulkanUniformSet</a></li>
+          </ul></dd>
+<dt><a name="vulkanVertexUniformBinding" href="#vulkanVertexUniformBinding"><span>vulkanVertexUniformBinding:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="vulkan: const vulkanVertexUniformBinding" href="shady/backends/vulkan.html#vulkanVertexUniformBinding">vulkan: const vulkanVertexUniformBinding</a></li>
+          </ul></dd>
+<dt><a name="writeShaderSource" href="#writeShaderSource"><span>writeShaderSource:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="binary: proc writeShaderSource(source, sourcePath: string): string" href="shady/binary.html#writeShaderSource%2Cstring%2Cstring">binary: proc writeShaderSource(source, sourcePath: string): string</a></li>
           </ul></dd>
 </dl>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-03-28 23:57:38 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-05-30 13:37:07 UTC</small>
       </div>
     </div>
   </div>

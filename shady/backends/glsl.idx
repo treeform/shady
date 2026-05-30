@@ -1,0 +1,6 @@
+nimTitle	glsl	shady/backends/glsl.html	module shady/backends/glsl		0
+nim	glslTypeRename	shady/backends/glsl.html#glslTypeRename,string	proc glslTypeRename(t: string): string		3
+nim	glslProcRename	shady/backends/glsl.html#glslProcRename,string	proc glslProcRename(t: string): string		45
+nim	glslTypeDefault	shady/backends/glsl.html#glslTypeDefault,string	proc glslTypeDefault(t: string): string		55
+nim	glslGlobals	shady/backends/glsl.html#glslGlobals	const glslGlobals		76
+nim	glslFunctions	shady/backends/glsl.html#glslFunctions	const glslFunctions		81

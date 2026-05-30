@@ -1,0 +1,13 @@
+nimTitle	vulkan	shady/backends/vulkan.html	module shady/backends/vulkan		0
+nim	UniformParam	shady/backends/vulkan.html#UniformParam	tuple UniformParam		3
+nim	vulkanGlsl450Version	shady/backends/vulkan.html#vulkanGlsl450Version	const vulkanGlsl450Version		6
+nim	vulkanGlsl450Extra	shady/backends/vulkan.html#vulkanGlsl450Extra	const vulkanGlsl450Extra		7
+nim	vulkanUniformSet	shady/backends/vulkan.html#vulkanUniformSet	const vulkanUniformSet		8
+nim	vulkanVertexUniformBinding	shady/backends/vulkan.html#vulkanVertexUniformBinding	const vulkanVertexUniformBinding		9
+nim	vulkanFragmentUniformBinding	shady/backends/vulkan.html#vulkanFragmentUniformBinding	const vulkanFragmentUniformBinding		10
+nim	vulkanMaxPushConstantBytes	shady/backends/vulkan.html#vulkanMaxPushConstantBytes	const vulkanMaxPushConstantBytes		11
+nim	vulkanSamplerDecl	shady/backends/vulkan.html#vulkanSamplerDecl,string,string,int	proc vulkanSamplerDecl(name, typ: string; binding: int): string		13
+nim	emitVulkanPushConstants	shady/backends/vulkan.html#emitVulkanPushConstants,openArray[UniformParam]	proc emitVulkanPushConstants(uniforms: openArray[UniformParam]): string		17
+nim	emitVulkanUniformBuffer	shady/backends/vulkan.html#emitVulkanUniformBuffer,openArray[UniformParam],int	proc emitVulkanUniformBuffer(uniforms: openArray[UniformParam]; binding: int): string		38
+nim	vulkanUniformBytes	shady/backends/vulkan.html#vulkanUniformBytes,openArray[UniformParam]	proc vulkanUniformBytes(uniforms: openArray[UniformParam]): int		113
+nim	useVulkanUniformBuffer	shady/backends/vulkan.html#useVulkanUniformBuffer,openArray[UniformParam]	proc useVulkanUniformBuffer(uniforms: openArray[UniformParam]): bool		119

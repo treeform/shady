@@ -1,0 +1,6 @@
+nimTitle	glsl3	shady/backends/glsl3.html	module shady/backends/glsl3		0
+nim	glsl3DesktopVersion	shady/backends/glsl3.html#glsl3DesktopVersion	const glsl3DesktopVersion		2
+nim	glsl3DesktopExtra	shady/backends/glsl3.html#glsl3DesktopExtra	const glsl3DesktopExtra		3
+nim	glsl3WebGLVersion	shady/backends/glsl3.html#glsl3WebGLVersion	const glsl3WebGLVersion		4
+nim	glsl3WebGLExtra	shady/backends/glsl3.html#glsl3WebGLExtra	const glsl3WebGLExtra		5
+nim	glsl3NeedsHighp	shady/backends/glsl3.html#glsl3NeedsHighp,string	proc glsl3NeedsHighp(samplerType: string): bool		7

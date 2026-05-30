@@ -1,0 +1,3 @@
+nimTitle	glsl4	shady/backends/glsl4.html	module shady/backends/glsl4		0
+nim	glsl4DesktopVersion	shady/backends/glsl4.html#glsl4DesktopVersion	const glsl4DesktopVersion		2
+nim	glsl4DesktopExtra	shady/backends/glsl4.html#glsl4DesktopExtra	const glsl4DesktopExtra		3
