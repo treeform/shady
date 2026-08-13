@@ -7,8 +7,8 @@ nim	metalTypeRename	shady/backends/metal4.html#metalTypeRename,string	proc metal
 nim	metalProcRename	shady/backends/metal4.html#metalProcRename,string	proc metalProcRename(t: string): string		49
 nim	metalTypeDefault	shady/backends/metal4.html#metalTypeDefault,string	proc metalTypeDefault(t: string): string		75
 nim	metalAttribute	shady/backends/metal4.html#metalAttribute,string,int,bool	proc metalAttribute(name: string; index: int; isOutput: bool): string		97
-nim	metalOutputFieldName	shady/backends/metal4.html#metalOutputFieldName,string	proc metalOutputFieldName(name: string): string		113
-nim	metalTextureDecl	shady/backends/metal4.html#metalTextureDecl,string,string,int,int	proc metalTextureDecl(name, typ: string; binding, samplerBinding: int): string		116
-nim	emitMetalUniformBuffer	shady/backends/metal4.html#emitMetalUniformBuffer,openArray[UniformParam],int	proc emitMetalUniformBuffer(uniforms: openArray[UniformParam]; bufferIndex: int): string		125
-nim	metalResourceCall	shady/backends/metal4.html#metalResourceCall,string,openArray[string],bool,bool	proc metalResourceCall(name: string; args: openArray[string];\n                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string		151
-nim	emitMetalEntry	shady/backends/metal4.html#emitMetalEntry,openArray[EntryParam],string,int,openArray[UniformParam],openArray[TextureParam]	proc emitMetalEntry(params: openArray[EntryParam]; bodyCode: string; stage: int;\n               uniforms: openArray[UniformParam] = [];\n               textures: openArray[TextureParam] = []): string		291
+nim	metalOutputFieldName	shady/backends/metal4.html#metalOutputFieldName,string	proc metalOutputFieldName(name: string): string		115
+nim	metalTextureDecl	shady/backends/metal4.html#metalTextureDecl,string,string,int,int	proc metalTextureDecl(name, typ: string; binding, samplerBinding: int): string		118
+nim	emitMetalUniformBuffer	shady/backends/metal4.html#emitMetalUniformBuffer,openArray[UniformParam],int	proc emitMetalUniformBuffer(uniforms: openArray[UniformParam]; bufferIndex: int): string		127
+nim	metalResourceCall	shady/backends/metal4.html#metalResourceCall,string,openArray[string],bool,bool	proc metalResourceCall(name: string; args: openArray[string];\n                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string		153
+nim	emitMetalEntry	shady/backends/metal4.html#emitMetalEntry,openArray[EntryParam],string,int,openArray[UniformParam],openArray[TextureParam]	proc emitMetalEntry(params: openArray[EntryParam]; bodyCode: string; stage: int;\n               uniforms: openArray[UniformParam] = [];\n               textures: openArray[TextureParam] = []): string		293

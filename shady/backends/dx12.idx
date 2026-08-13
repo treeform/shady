@@ -6,10 +6,10 @@ nim	hlslTypeRename	shady/backends/dx12.html#hlslTypeRename,string	proc hlslTypeR
 nim	hlslProcRename	shady/backends/dx12.html#hlslProcRename,string	proc hlslProcRename(t: string): string		48
 nim	hlslTypeDefault	shady/backends/dx12.html#hlslTypeDefault,string	proc hlslTypeDefault(t: string): string		77
 nim	hlslSemantic	shady/backends/dx12.html#hlslSemantic,string,int,bool	proc hlslSemantic(name: string; index: int; isOutput: bool): string		112
-nim	hlslOutputFieldName	shady/backends/dx12.html#hlslOutputFieldName,string	proc hlslOutputFieldName(name: string): string		146
-nim	hlslInputFieldName	shady/backends/dx12.html#hlslInputFieldName,string	proc hlslInputFieldName(name: string): string		149
-nim	hlslTextureDecl	shady/backends/dx12.html#hlslTextureDecl,string,string,int	proc hlslTextureDecl(name, typ: string; register: int): string		152
-nim	hlslSamplerDecl	shady/backends/dx12.html#hlslSamplerDecl,string,int,string	proc hlslSamplerDecl(name: string; register: int; nimType = ""): string		155
-nim	emitHlslUniformBuffer	shady/backends/dx12.html#emitHlslUniformBuffer,openArray[UniformParam],int	proc emitHlslUniformBuffer(uniforms: openArray[UniformParam]; register = 0): string		163
-nim	hlslResourceCall	shady/backends/dx12.html#hlslResourceCall,string,openArray[string],bool,bool	proc hlslResourceCall(name: string; args: openArray[string];\n                 firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string		182
-nim	emitHlslEntry	shady/backends/dx12.html#emitHlslEntry,openArray[EntryParam],string,int	proc emitHlslEntry(params: openArray[EntryParam]; bodyCode: string; stage: int): string		241
+nim	hlslOutputFieldName	shady/backends/dx12.html#hlslOutputFieldName,string	proc hlslOutputFieldName(name: string): string		148
+nim	hlslInputFieldName	shady/backends/dx12.html#hlslInputFieldName,string	proc hlslInputFieldName(name: string): string		151
+nim	hlslTextureDecl	shady/backends/dx12.html#hlslTextureDecl,string,string,int	proc hlslTextureDecl(name, typ: string; register: int): string		154
+nim	hlslSamplerDecl	shady/backends/dx12.html#hlslSamplerDecl,string,int,string	proc hlslSamplerDecl(name: string; register: int; nimType = ""): string		157
+nim	emitHlslUniformBuffer	shady/backends/dx12.html#emitHlslUniformBuffer,openArray[UniformParam],int	proc emitHlslUniformBuffer(uniforms: openArray[UniformParam]; register = 0): string		165
+nim	hlslResourceCall	shady/backends/dx12.html#hlslResourceCall,string,openArray[string],bool,bool	proc hlslResourceCall(name: string; args: openArray[string];\n                 firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string		184
+nim	emitHlslEntry	shady/backends/dx12.html#emitHlslEntry,openArray[EntryParam],string,int	proc emitHlslEntry(params: openArray[EntryParam]; bodyCode: string; stage: int): string		243
