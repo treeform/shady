@@ -75,7 +75,7 @@ proc glslTypeDefault*(t: string): string =
 
 const glslGlobals* = [
   "gl_Position", "gl_FragCoord", "gl_GlobalInvocationID",
-  "gl_VertexID", "gl_FrontFacing",
+  "gl_VertexID", "gl_InstanceID", "gl_FrontFacing",
 ]
 
 const glslFunctions* = [

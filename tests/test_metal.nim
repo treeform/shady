@@ -8,7 +8,13 @@ when defined(macosx) and defined(shadyRunMetal):
     gl_Position: var Vec4,
     vertColor: var Vec3
   ) =
-    gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0)
+    let instanceOffset = gl_InstanceID.float32 * 0.001
+    gl_Position = vec4(
+      vPos.x + instanceOffset,
+      vPos.y,
+      vPos.z,
+      1.0
+    )
     vertColor = vCol
 
   proc fragmentMain(fragColor: var Vec4) =

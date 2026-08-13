@@ -177,7 +177,7 @@ proc typeDefault(t: string, n: NimNode): string =
       hlslTypeDefault(t)
     of langMetal:
       metalTypeDefault(t)
-  if result.len == 0:
+  if result.len == 0 and (t.len == 0 or not t[0].isUpperAscii):
     err "no typeDefault " & t, n
 
 ## Simply SKIP these functions.
@@ -200,6 +200,11 @@ proc isVectorAccess(s: string): bool =
 
 proc procRename(t: string): string =
   ## Some shader proc names don't match Nim names, rename here.
+  if isVulkan():
+    if t == "gl_VertexID":
+      return "gl_VertexIndex"
+    if t == "gl_InstanceID":
+      return "gl_InstanceIndex"
   case shaderTarget.language
   of langGlsl:
     glslProcRename(t)
@@ -681,8 +686,10 @@ proc toCode(n: NimNode, res: var string, level = 0) =
           res.add " = "
           n[j + 2].toCode(res)
         else:
-          res.add " = "
-          res.add typeDefault(typeStr, n[j])
+          let defaultValue = typeDefault(typeStr, n[j])
+          if defaultValue.len > 0:
+            res.add " = "
+            res.add defaultValue
 
   of nnkReturnStmt:
     res.addIndent level
@@ -1551,6 +1558,7 @@ var
   ## GLSL globals.
   gl_Position*: Vec4
   gl_VertexID*: int32
+  gl_InstanceID*: int32
   gl_FrontFacing*: bool
 
 proc mat3*(m: Mat4): Mat3 =
