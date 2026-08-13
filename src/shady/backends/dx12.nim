@@ -121,6 +121,8 @@ proc hlslSemantic*(name: string, index: int, isOutput: bool): string =
     " : SV_IsFrontFace"
   of "gl_VertexID":
     " : SV_VertexID"
+  of "gl_InstanceID":
+    " : SV_InstanceID"
   else:
     let base = semanticBase(name)
     if base.startsWith("SV_"):
@@ -133,8 +135,8 @@ proc nextSemanticIndex(
   counts: var Table[string, int]
 ): int =
   case name
-  of "fragColor", "gl_FragColor", "gl_Position", "gl_FragCoord", "gl_VertexID",
-      "gl_FrontFacing":
+  of "fragColor", "gl_FragColor", "gl_Position", "gl_FragCoord",
+      "gl_VertexID", "gl_InstanceID", "gl_FrontFacing":
     return 0
   else:
     let base = semanticBase(name)
@@ -291,6 +293,13 @@ proc emitHlslEntry*(
       else:
         result.add ",\n"
       result.add "  uint gl_VertexID : SV_VertexID"
+    if not params.hasParam("gl_InstanceID") and "gl_InstanceID" in bodyCode:
+      if first:
+        result.add "\n"
+        first = false
+      else:
+        result.add ",\n"
+      result.add "  uint gl_InstanceID : SV_InstanceID"
     if not first:
       result.add "\n"
     result.add ") {\n"

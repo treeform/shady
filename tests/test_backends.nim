@@ -55,6 +55,60 @@ block:
   doAssert "output.position = gl_Position;" in msl
 
 block:
+  proc instancedVertex(gl_Position: var Vec4) =
+    ## Exercises portable vertex and instance identifiers.
+    let
+      vertex = float32(gl_VertexID)
+      instance = float32(gl_InstanceID)
+    gl_Position = vec4(vertex, instance, 0.0, 1.0)
+
+  let glsl = toShader(instancedVertex, glsl4Desktop, shaderVertex)
+  doAssert "gl_VertexID" in glsl
+  doAssert "gl_InstanceID" in glsl
+
+  let web = toShader(instancedVertex, glsl3WebGL, shaderVertex)
+  doAssert "gl_VertexID" in web
+  doAssert "gl_InstanceID" in web
+
+  let vulkan = toShader(instancedVertex, vulkanGlsl450, shaderVertex)
+  doAssert "gl_VertexIndex" in vulkan
+  doAssert "gl_InstanceIndex" in vulkan
+
+  let hlsl = toHLSL(instancedVertex, shaderVertex)
+  doAssert "uint gl_VertexID : SV_VertexID" in hlsl
+  doAssert "uint gl_InstanceID : SV_InstanceID" in hlsl
+
+  let msl = toMSL(instancedVertex, shaderVertex)
+  doAssert "uint gl_VertexID [[vertex_id]]" in msl
+  doAssert "uint gl_InstanceID [[instance_id]]" in msl
+
+block:
+  type Params = object
+    offset: float32
+
+  proc readOffset(params: Params): float32 =
+    ## Returns a field from a shader-local parameter structure.
+    params.offset
+
+  proc structuredVertex(gl_Position: var Vec4) =
+    ## Exercises an uninitialized shader-local parameter structure.
+    var params: Params
+    params.offset = gl_InstanceID.float32
+    gl_Position = vec4(readOffset(params), 0.0, 0.0, 1.0)
+
+  let glsl = toShader(structuredVertex, glsl4Desktop, shaderVertex)
+  doAssert "struct Params" in glsl
+  doAssert "Params params;" in glsl
+
+  let hlsl = toHLSL(structuredVertex, shaderVertex)
+  doAssert "struct Params" in hlsl
+  doAssert "Params params;" in hlsl
+
+  let msl = toMSL(structuredVertex, shaderVertex)
+  doAssert "struct Params" in msl
+  doAssert "Params params;" in msl
+
+block:
   var atlas: Uniform[Sampler2d]
 
   proc sampledTexture(uv: Vec2, fragColor: var Vec4) =

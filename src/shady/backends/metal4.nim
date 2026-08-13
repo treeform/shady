@@ -102,6 +102,8 @@ proc metalAttribute*(name: string, index: int, isOutput: bool): string =
     " [[position]]"
   of "gl_VertexID":
     " [[vertex_id]]"
+  of "gl_InstanceID":
+    " [[instance_id]]"
   of "gl_FrontFacing":
     " [[front_facing]]"
   else:
@@ -196,7 +198,7 @@ proc hasParam(params: openArray[EntryParam], name: string): bool =
       return true
 
 proc isSpecialInput(p: EntryParam): bool =
-  p.name in ["gl_VertexID", "gl_FrontFacing"]
+  p.name in ["gl_VertexID", "gl_InstanceID", "gl_FrontFacing"]
 
 proc outputLocals(params: openArray[EntryParam], level: int): string =
   let indent = repeat("  ", level)
@@ -322,6 +324,9 @@ proc emitMetalEntry*(
     if not params.hasParam("gl_VertexID") and "gl_VertexID" in bodyCode:
       result.addComma(first)
       result.add "  uint gl_VertexID [[vertex_id]]"
+    if not params.hasParam("gl_InstanceID") and "gl_InstanceID" in bodyCode:
+      result.addComma(first)
+      result.add "  uint gl_InstanceID [[instance_id]]"
     for resource in resourceParams(uniforms, textures, stage):
       result.addComma(first)
       result.add "  "
