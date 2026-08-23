@@ -14,7 +14,22 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: treeform/setup-nim-action@v5
-    - run: nimby install -g shady.nimble
+    - uses: actions/checkout@v5
+    - uses: treeform/setup-nim-action@v6
+
+    # Nimby installs packages as siblings of the workspace root, so the
+    # workspace has to be the parent of this checkout: shady then sits inside
+    # it next to its dependencies and nim finds nim.cfg by walking up.
+    - name: Create a Nimby workspace
+      shell: bash
+      run: |
+        cd ..
+        nimby create
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        cd ..
+        nimby install shady/shady.nimble
+
     - run: nim r tests/test_shady.nim
