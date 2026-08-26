@@ -507,3 +507,33 @@ void main() {
   fragColor = vec4(float(float(tile.x)), 0.0, 0.0, 1.0);
 }
 
+--------------------------------------------------
+Uniform params on the entry point (issue #32):
+#version 410
+precision highp float;
+// from uniformParamVert
+
+uniform mat4 MVP;
+in vec3 vCol;
+in vec3 vPos;
+out vec3 vertColor;
+
+void main() {
+  gl_Position = MVP * vec4(vPos.x, vPos.y, 0.0, 1.0);
+  vertColor = vCol;
+}
+
+--------------------------------------------------
+Uniform float param on the entry point:
+#version 410
+precision highp float;
+// from uniformParamFrag
+
+out vec4 fragColor;
+in vec2 uv;
+uniform float time;
+
+void main() {
+  fragColor = vec4(uv.x, uv.y, sin(time), 1.0);
+}
+
