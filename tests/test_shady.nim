@@ -384,6 +384,31 @@ block:
     fragColor = vec4(float(tile.x), 0.0, 0.0, 1.0)
   log toGLSL(desktopSamplerFrag, glslDesktop)
 
+block:
+  log "--------------------------------------------------"
+  log "Uniform params on the entry point (issue #32):"
+  proc uniformParamVert(
+    gl_Position: var Vec4,
+    MVP: Uniform[Mat4],
+    vCol: Vec3,
+    vPos: Vec3,
+    vertColor: var Vec3
+  ) =
+    gl_Position = MVP * vec4(vPos.x, vPos.y, 0.0, 1.0)
+    vertColor = vCol
+  log toGLSL(uniformParamVert)
+
+block:
+  log "--------------------------------------------------"
+  log "Uniform float param on the entry point:"
+  proc uniformParamFrag(
+    fragColor: var Vec4,
+    uv: Vec2,
+    time: Uniform[float32]
+  ) =
+    fragColor = vec4(uv.x, uv.y, sin(time), 1.0)
+  log toGLSL(uniformParamFrag)
+
 when defined(gen_master):
   writeFile(goldMasterPath, masterOutput)
 else:

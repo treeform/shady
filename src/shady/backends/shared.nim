@@ -115,9 +115,11 @@ proc typeString(n: NimNode): string =
     of "GVec2[int32]": typeRename("IVec2")
     of "GVec3[int32]": typeRename("IVec3")
     of "GVec4[int32]": typeRename("IVec4")
-    of "Uniform[float32]": typeRename("float32")
-    of "Uniform[int]": typeRename("int")
     else:
+      if n[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
+        # Uniform[T], UniformWriteOnly[T] and Attribute[T] are just T
+        # in the shader, so use the inner type.
+        return typeString(n[1])
       if n[0].repr == "array":
         var length = 0
         if n[1].kind == nnkIntLit:
@@ -983,7 +985,22 @@ proc toCodeTopLevel(
               res.add "out "
               res.add typeRename(typeNode[0].strVal)
             else:
-              if typeNode.kind == nnkBracketExpr:
+              if typeNode.kind == nnkBracketExpr and
+                  typeNode[0].repr in ["Uniform", "UniformWriteOnly", "Attribute"]:
+                # Uniform[T] params become uniform globals, not "in" params.
+                res.add typeRename(typeNode[0].repr)
+                res.add " "
+                let (innerType, arraySuffix) = splitArrayType(typeNode[1])
+                if shaderTarget == glslES3 and glsl3NeedsHighp(innerType):
+                  res.add "highp "
+                res.add innerType
+                res.add " "
+                res.add param.strVal
+                res.add arraySuffix
+                res.addSmart ';'
+                res.add "\n"
+                continue
+              elif typeNode.kind == nnkBracketExpr:
                 if isVulkan():
                   res.add "layout(location = "
                   res.add $inLocation
