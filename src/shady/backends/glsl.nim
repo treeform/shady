@@ -50,6 +50,7 @@ proc glslProcRename*(t: string): string =
   of "fmod": "mod"
   of "mod": "%"
   of "div": "/"
+  of "input", "output": "shady_" & t
   else: t.replace("`", "_")
 
 proc glslTypeDefault*(t: string): string =
