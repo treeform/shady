@@ -402,7 +402,7 @@ proc emitMetalEntry*(
     result.add ") {\n"
     result.add inputLocals(params, "input", 1)
     result.add outputLocals(params, 1)
-    result.add bodyCode.replace("return result;",
+    result.add bodyCode.replace("return;",
       "return " & returnExpression & ";")
     if outputIndex >= 0:
       result.add "  return "

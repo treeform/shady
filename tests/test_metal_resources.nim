@@ -37,6 +37,7 @@ doAssert layout.offsets["strength"] mod 4 == 0
 doAssert shared.count("[[sampler(") == 1
 doAssert "[[color(1)]]" in shared
 doAssert "return FragmentOut{fragColor, flags};" in shared
+doAssert "return;" notin shared
 
 when defined(macosx):
   import metal4
