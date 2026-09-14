@@ -2,5 +2,6 @@
 
 import shady/backends/[shared, glsl, glsl3, glsl4, dx12, metal4, vulkan]
 import shady/binary
+import shady/[specializations, layouts, errors]
 
-export shared, glsl, glsl3, glsl4, dx12, metal4, vulkan, binary
+export shared, glsl, glsl3, glsl4, dx12, metal4, vulkan, binary, specializations, layouts, errors

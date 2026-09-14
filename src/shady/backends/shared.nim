@@ -1438,6 +1438,17 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     code.add(v)
     code.add "\n"
 
+  var entryCode = ""
+  toCodeTopLevel(n, entryCode, 0, metalUniforms, metalTextures)
+  if isMetal():
+    bindMetalResources(
+      functions,
+      entryCode,
+      metalUniforms,
+      metalTextures,
+      entryStage.stageId()
+    )
+
   # Put functions definition (just name and types part).
   code.addGap()
   for k, v in functions:
@@ -1458,7 +1469,7 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     code.add "\n"
 
   # Put the main function last.
-  toCodeTopLevel(n, code, 0, metalUniforms, metalTextures)
+  code.add(entryCode)
 
   return code
 
