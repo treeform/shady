@@ -16,14 +16,13 @@ Fragment with a function:
 precision highp float;
 // from functionFrag
 
-void vec3Fun(inout vec3 output);
+void vec3Fun(inout vec3 shady_output);
 
 void vec3Fun(
-  inout vec3 output
+  inout vec3 shady_output
 ) {
-  output = vec3(0.5, 0.3, 0.1);
+  shady_output = vec3(0.5, 0.3, 0.1);
 }
-
 out vec4 fragColor;
 
 void main() {
@@ -246,7 +245,6 @@ float add(
   result = a + b;
   return result;
 }
-
 out vec4 fragColor;
 
 void main() {
