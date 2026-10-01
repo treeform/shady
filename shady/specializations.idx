@@ -1,0 +1,3 @@
+nimTitle	specializations	shady/specializations.html	module shady/specializations		0
+nim	replaceTextureReads	shady/specializations.html#replaceTextureReads,string,openArray[string]	proc replaceTextureReads(source: string; textures: openArray[string]): string		4
+nim	shareMetalSamplers	shady/specializations.html#shareMetalSamplers,string,openArray[int]	proc shareMetalSamplers(source: string; bindings: openArray[int]): string		36

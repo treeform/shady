@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>shady/backends/glsl3</title>
+<title>shady/layouts</title>
 
 <!-- Google fonts -->
 <link href='https://fonts.googleapis.com/css?family=Lato:400,600,900' rel='stylesheet' type='text/css'/>
@@ -16,10 +16,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4QQQEwksSS9ZWwAAAk1JREFUWMPtll2ITVEUx39nn/O7Y5qR8f05wtCUUr6ZIS++8pEnkZInPImneaCQ5METNdOkeFBKUhMPRIkHKfEuUZSUlGlKPN2TrgfncpvmnntnmlEyq1Z7t89/rf9a6+y99oZxGZf/XeIq61EdtgKXgdXA0xrYAvBjOIF1AI9zvjcC74BSpndrJPkBWDScTF8Aa4E3wDlgHbASaANmVqlcCnwHvgDvgVfAJ+AikAAvgfVZwLnSVZHZaOuKoQi3ZOMi4NkYkpe1p4J7A8BpYAD49hfIy/oqG0+hLomiKP2L5L+1ubn5115S+3OAn4EnwBlgMzCjyt6ZAnQCJ4A7wOs88iRJHvw50HoujuPBoCKwHWiosy8MdfZnAdcHk8dxXFJ3VQbQlCTJvRBCGdRbD4M6uc5glpY3eAihpN5S5w12diSEcCCEcKUO4ljdr15T76ur1FDDLIQQ3qv71EdDOe3Kxj3leRXyk+pxdWnFWod6Wt2bY3de3aSuUHcPBVimHs7mK9WrmeOF6lR1o9qnzskh2ar2qm1qizpfXaPeVGdlmGN5pb09qMxz1Xb1kLqgzn1RyH7JUXW52lr5e/Kqi9qpto7V1atuUzfnARrV7jEib1T76gG2qxdGmXyiekkt1GswPTtek0aBfJp6YySGBfWg2tPQ0FAYgf1stUfdmdcjarbYJEniKIq6gY/Aw+zWHAC+p2labGpqiorFYgGYCEzN7oQdQClN07O1/EfDyGgC0ALMBdYAi4FyK+4H3gLPsxfR1zRNi+NP7nH5J+QntnXe5B5mpfQAAAAASUVORK5CYII=">
 
 <!-- CSS -->
-<link rel="stylesheet" type="text/css" href="../../nimdoc.out.css?v=2.2.12">
+<link rel="stylesheet" type="text/css" href="../nimdoc.out.css?v=2.2.12">
 
 <!-- JS -->
-<script type="text/javascript" src="../../dochack.js?v=2.2.12"></script>
+<script type="text/javascript" src="../dochack.js?v=2.2.12"></script>
 </head>
 <body>
   <div class="document" id="documentId">
@@ -27,7 +27,7 @@
     <label for="nav-toggle" id="nav-burger">&#9776;</label>
     <label for="nav-toggle" id="nav-overlay"></label>
     <div class="container">
-      <h1 class="title">shady/backends/glsl3</h1>
+      <h1 class="title">shady/layouts</h1>
       <div class="row">
   <div class="three columns">
     <div class="theme-select-wrapper">
@@ -40,7 +40,7 @@
     </div>
     <div id="global-links">
       <ul class="simple">
-        <li><a id="indexLink" href="../../theindex.html">Index</a></li>
+        <li><a id="indexLink" href="../theindex.html">Index</a></li>
       </ul>
     </div>
     <div id="searchInputDiv">
@@ -55,13 +55,19 @@
     </div>
     <ul class="simple simple-toc" id="toc-list">
   <li>
+  <a class="reference reference-toplevel" href="#6" id="56">Imports</a>
+</li>
+<li>
   <details open>
-    <summary><a class="reference reference-toplevel" href="#10" id="60">Consts</a></summary>
+    <summary><a class="reference reference-toplevel" href="#7" id="57">Types</a></summary>
     <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#glsl3DesktopExtra" title="glsl3DesktopExtra = &quot;&quot;">glsl3DesktopExtra</a></li>
-<li><a class="reference" href="#glsl3DesktopVersion" title="glsl3DesktopVersion = &quot;330&quot;">glsl3DesktopVersion</a></li>
-<li><a class="reference" href="#glsl3WebGLExtra" title="glsl3WebGLExtra = &quot;precision highp float;\n&quot;">glsl3WebGLExtra</a></li>
-<li><a class="reference" href="#glsl3WebGLVersion" title="glsl3WebGLVersion = &quot;300 es&quot;">glsl3WebGLVersion</a></li>
+      <li><a class="reference" href="#UniformField" title="UniformField = object
+  name*, kind*: string
+  offset*, size*, count*: int">UniformField</a></li>
+<li><a class="reference" href="#UniformLayout" title="UniformLayout = object
+  fields*: seq[UniformField]
+  offsets*: Table[string, int]
+  size*: int">UniformLayout</a></li>
 
     </ul>
   </details>
@@ -70,8 +76,8 @@
   <details open>
     <summary><a class="reference reference-toplevel" href="#12" id="62">Procs</a></summary>
     <ul class="simple simple-toc-section">
-      <ul class="simple nested-toc-section">glsl3NeedsHighp
-  <li><a class="reference" href="#glsl3NeedsHighp%2Cstring" title="glsl3NeedsHighp(samplerType: string): bool">glsl3NeedsHighp(samplerType: string): bool</a></li>
+      <ul class="simple nested-toc-section">metalUniformLayout
+  <li><a class="reference" href="#metalUniformLayout%2Cstring" title="metalUniformLayout(source: string): UniformLayout">metalUniformLayout(source: string): UniformLayout</a></li>
 
 </ul>
 
@@ -83,52 +89,43 @@
 
   </div>
   <div class="nine columns" id="content">
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl3.nim#L1" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl3.nim#L1" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady/layouts.nim#L1" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady/layouts.nim#L1" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
     <div id="tocRoot"></div>
     
     <p class="module-desc"></p>
-    <div class="section" id="10">
-  <h1><a class="toc-backref" href="#10">Consts</a></h1>
+    <div class="section" id="6">
+  <h1><a class="toc-backref" href="#6">Imports</a></h1>
   <dl class="item">
-    <div id="glsl3DesktopExtra">
-  <dt><pre><a href="#glsl3DesktopExtra"><span class="Identifier">glsl3DesktopExtra</span></a> <span class="Other">=</span> <span class="StringLit">&quot;&quot;</span></pre></dt>
+    <a class="reference external" href="errors.html">errors</a>
+  </dl>
+</div>
+<div class="section" id="7">
+  <h1><a class="toc-backref" href="#7">Types</a></h1>
+  <dl class="item">
+    <div id="UniformField">
+  <dt><pre><a href="#UniformField"><span class="Identifier">UniformField</span></a> <span class="Other">=</span> <span class="Keyword">object</span>
+  <span class="Identifier">name</span><span class="Operator">*</span><span class="Other">,</span> <span class="Identifier">kind</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">string</span>
+  <span class="Identifier">offset</span><span class="Operator">*</span><span class="Other">,</span> <span class="Identifier">size</span><span class="Operator">*</span><span class="Other">,</span> <span class="Identifier">count</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">int</span></pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl3.nim#L3" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl3.nim#L3" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady/layouts.nim#L5" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady/layouts.nim#L5" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
-<div id="glsl3DesktopVersion">
-  <dt><pre><a href="#glsl3DesktopVersion"><span class="Identifier">glsl3DesktopVersion</span></a> <span class="Other">=</span> <span class="StringLit">&quot;330&quot;</span></pre></dt>
+<div id="UniformLayout">
+  <dt><pre><a href="#UniformLayout"><span class="Identifier">UniformLayout</span></a> <span class="Other">=</span> <span class="Keyword">object</span>
+  <span class="Identifier">fields</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><a href="#UniformField"><span class="Identifier">UniformField</span></a><span class="Other">]</span>
+  <span class="Identifier">offsets</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">Table</span><span class="Other">[</span><span class="Identifier">string</span><span class="Other">,</span> <span class="Identifier">int</span><span class="Other">]</span>
+  <span class="Identifier">size</span><span class="Operator">*</span><span class="Other">:</span> <span class="Identifier">int</span></pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl3.nim#L2" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl3.nim#L2" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
-
-  </dd>
-</div>
-<div id="glsl3WebGLExtra">
-  <dt><pre><a href="#glsl3WebGLExtra"><span class="Identifier">glsl3WebGLExtra</span></a> <span class="Other">=</span> <span class="StringLit">&quot;precision highp float;\n&quot;</span></pre></dt>
-  <dd>
-    
-    
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl3.nim#L5" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl3.nim#L5" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
-
-  </dd>
-</div>
-<div id="glsl3WebGLVersion">
-  <dt><pre><a href="#glsl3WebGLVersion"><span class="Identifier">glsl3WebGLVersion</span></a> <span class="Other">=</span> <span class="StringLit">&quot;300 es&quot;</span></pre></dt>
-  <dd>
-    
-    
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl3.nim#L4" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl3.nim#L4" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady/layouts.nim#L8" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady/layouts.nim#L8" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -138,15 +135,15 @@
 <div class="section" id="12">
   <h1><a class="toc-backref" href="#12">Procs</a></h1>
   <dl class="item">
-    <div id="glsl3NeedsHighp-procs-all">
-  <div id="glsl3NeedsHighp,string">
-  <dt><pre><span class="Keyword">proc</span> <a href="#glsl3NeedsHighp%2Cstring"><span class="Identifier">glsl3NeedsHighp</span></a><span class="Other">(</span><span class="Identifier">samplerType</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
-    <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
+    <div id="metalUniformLayout-procs-all">
+  <div id="metalUniformLayout,string">
+  <dt><pre><span class="Keyword">proc</span> <a href="#metalUniformLayout%2Cstring"><span class="Identifier">metalUniformLayout</span></a><span class="Other">(</span><span class="Identifier">source</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <a href="#UniformLayout"><span class="Identifier">UniformLayout</span></a> {.
+    <span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">ShadyError</span><span class="Other">,</span> <span class="Identifier">ShadyError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
-    
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl3.nim#L7" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl3.nim#L7" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    Describes the native MSL layout emitted for a Shady uniform buffer.
+    <a href="https://github.com/treeform/shady/tree/master/src/shady/layouts.nim#L17" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady/layouts.nim#L17" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>

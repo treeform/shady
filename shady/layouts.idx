@@ -1,0 +1,4 @@
+nimTitle	layouts	shady/layouts.html	module shady/layouts		0
+nim	UniformField	shady/layouts.html#UniformField	object UniformField		5
+nim	UniformLayout	shady/layouts.html#UniformLayout	object UniformLayout		8
+nim	metalUniformLayout	shady/layouts.html#metalUniformLayout,string	proc metalUniformLayout(source: string): UniformLayout		17

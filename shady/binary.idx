@@ -5,4 +5,4 @@ nim	binaryCompute	shady/binary.html#binaryCompute	BinaryShaderStage.binaryComput
 nim	BinaryShaderStage	shady/binary.html#BinaryShaderStage	enum BinaryShaderStage		3
 nim	writeShaderSource	shady/binary.html#writeShaderSource,string,string	proc writeShaderSource(source, sourcePath: string): string		22
 nim	compileSpirvShader	shady/binary.html#compileSpirvShader,string,string,string,BinaryShaderStage	proc compileSpirvShader(source, sourcePath, outputPath: string;\n                   stage: BinaryShaderStage): string		29
-nim	compileHlslShader	shady/binary.html#compileHlslShader,string,string,string,string,string	proc compileHlslShader(source, sourcePath, outputPath, entryPoint, target: string): string		46
+nim	compileHlslShader	shady/binary.html#compileHlslShader,string,string,string,string,string	proc compileHlslShader(source, sourcePath, outputPath, entryPoint, target: string): string		48

@@ -16,10 +16,10 @@
 <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4QQQEwksSS9ZWwAAAk1JREFUWMPtll2ITVEUx39nn/O7Y5qR8f05wtCUUr6ZIS++8pEnkZInPImneaCQ5METNdOkeFBKUhMPRIkHKfEuUZSUlGlKPN2TrgfncpvmnntnmlEyq1Z7t89/rf9a6+y99oZxGZf/XeIq61EdtgKXgdXA0xrYAvBjOIF1AI9zvjcC74BSpndrJPkBWDScTF8Aa4E3wDlgHbASaANmVqlcCnwHvgDvgVfAJ+AikAAvgfVZwLnSVZHZaOuKoQi3ZOMi4NkYkpe1p4J7A8BpYAD49hfIy/oqG0+hLomiKP2L5L+1ubn5115S+3OAn4EnwBlgMzCjyt6ZAnQCJ4A7wOs88iRJHvw50HoujuPBoCKwHWiosy8MdfZnAdcHk8dxXFJ3VQbQlCTJvRBCGdRbD4M6uc5glpY3eAihpN5S5w12diSEcCCEcKUO4ljdr15T76ur1FDDLIQQ3qv71EdDOe3Kxj3leRXyk+pxdWnFWod6Wt2bY3de3aSuUHcPBVimHs7mK9WrmeOF6lR1o9qnzskh2ar2qm1qizpfXaPeVGdlmGN5pb09qMxz1Xb1kLqgzn1RyH7JUXW52lr5e/Kqi9qpto7V1atuUzfnARrV7jEib1T76gG2qxdGmXyiekkt1GswPTtek0aBfJp6YySGBfWg2tPQ0FAYgf1stUfdmdcjarbYJEniKIq6gY/Aw+zWHAC+p2labGpqiorFYgGYCEzN7oQdQClN07O1/EfDyGgC0ALMBdYAi4FyK+4H3gLPsxfR1zRNi+NP7nH5J+QntnXe5B5mpfQAAAAASUVORK5CYII=">
 
 <!-- CSS -->
-<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.10">
+<link rel="stylesheet" type="text/css" href="nimdoc.out.css?v=2.2.12">
 
 <!-- JS -->
-<script type="text/javascript" src="dochack.js?v=2.2.10"></script>
+<script type="text/javascript" src="dochack.js?v=2.2.12"></script>
 </head>
 <body>
   <div class="document" id="documentId">
@@ -28,7 +28,7 @@
     <label for="nav-toggle" id="nav-overlay"></label>
     <div class="container">
       <h1 class="title">Index</h1>
-      Modules: <a href="shady.html">shady</a>, <a href="shady/backends/dx12.html">shady/backends/dx12</a>, <a href="shady/backends/glsl.html">shady/backends/glsl</a>, <a href="shady/backends/glsl3.html">shady/backends/glsl3</a>, <a href="shady/backends/glsl4.html">shady/backends/glsl4</a>, <a href="shady/backends/metal4.html">shady/backends/metal4</a>, <a href="shady/backends/shared.html">shady/backends/shared</a>, <a href="shady/backends/vulkan.html">shady/backends/vulkan</a>, <a href="shady/binary.html">shady/binary</a>.<br/><p /><h2>API symbols</h2>
+      Modules: <a href="shady.html">shady</a>, <a href="shady/backends/dx12.html">shady/backends/dx12</a>, <a href="shady/backends/glsl.html">shady/backends/glsl</a>, <a href="shady/backends/glsl3.html">shady/backends/glsl3</a>, <a href="shady/backends/glsl4.html">shady/backends/glsl4</a>, <a href="shady/backends/metal4.html">shady/backends/metal4</a>, <a href="shady/backends/shared.html">shady/backends/shared</a>, <a href="shady/backends/vulkan.html">shady/backends/vulkan</a>, <a href="shady/binary.html">shady/binary</a>, <a href="shady/errors.html">shady/errors</a>, <a href="shady/layouts.html">shady/layouts</a>, <a href="shady/specializations.html">shady/specializations</a>.<br/><p /><h2>API symbols</h2>
 <dl><dt><a name="%60%2A%60" href="#%60%2A%60"><span>`*`:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="shared: proc `*`(s: float32; m: Mat4): Mat4" href="shady/backends/shared.html#%2A%2Cfloat32%2CMat4">shared: proc `*`(s: float32; m: Mat4): Mat4</a></li>
@@ -58,6 +58,14 @@
 <dt><a name="binaryVertex" href="#binaryVertex"><span>binaryVertex:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="binary: BinaryShaderStage.binaryVertex" href="shady/binary.html#binaryVertex">binary: BinaryShaderStage.binaryVertex</a></li>
+          </ul></dd>
+<dt><a name="bindMetalResources" href="#bindMetalResources"><span>bindMetalResources:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="metal4: proc bindMetalResources(functions: var Table[string, string]; entry: var string;
+                   uniforms: openArray[UniformParam];
+                   textures: openArray[TextureParam]; stage: int)" href="shady/backends/metal4.html#bindMetalResources%2CTable%5Bstring%2Cstring%5D%2Cstring%2CopenArray%5BUniformParam%5D%2CopenArray%5BTextureParam%5D%2Cint">metal4: proc bindMetalResources(functions: var Table[string, string]; entry: var string;
+                   uniforms: openArray[UniformParam];
+                   textures: openArray[TextureParam]; stage: int)</a></li>
           </ul></dd>
 <dt><a name="compileHlslShader" href="#compileHlslShader"><span>compileHlslShader:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -365,9 +373,17 @@
 <li><a class="reference external"
           data-doc-search-tag="metal4: proc metalTypeRename(t: string): string" href="shady/backends/metal4.html#metalTypeRename%2Cstring">metal4: proc metalTypeRename(t: string): string</a></li>
           </ul></dd>
+<dt><a name="metalUniformLayout" href="#metalUniformLayout"><span>metalUniformLayout:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="layouts: proc metalUniformLayout(source: string): UniformLayout" href="shady/layouts.html#metalUniformLayout%2Cstring">layouts: proc metalUniformLayout(source: string): UniformLayout</a></li>
+          </ul></dd>
 <dt><a name="reflect" href="#reflect"><span>reflect:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="shared: proc reflect(incident, normal: Vec3): Vec3" href="shady/backends/shared.html#reflect%2CVec3%2CVec3">shared: proc reflect(incident, normal: Vec3): Vec3</a></li>
+          </ul></dd>
+<dt><a name="replaceTextureReads" href="#replaceTextureReads"><span>replaceTextureReads:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="specializations: proc replaceTextureReads(source: string; textures: openArray[string]): string" href="shady/specializations.html#replaceTextureReads%2Cstring%2CopenArray%5Bstring%5D">specializations: proc replaceTextureReads(source: string; textures: openArray[string]): string</a></li>
           </ul></dd>
 <dt><a name="Sampler2d" href="#Sampler2d"><span>Sampler2d:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -420,6 +436,18 @@
 <dt><a name="shaderVertex" href="#shaderVertex"><span>shaderVertex:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="shared: ShaderStage.shaderVertex" href="shady/backends/shared.html#shaderVertex">shared: ShaderStage.shaderVertex</a></li>
+          </ul></dd>
+<dt><a name="ShadyError" href="#ShadyError"><span>ShadyError:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="errors: object ShadyError" href="shady/errors.html#ShadyError">errors: object ShadyError</a></li>
+          </ul></dd>
+<dt><a name="shareHlslSamplers" href="#shareHlslSamplers"><span>shareHlslSamplers:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="dx12: proc shareHlslSamplers(source: string; slots: openArray[int]): string" href="shady/backends/dx12.html#shareHlslSamplers%2Cstring%2CopenArray%5Bint%5D">dx12: proc shareHlslSamplers(source: string; slots: openArray[int]): string</a></li>
+          </ul></dd>
+<dt><a name="shareMetalSamplers" href="#shareMetalSamplers"><span>shareMetalSamplers:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="specializations: proc shareMetalSamplers(source: string; bindings: openArray[int]): string" href="shady/specializations.html#shareMetalSamplers%2Cstring%2CopenArray%5Bint%5D">specializations: proc shareMetalSamplers(source: string; bindings: openArray[int]): string</a></li>
           </ul></dd>
 <dt><a name="smoothstep" href="#smoothstep"><span>smoothstep:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -509,6 +537,14 @@
 <li><a class="reference external"
           data-doc-search-tag="shared: type Uniform" href="shady/backends/shared.html#Uniform">shared: type Uniform</a></li>
           </ul></dd>
+<dt><a name="UniformField" href="#UniformField"><span>UniformField:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="layouts: object UniformField" href="shady/layouts.html#UniformField">layouts: object UniformField</a></li>
+          </ul></dd>
+<dt><a name="UniformLayout" href="#UniformLayout"><span>UniformLayout:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="layouts: object UniformLayout" href="shady/layouts.html#UniformLayout">layouts: object UniformLayout</a></li>
+          </ul></dd>
 <dt><a name="UniformParam" href="#UniformParam"><span>UniformParam:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="dx12: tuple UniformParam" href="shady/backends/dx12.html#UniformParam">dx12: tuple UniformParam</a></li>
@@ -577,7 +613,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-08-26 22:55:50 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-10-01 17:41:13 UTC</small>
       </div>
     </div>
   </div>
