@@ -1,4 +1,4 @@
-import algorithm, strutils
+import algorithm, strutils, tables, sets
 
 type
   EntryParam* = tuple[name, typ: string, isOut: bool]
@@ -166,10 +166,15 @@ proc metalResourceCall*(
       args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ")"
   of "textureLod":
     if args.len != 3: return ""
-    args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ", level(" & args[2] & "))"
+    args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ", metal::level(" & args[2] & "))"
   of "textureSize":
     if args.len < 1: return ""
-    args[0] & ".get_width()"
+    if firstArgIsSamplerBuffer:
+      args[0] & ".get_width()"
+    else:
+      let level = if args.len >= 2: args[1] else: "0"
+      "int2(" & args[0] & ".get_width(" & level & "), " &
+        args[0] & ".get_height(" & level & "))"
   of "texelFetch":
     if args.len < 2: return ""
     if firstArgIsSamplerBuffer:
@@ -353,7 +358,30 @@ proc emitMetalEntry*(
 
   of 2:
     let outputIndex = firstOutput(params)
-    let returnType = if outputIndex >= 0: params[outputIndex].typ else: "void"
+    var outputs: seq[EntryParam]
+    for param in params:
+      if param.isOut:
+        outputs.add(param)
+    var returnExpression = ""
+    let returnType =
+      if outputs.len > 1:
+        "FragmentOut"
+      elif outputIndex >= 0:
+        params[outputIndex].typ
+      else:
+        "void"
+    if outputs.len > 1:
+      result.add "struct FragmentOut {\n"
+      for i, param in outputs:
+        result.add "  " & param.typ & " " & param.name &
+          " [[color(" & $i & ")]];\n"
+      result.add "};\n"
+      var names: seq[string]
+      for param in outputs:
+        names.add(param.name)
+      returnExpression = "FragmentOut{" & names.join(", ") & "}"
+    elif outputIndex >= 0:
+      returnExpression = params[outputIndex].name
     result.add inputStruct("FragmentIn", params, stage)
     result.add "\nfragment "
     result.add returnType
@@ -374,10 +402,11 @@ proc emitMetalEntry*(
     result.add ") {\n"
     result.add inputLocals(params, "input", 1)
     result.add outputLocals(params, 1)
-    result.add bodyCode
+    result.add bodyCode.replace("return;",
+      "return " & returnExpression & ";")
     if outputIndex >= 0:
       result.add "  return "
-      result.add params[outputIndex].name
+      result.add returnExpression
       result.add ";\n"
     result.add "}\n"
 
@@ -388,3 +417,97 @@ proc emitMetalEntry*(
 
   else:
     discard
+
+proc identifiers(source: string): HashSet[string] =
+  ## Collects identifiers for resource dependency analysis.
+  var word = ""
+  for c in source & " ":
+    if c in {'a' .. 'z', 'A' .. 'Z', '0' .. '9', '_'}:
+      word.add(c)
+    elif word.len > 0:
+      result.incl(word)
+      word.setLen(0)
+
+proc prependArguments(source, name, arguments: string): string =
+  ## Adds explicit captured resources to calls of one generated helper.
+  if arguments.len == 0:
+    return source
+  var cursor = 0
+  while cursor < source.len:
+    let start = source.find(name & "(", cursor)
+    if start < 0:
+      result.add(source[cursor .. ^1])
+      break
+    let finish = start + name.len + 1
+    result.add(source[cursor ..< finish])
+    if start > 0 and source[start - 1] in
+      {'a' .. 'z', 'A' .. 'Z', '0' .. '9', '_'}:
+        cursor = finish
+        continue
+    result.add(arguments)
+    var next = finish
+    while next < source.len and source[next] in Whitespace:
+      inc next
+    if next < source.len and source[next] != ')':
+      result.add(", ")
+    cursor = finish
+
+proc bindMetalResources*(
+  functions: var Table[string, string],
+  entry: var string,
+  uniforms: openArray[UniformParam],
+  textures: openArray[TextureParam],
+  stage: int
+) =
+  ## Passes uniform and texture dependencies through every helper call.
+  var
+    used: Table[string, HashSet[string]]
+    needs: Table[string, HashSet[string]]
+  for name, source in functions:
+    used[name] = identifiers(source[source.find(" {") + 2 .. ^1])
+    for uniform in uniforms:
+      if uniform.name.split('[')[0] in used[name]:
+        needs.mgetOrPut(name, initHashSet[string]()).incl("uniforms")
+    for texture in textures:
+      if texture.name in used[name]:
+        needs.mgetOrPut(name, initHashSet[string]()).incl(texture.name)
+  var changed = true
+  while changed:
+    changed = false
+    for name in functions.keys:
+      for called in functions.keys:
+        if called in used[name]:
+          for resource in needs.getOrDefault(called):
+            if resource notin needs.getOrDefault(name):
+              needs.mgetOrPut(name, initHashSet[string]()).incl(resource)
+              changed = true
+  var
+    declarations: Table[string, string]
+    arguments: Table[string, string]
+  let buffer = if stage == 2: "1" else: "0"
+  for name in functions.keys:
+    var
+      params: seq[string]
+      values: seq[string]
+    if "uniforms" in needs.getOrDefault(name):
+      params.add("constant ShadyUniforms" & buffer & " &shadyUniforms" & buffer)
+      values.add("shadyUniforms" & buffer)
+    for texture in textures:
+      if texture.name in needs.getOrDefault(name):
+        params.add(texture.typ & " " & texture.name)
+        params.add("sampler " & texture.name & "Sampler")
+        values.add(texture.name)
+        values.add(texture.name & "Sampler")
+    declarations[name] = params.join(", ")
+    arguments[name] = values.join(", ")
+  for name, source in functions.mpairs:
+    let bodyStart = source.find(" {")
+    var
+      signature = source[0 ..< bodyStart]
+      body = source[bodyStart .. ^1]
+    signature = prependArguments(signature, name, declarations[name])
+    for called in functions.keys:
+      body = prependArguments(body, called, arguments[called])
+    source = signature & body
+  for name in functions.keys:
+    entry = prependArguments(entry, name, arguments[name])

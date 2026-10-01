@@ -395,8 +395,8 @@ proc toCode(n: NimNode, res: var string, level = 0) =
 
     elif isHlsl() and "*" in n[0].repr:
       let
-        leftType = n[1].getType.repr
-        rightType = n[2].getType.repr
+        leftType = n[1].getTypeInst.repr
+        rightType = n[2].getTypeInst.repr
         leftIsMatrix = leftType.isMatrixTypeName() or n[1].looksMatrixExpr()
         rightIsMatrix = rightType.isMatrixTypeName() or n[2].looksMatrixExpr()
         leftIsVector = leftType.isVectorTypeName() or n[1].looksVectorExpr()
@@ -481,6 +481,15 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     if n.emitBackendCall(res):
       return
     var procName = procRename(n[0].strVal)
+    if isHlsl() and n.len == 2 and procName in [
+        "float2", "float3", "float4", "int2", "int3", "int4", "uint2", "uint3", "uint4"] and
+        not n[1].getTypeInst.repr.isVectorTypeName():
+      # HLSL constructors require every component; a cast broadcasts a scalar
+      # without evaluating an expression more than once.
+      res.add "(" & procName & ") ("
+      n[1].toCode(res)
+      res.add ")"
+      return
     if procName in ignoreFunctions:
       return
     if procName == "[]=":
@@ -726,11 +735,11 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     res.addIndent level
     res.add "for("
     res.add "int "
-    res.add n[0].strVal
+    res.add procRename(n[0].strVal)
     res.add " = "
     n[1][1].toCode(res)
     res.add "; "
-    res.add n[0].strVal
+    res.add procRename(n[0].strVal)
     if n[1][0].strVal == "..<":
       res.add " < "
     elif n[1][0].strVal == "..":
@@ -739,7 +748,7 @@ proc toCode(n: NimNode, res: var string, level = 0) =
       err "For loop only supports integer .. or ..<.", n
     n[1][2].toCode(res)
     res.add "; "
-    res.add n[0].strVal
+    res.add procRename(n[0].strVal)
     res.add "++"
     res.add ") {\n"
     if n[2].kind == nnkStmtList:
@@ -870,13 +879,13 @@ proc gatherEntryParams(formalParams: NimNode): seq[EntryParam] =
         let param = paramDefs[i]
         if typeNode.kind == nnkVarTy:
           result.add (
-            name: param.strVal,
+            name: procRename(param.strVal),
             typ: innerTypeFromVar(typeNode),
             isOut: true
           )
         else:
           result.add (
-            name: param.strVal,
+            name: procRename(param.strVal),
             typ: typeFromNode(typeNode),
             isOut: false
           )
@@ -904,7 +913,10 @@ proc emitBackendEntry(
   metalTextures: seq[metal4.TextureParam]
 ) =
   var bodyCode = ""
+  let oldUseResult = useResult
+  useResult = false
   body.toCodeStmts(bodyCode, 1)
+  useResult = oldUseResult
   let stage = resolvedStage(params).stageId()
   if isHlsl():
     res.add dx12.emitHlslEntry(params, bodyCode, stage)
@@ -995,7 +1007,7 @@ proc toCodeTopLevel(
                   res.add "highp "
                 res.add innerType
                 res.add " "
-                res.add param.strVal
+                res.add procRename(param.strVal)
                 res.add arraySuffix
                 res.addSmart ';'
                 res.add "\n"
@@ -1021,7 +1033,7 @@ proc toCodeTopLevel(
                 res.add "in "
                 res.add typeRename(typeNode.strVal)
             res.add " "
-            res.add param.strVal
+            res.add procRename(param.strVal)
             res.addSmart ';'
             res.add "\n"
     else:
@@ -1056,7 +1068,7 @@ proc procDef(topLevelNode: NimNode): string =
     of nnkEmpty, nnkPragma:
       discard
     of nnkSym:
-      procName = $n
+      procName = procRename($n)
     of nnkFormalParams:
       # Reading parameter list `(x, y, z: float)`
       if n[0].kind != nnkEmpty:
@@ -1067,7 +1079,7 @@ proc procDef(topLevelNode: NimNode): string =
           for param in paramDef[0 ..< ^2]:
             # Process each `x`, `y`, `z` in a loop.
             paramsStr.add "  "
-            let paramName = param.repr()
+            let paramName = procRename(param.repr())
             let paramType = param.getTypeInst()
             if paramType.kind == nnkVarTy:
               # Process `x: var float`
@@ -1141,6 +1153,7 @@ proc gatherTypes(
             var fieldName = field[i].repr
             if fieldName.endsWith("*"):
               fieldName = fieldName[0 .. ^2]
+            if fieldName in ["input", "output"]: fieldName = procRename(fieldName)
             def.add "  " & typeString(fieldType) & " " & fieldName & ";\n"
       def.add "};"
       types[name] = def
@@ -1166,7 +1179,7 @@ proc gatherFunction(
   for n in topLevelNode:
     if n.kind == nnkSym:
       # Looking for globals.
-      let name = n.strVal
+      let name = if n.strVal in ["input", "output"]: procRename(n.strVal) else: n.strVal
       if name notin glslGlobals and name notin glslFunctions and name notin globals:
         if n.owner().symKind == nskModule:
           let impl = n.getImpl()
@@ -1438,6 +1451,17 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     code.add(v)
     code.add "\n"
 
+  var entryCode = ""
+  toCodeTopLevel(n, entryCode, 0, metalUniforms, metalTextures)
+  if isMetal():
+    bindMetalResources(
+      functions,
+      entryCode,
+      metalUniforms,
+      metalTextures,
+      entryStage.stageId()
+    )
+
   # Put functions definition (just name and types part).
   code.addGap()
   for k, v in functions:
@@ -1458,7 +1482,7 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
     code.add "\n"
 
   # Put the main function last.
-  toCodeTopLevel(n, code, 0, metalUniforms, metalTextures)
+  code.add(entryCode)
 
   return code
 

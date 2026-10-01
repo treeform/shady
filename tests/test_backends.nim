@@ -1,4 +1,4 @@
-import shady, strutils, vmath
+import shady, shady/backends/dx12, strutils, vmath
 
 block:
   proc fragmentConstant(fragColor: var Vec4) =
@@ -265,4 +265,51 @@ block:
   doAssert "layout(location = 1) in vec4 fragmentColor;" in vulkanFragment
   doAssert "layout(location = 0) out vec4 fragColor;" in vulkanFragment
 
+block:
+  var normalTransform: Uniform[Mat3]
+  proc transformedNormal(normal: Vec3, fragColor: var Vec4) =
+    let transformed: Vec3 = normalTransform * normal
+    fragColor = vec4(transformed, 1.0'f)
+  let source = toHLSL(transformedNormal, shaderFragment)
+  doAssert "mul(normalTransform, normal)" in source
+
+block:
+  var image: Uniform[Sampler2d]
+  var flags: Uniform[USampler2d]
+  proc linear(input: Vec3): Vec3 =
+    result = input + vec3(0.25'f)
+  proc multipleTargets(uv: Vec2, color: var Vec4, flag: var uint32) =
+    let value: Vec3 = linear(texture(image, uv).rgb)
+    color = vec4(value, 1.0'f)
+    flag = texelFetch(flags, ivec2(uv * textureSize(image, 0)), 0).r
+    if flag == uint32(0):
+      return
+    color.rgb = vec3(1.0'f)
+  let source = toHLSL(multipleTargets, shaderFragment)
+  doAssert "shady_linear" in source
+  doAssert "shadyTextureSize(image, 0)" in source
+  doAssert "(float3) (1.0)" in source
+  doAssert "SV_TARGET0" in source and "SV_TARGET1" in source
+  let entry = source[source.find("PSOutput PSMain") .. ^1]
+  doAssert "return result" notin entry
+  doAssert entry.count("return output;") == 2
+  let vulkan = toShader(multipleTargets, vulkanGlsl450, shaderFragment)
+  doAssert "vec3 shady_input" in vulkan
+  doAssert "result = shady_input +" in vulkan
+  let shared = shareHlslSamplers(source, [0, 0])
+  doAssert shared.count("SamplerState sharedSampler0") == 1
+  doAssert "#define imageSampler sharedSampler0" in shared
+  var rejected = false
+  try: discard shareHlslSamplers(source, [16, 0])
+  except ValueError: rejected = true
+  doAssert rejected
+
 echo "Backend codegen tests passed"
+
+block:
+  proc escapedEntry(input: Vec2, output: var Vec4) =
+    output = vec4(input.x, input.y, 0.0'f, 1.0'f)
+  let source = toShader(escapedEntry, vulkanGlsl450, shaderFragment)
+  doAssert "in vec2 shady_input;" in source
+  doAssert "out vec4 shady_output;" in source
+  doAssert "shady_output = vec4(shady_input.x, shady_input.y" in source

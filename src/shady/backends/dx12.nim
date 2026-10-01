@@ -4,7 +4,18 @@ type
   EntryParam* = tuple[name, typ: string, isOut: bool]
   UniformParam* = tuple[name, typ: string]
 
-const hlslHeader* = "// target hlsl dx12\n"
+const hlslHeader* = """// target hlsl dx12
+int2 shadyTextureSize(Texture2D<float4> image, int level) {
+  uint width, height, levels;
+  image.GetDimensions(level, width, height, levels);
+  return int2(width, height);
+}
+int2 shadyTextureSize(Texture2D<uint4> image, int level) {
+  uint width, height, levels;
+  image.GetDimensions(level, width, height, levels);
+  return int2(width, height);
+}
+"""
 
 proc hlslTypeRename*(t: string): string =
   case t
@@ -72,6 +83,7 @@ proc hlslProcRename*(t: string): string =
   of "div": "/"
   of "gl_Position": "gl_Position"
   of "gl_FrontFacing": "gl_FrontFacing"
+  of "linear": "shady_linear"
   else: t.replace("`", "_")
 
 proc hlslTypeDefault*(t: string): string =
@@ -200,7 +212,7 @@ proc hlslResourceCall*(
     args[0] & ".SampleLevel(" & args[0] & "Sampler, " & args[1] & ", " & args[2] & ")"
   of "textureSize":
     if args.len < 1: return ""
-    args[0] & ".GetDimensions()"
+    "shadyTextureSize(" & args[0] & ", " & (if args.len > 1: args[1] else: "0") & ")"
   of "texelFetch":
     if args.len < 2: return ""
     if firstArgIsSamplerBuffer:
@@ -342,9 +354,18 @@ proc emitHlslEntry*(
       result.add ";\n"
     result.add "};\n\n"
 
-    result.add returnType
+    var outputs: seq[EntryParam]
+    for p in params:
+      if p.isOut: outputs.add p
+    if outputs.len > 1:
+      result.add "struct PSOutput {\n"
+      for i, p in outputs:
+        result.add "  " & p.typ & " " & p.name & " : SV_TARGET" & $i & ";\n"
+      result.add "};\n\nPSOutput"
+    else:
+      result.add returnType
     result.add " PSMain(PSInput input)"
-    if outputIndex >= 0:
+    if outputIndex >= 0 and outputs.len == 1:
       result.add hlslSemantic(params[outputIndex].name, 0, true)
     result.add " {\n"
     for p in inputs:
@@ -358,11 +379,18 @@ proc emitHlslEntry*(
       result.add hlslInputFieldName(p.name)
       result.add ";\n"
     result.add outputLocals(params, 1)
-    result.add bodyCode
-    if outputIndex >= 0:
-      result.add "  return "
-      result.add params[outputIndex].name
-      result.add ";\n"
+    var returnCode: string
+    if outputs.len > 1:
+      returnCode.add "{ PSOutput output;\n"
+      for p in outputs:
+        returnCode.add "  output." & p.name & " = " & p.name & ";\n"
+      returnCode.add "  return output; }\n"
+    elif outputIndex >= 0:
+      returnCode = "return " & params[outputIndex].name & ";\n"
+    else:
+      returnCode = "return;\n"
+    result.add bodyCode.replace("return;", returnCode)
+    result.add "  " & returnCode
     result.add "}\n"
 
   of 3:
@@ -373,3 +401,19 @@ proc emitHlslEntry*(
 
   else:
     discard
+
+func shareHlslSamplers*(source: string, slots: openArray[int]): string =
+  ## D3D has 16 sampler slots. Textures with identical sampler state share one
+  ## declaration while retaining independent texture resources and color space.
+  var declared: seq[int]
+  for line in source.splitLines:
+    if line.startsWith("SamplerState "):
+      let textureIndex = parseInt(line.split("register(s")[1].split(')')[0])
+      if textureIndex >= slots.len or slots[textureIndex] notin 0 ..< 16:
+        raise newException(ValueError, "Invalid HLSL sampler assignment")
+      let slot = slots[textureIndex]
+      if slot notin declared:
+        result.add "SamplerState sharedSampler" & $slot & " : register(s" & $slot & ");\n"
+        declared.add(slot)
+      result.add "#define " & line.splitWhitespace()[1] & " sharedSampler" & $slot & "\n"
+    else: result.add line & "\n"

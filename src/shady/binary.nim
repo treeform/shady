@@ -40,7 +40,9 @@ proc compileSpirvShader*(
   let command =
     quoteShell(compiler) & " -V -S " & spirvStage(stage) &
     " -o " & quoteShell(outputPath) & " " & quoteShell(sourcePath)
-  discard staticExec(command)
+  let (output, code) = gorgeEx(command)
+  if code != 0:
+    raise newException(ValueError, "SPIR-V compilation failed:\n" & output)
   readFile(outputPath)
 
 proc compileHlslShader*(
@@ -56,5 +58,7 @@ proc compileHlslShader*(
   let command =
     quoteShell(compiler) & " -T " & target & " -E " & entryPoint &
     " -Fo " & quoteShell(outputPath) & " " & quoteShell(sourcePath)
-  discard staticExec(command)
+  let (output, code) = gorgeEx(command)
+  if code != 0:
+    raise newException(ValueError, "HLSL compilation failed:\n" & output)
   readFile(outputPath)
