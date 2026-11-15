@@ -358,8 +358,10 @@
 <dt><a name="metalResourceCall" href="#metalResourceCall"><span>metalResourceCall:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="metal4: proc metalResourceCall(name: string; args: openArray[string];
-                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string" href="shady/backends/metal4.html#metalResourceCall%2Cstring%2CopenArray%5Bstring%5D%2Cbool%2Cbool">metal4: proc metalResourceCall(name: string; args: openArray[string];
-                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string</a></li>
+                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool;
+                  firstArgIsSamplerArray = false): string" href="shady/backends/metal4.html#metalResourceCall%2Cstring%2CopenArray%5Bstring%5D%2Cbool%2Cbool">metal4: proc metalResourceCall(name: string; args: openArray[string];
+                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool;
+                  firstArgIsSamplerArray = false): string</a></li>
           </ul></dd>
 <dt><a name="metalTextureDecl" href="#metalTextureDecl"><span>metalTextureDecl:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -376,6 +378,10 @@
 <dt><a name="metalUniformLayout" href="#metalUniformLayout"><span>metalUniformLayout:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
           data-doc-search-tag="layouts: proc metalUniformLayout(source: string): UniformLayout" href="shady/layouts.html#metalUniformLayout%2Cstring">layouts: proc metalUniformLayout(source: string): UniformLayout</a></li>
+          </ul></dd>
+<dt><a name="pow" href="#pow"><span>pow:</span></a></dt><dd><ul class="simple">
+<li><a class="reference external"
+          data-doc-search-tag="shared: proc pow(base, exponent: Vec3): Vec3" href="shady/backends/shared.html#pow%2CVec3%2CVec3">shared: proc pow(base, exponent: Vec3): Vec3</a></li>
           </ul></dd>
 <dt><a name="reflect" href="#reflect"><span>reflect:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
@@ -477,7 +483,7 @@
           </ul></dd>
 <dt><a name="textureGrad" href="#textureGrad"><span>textureGrad:</span></a></dt><dd><ul class="simple">
 <li><a class="reference external"
-          data-doc-search-tag="shared: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady/backends/shared.html#textureGrad%2CUniform%5BSampler2d%5D%2CVec3%2CVec2%2CVec2">shared: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
+          data-doc-search-tag="shared: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec2; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady/backends/shared.html#textureGrad%2CUniform%5BSampler2d%5D%2CVec2%2CVec2%2CVec2">shared: proc textureGrad(s: Uniform[Sampler2d]; uv: Vec2; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
           <li><a class="reference external"
           data-doc-search-tag="shared: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4" href="shady/backends/shared.html#textureGrad%2CUniform%5BSampler2dArray%5D%2CVec3%2CVec2%2CVec2">shared: proc textureGrad(s: Uniform[Sampler2dArray]; uvw: Vec3; dUVdx: Vec2; dUVdy: Vec2): Vec4</a></li>
           </ul></dd>
@@ -613,7 +619,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-11-15 16:47:05 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-11-15 22:10:00 UTC</small>
       </div>
     </div>
   </div>

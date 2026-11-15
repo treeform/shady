@@ -118,8 +118,10 @@
 </ul>
 <ul class="simple nested-toc-section">metalResourceCall
   <li><a class="reference" href="#metalResourceCall%2Cstring%2CopenArray%5Bstring%5D%2Cbool%2Cbool" title="metalResourceCall(name: string; args: openArray[string];
-                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string">metalResourceCall(name: string; args: openArray[string];
-                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool): string</a></li>
+                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool;
+                  firstArgIsSamplerArray = false): string">metalResourceCall(name: string; args: openArray[string];
+                  firstArgIsSamplerBuffer: bool; firstArgIsShadowSampler: bool;
+                  firstArgIsSamplerArray = false): string</a></li>
 
 </ul>
 <ul class="simple nested-toc-section">metalTextureDecl
@@ -213,8 +215,8 @@
   <dd>
     
     Passes uniform and texture dependencies through every helper call.
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/metal4.nim#L455" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/metal4.nim#L455" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/metal4.nim#L465" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/metal4.nim#L465" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -229,8 +231,8 @@
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/metal4.nim#L298" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/metal4.nim#L298" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/metal4.nim#L308" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/metal4.nim#L308" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
@@ -295,7 +297,8 @@
   <div id="metalResourceCall,string,openArray[string],bool,bool">
   <dt><pre><span class="Keyword">proc</span> <a href="#metalResourceCall%2Cstring%2CopenArray%5Bstring%5D%2Cbool%2Cbool"><span class="Identifier">metalResourceCall</span></a><span class="Other">(</span><span class="Identifier">name</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">args</span><span class="Other">:</span> <span class="Identifier">openArray</span><span class="Other">[</span><span class="Identifier">string</span><span class="Other">]</span><span class="Other">;</span>
                        <span class="Identifier">firstArgIsSamplerBuffer</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">;</span>
-                       <span class="Identifier">firstArgIsShadowSampler</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
+                       <span class="Identifier">firstArgIsShadowSampler</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">;</span>
+                       <span class="Identifier">firstArgIsSamplerArray</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> {.<span><span class="Other pragmadots">...</span></span><span class="pragmawrap"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span>
     <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">forbids</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span>.}</pre></dt>
   <dd>
     
@@ -357,7 +360,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-11-15 16:47:05 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-11-15 22:10:00 UTC</small>
       </div>
     </div>
   </div>
