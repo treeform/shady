@@ -14,7 +14,7 @@ proc basicVert(
   vPos: Vec3,
   vertColor: var Vec3
 ) =
-  gl_Position = MVP * vec4(vPos.x, vPos.y, 0.0, 1.0)
+  gl_Position = Mat4(MVP) * vec4(vPos.x, vPos.y, 0.0, 1.0)
   vertColor = vCol
 
 proc basicFrag(fragColor: var Vec4, vertColor: Vec3) =
@@ -119,7 +119,7 @@ proc draw() {.cdecl.} =
   # Swap buffers (this will display the red color)
   window.swapBuffers()
 
-proc onResize(handle: staticglfw.Window, w, h: int32) {.cdecl.} =
+proc onResize(handle: staticglfw.Window, w, h: cint) {.cdecl.} =
   draw()
 discard window.setFramebufferSizeCallback(onResize)
 
