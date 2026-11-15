@@ -73,6 +73,8 @@ block:
   let vulkan = toShader(instancedVertex, vulkanGlsl450, shaderVertex)
   doAssert "gl_VertexIndex" in vulkan
   doAssert "gl_InstanceIndex" in vulkan
+  doAssert "int gl_VertexIndex" notin vulkan
+  doAssert "int gl_InstanceIndex" notin vulkan
 
   let hlsl = toHLSL(instancedVertex, shaderVertex)
   doAssert "uint gl_VertexID : SV_VertexID" in hlsl
@@ -313,3 +315,65 @@ block:
   doAssert "in vec2 shady_input;" in source
   doAssert "out vec4 shady_output;" in source
   doAssert "shady_output = vec4(shady_input.x, shady_input.y" in source
+
+block:
+  var bitmap: Uniform[Sampler2D]
+  proc explicitGradient(uv: Vec2, fragColor: var Vec4) =
+    ## Retains explicit image derivatives on every source target.
+    fragColor = textureGrad(bitmap, uv, dFdx(uv), dFdy(uv))
+  let
+    glsl = toShader(explicitGradient, glsl4Desktop, shaderFragment)
+    hlsl = toHLSL(explicitGradient, shaderFragment)
+    msl = toMSL(explicitGradient, shaderFragment)
+  doAssert "textureGrad(bitmap, uv, dFdx(uv), dFdy(uv))" in glsl
+  doAssert "bitmap.SampleGrad(bitmapSampler, uv, ddx(uv), ddy(uv))" in hlsl
+  doAssert "bitmap.sample(bitmapSampler, uv, metal::gradient2d(" in msl
+  doAssert "dfdx(uv), -dfdy(uv)" in msl
+  doAssert "textureGrad(" notin hlsl and "textureGrad(" notin msl
+
+block:
+  var layers: Uniform[Sampler2DArray]
+  proc layerGradient(uvw: Vec3, fragColor: var Vec4) =
+    ## Separates an array layer from two-dimensional sampling derivatives.
+    fragColor = textureGrad(layers, uvw, dFdx(uvw.xy), dFdy(uvw.xy))
+  let
+    hlsl = toHLSL(layerGradient, shaderFragment)
+    msl = toMSL(layerGradient, shaderFragment)
+  doAssert "layers.SampleGrad(layersSampler, uvw," in hlsl
+  doAssert "layers.sample(layersSampler, (uvw).xy, uint((uvw).z)," in msl
+  doAssert "metal::gradient2d(" in msl
+
+block:
+  type ShapeData = object
+    point: Vec2
+  var line: Uniform[Vec2]
+  proc pointValue(shape: ShapeData): Vec2 =
+    ## Reads a field whose ordinary Nim name is a target keyword.
+    shape.point
+  proc reservedNames(point: Vec2, fragColor: var Vec4) =
+    ## Uses HLSL primitive keywords as Nim fields, uniforms and local names.
+    var triangle: ShapeData
+    triangle.point = point + line
+    let value = pointValue(triangle)
+    fragColor = vec4(value.x, value.y, 0'f, 1'f)
+  let hlsl = toHLSL(reservedNames, shaderFragment)
+  doAssert "float2 shady_point;" in hlsl
+  doAssert "float2 shady_line;" in hlsl
+  doAssert "ShapeData shady_triangle;" in hlsl
+  doAssert "shady_triangle.shady_point = shady_point + shady_line;" in hlsl
+
+block:
+  proc colorTransfer(rgb: Vec3, fragColor: var Vec4) =
+    ## Expresses piecewise SVG color transfer through vector intrinsics.
+    let linear = mix(rgb / 12.92'f,
+      pow((rgb + 0.055'f) / 1.055'f, vec3(2.4'f)),
+      step(vec3(0.04045'f), rgb))
+    fragColor = vec4(linear, 1'f)
+  let
+    glsl = toShader(colorTransfer, glsl4Desktop, shaderFragment)
+    hlsl = toHLSL(colorTransfer, shaderFragment)
+    msl = toMSL(colorTransfer, shaderFragment)
+  doAssert "pow(" in glsl and "step(" in glsl
+  doAssert "pow(" in hlsl and "step(" in hlsl
+  doAssert "pow(" in msl and "step(" in msl
+  doAssert pow(vec3(2, 3, 4), vec3(2)) == vec3(4, 9, 16)

@@ -102,5 +102,5 @@ const glslFunctions* = [
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",
   "dFdx", "dFdy", "fract", "fwidth",
-  "smoothstep", "inc", "dec", "discardFragment"
+  "step", "smoothstep", "inc", "dec", "discardFragment"
 ]
