@@ -154,7 +154,8 @@ proc metalResourceCall*(
   name: string,
   args: openArray[string],
   firstArgIsSamplerBuffer: bool,
-  firstArgIsShadowSampler: bool
+  firstArgIsShadowSampler: bool,
+  firstArgIsSamplerArray = false
 ): string =
   case name
   of "texture":
@@ -167,6 +168,15 @@ proc metalResourceCall*(
   of "textureLod":
     if args.len != 3: return ""
     args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ", metal::level(" & args[2] & "))"
+  of "textureGrad":
+    if args.len != 4: return ""
+    let coordinates =
+      if firstArgIsSamplerArray:
+        "(" & args[1] & ").xy, uint((" & args[1] & ").z)"
+      else:
+        args[1]
+    args[0] & ".sample(" & args[0] & "Sampler, " & coordinates &
+      ", metal::gradient2d(" & args[2] & ", " & args[3] & "))"
   of "textureSize":
     if args.len < 1: return ""
     if firstArgIsSamplerBuffer:

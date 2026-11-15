@@ -83,7 +83,9 @@ proc hlslProcRename*(t: string): string =
   of "div": "/"
   of "gl_Position": "gl_Position"
   of "gl_FrontFacing": "gl_FrontFacing"
-  of "linear": "shady_linear"
+  of "point", "line", "triangle", "lineadj", "triangleadj",
+      "linear", "centroid", "nointerpolation", "noperspective", "sample":
+    "shady_" & t
   else: t.replace("`", "_")
 
 proc hlslTypeDefault*(t: string): string =
@@ -210,6 +212,10 @@ proc hlslResourceCall*(
   of "textureLod":
     if args.len != 3: return ""
     args[0] & ".SampleLevel(" & args[0] & "Sampler, " & args[1] & ", " & args[2] & ")"
+  of "textureGrad":
+    if args.len != 4: return ""
+    args[0] & ".SampleGrad(" & args[0] & "Sampler, " & args[1] & ", " &
+      args[2] & ", " & args[3] & ")"
   of "textureSize":
     if args.len < 1: return ""
     "shadyTextureSize(" & args[0] & ", " & (if args.len > 1: args[1] else: "0") & ")"

@@ -1,6 +1,6 @@
 ## Shader macro, converts Nim code into shader source.
 
-import macros, pixie, strutils, tables, vmath
+import macros, math, pixie, strutils, tables, vmath
 import shady/backends/[glsl, glsl3, glsl4, dx12, metal4, vulkan]
 from chroma import ColorRGBX
 
@@ -320,6 +320,10 @@ proc isSamplerBufferExpr(n: NimNode): bool =
 proc isShadowSamplerExpr(n: NimNode): bool =
   "Sampler2dShadow" in n.typeInstRepr()
 
+proc isSamplerArrayExpr(n: NimNode): bool =
+  ## Distinguishes layered texture coordinates from ordinary 2D coordinates.
+  "sampler2darray" in n.typeInstRepr().toLowerAscii()
+
 proc codeExpr(n: NimNode): string =
   n.toCode(result)
 
@@ -330,7 +334,7 @@ proc emitBackendCall(n: NimNode, res: var string): bool =
 
   let name = n[0].strVal
   if name notin [
-    "texture", "textureLod", "textureSize", "texelFetch", "imageLoad",
+    "texture", "textureLod", "textureGrad", "textureSize", "texelFetch", "imageLoad",
     "imageStore"
   ]:
     return false
@@ -351,7 +355,8 @@ proc emitBackendCall(n: NimNode, res: var string): bool =
         name,
         args,
         n.len > 1 and n[1].isSamplerBufferExpr,
-        n.len > 1 and n[1].isShadowSamplerExpr
+        n.len > 1 and n[1].isShadowSamplerExpr,
+        n.len > 1 and n[1].isSamplerArrayExpr
       )
   if call.len == 0:
     return false
@@ -1153,7 +1158,7 @@ proc gatherTypes(
             var fieldName = field[i].repr
             if fieldName.endsWith("*"):
               fieldName = fieldName[0 .. ^2]
-            if fieldName in ["input", "output"]: fieldName = procRename(fieldName)
+            fieldName = procRename(fieldName)
             def.add "  " & typeString(fieldType) & " " & fieldName & ";\n"
       def.add "};"
       types[name] = def
@@ -1179,8 +1184,9 @@ proc gatherFunction(
   for n in topLevelNode:
     if n.kind == nnkSym:
       # Looking for globals.
-      let name = if n.strVal in ["input", "output"]: procRename(n.strVal) else: n.strVal
-      if name notin glslGlobals and name notin glslFunctions and name notin globals:
+      let name = procRename(n.strVal)
+      if n.strVal notin glslGlobals and n.strVal notin glslFunctions and
+        name notin globals:
         if n.owner().symKind == nskModule:
           let impl = n.getImpl()
           if impl.kind notin {
@@ -1797,13 +1803,19 @@ proc textureSize*(buffer: Uniform[SamplerCube], level: int): Vec2 =
 proc textureSize*(buffer: Uniform[Sampler2dShadow], level: int): Vec2 =
   vec2(buffer.image.width.float32, buffer.image.height.float32)
 
+proc pow*(base, exponent: Vec3): Vec3 =
+  ## Raises each RGB channel to its corresponding exponent.
+  vec3(pow(base.x, exponent.x), pow(base.y, exponent.y),
+    pow(base.z, exponent.z))
+
 proc textureGrad*(
   s: Uniform[Sampler2D],
-  uv: Vec3,
+  uv: Vec2,
   dUVdx: Vec2,
   dUVdy: Vec2
 ): Vec4 =
-  texture(s, uv.xy)
+  ## Samples a 2D texture with explicit screen-space coordinate derivatives.
+  texture(s, uv)
 
 proc textureGrad*(
   s: Uniform[Sampler2DArray],
