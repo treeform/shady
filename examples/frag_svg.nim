@@ -35,8 +35,7 @@ proc start(title, vertexShaderText, fragmentShaderText: string) =
       title = "Shady hidden window",
       size = ivec2(900, 900),
       visible = true,
-      openglMajorVersion = 4,
-      openglMinorVersion = 1,
+      openglVersion = OpenGL4Dot1,
     )
   # Connect the GL context.
   window.makeContextCurrent()
