@@ -273,7 +273,6 @@ gl_FragCoord and flat int attributes:
 precision highp float;
 // from complexShader
 
-layout(origin_upper_left) in vec4 gl_FragCoord;
 flat in int someInt;
 out vec4 fragColor;
 
@@ -431,7 +430,6 @@ GlslTarget: Desktop with gl_FragCoord:
 #version 410
 // from desktopFragCoord
 
-layout(origin_upper_left) in vec4 gl_FragCoord;
 out vec4 fragColor;
 
 void main() {
@@ -442,9 +440,9 @@ void main() {
 GlslTarget: ES3 with gl_FragCoord:
 #version 300 es
 precision highp float;
+precision highp int;
 // from es3FragCoord
 
-in vec4 gl_FragCoord;
 out vec4 fragColor;
 
 void main() {
@@ -455,6 +453,7 @@ void main() {
 GlslTarget: ES3 vertex shader with integer mod:
 #version 300 es
 precision highp float;
+precision highp int;
 // from es3VertShader
 
 uniform vec2 atlasSizeE;
@@ -478,6 +477,7 @@ void main() {
 GlslTarget: ES3 sampler uniforms get highp:
 #version 300 es
 precision highp float;
+precision highp int;
 // from es3SamplerFrag
 
 uniform highp usampler2D tileData;

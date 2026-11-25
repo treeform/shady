@@ -2,7 +2,7 @@ const
   glsl3DesktopVersion* = "330"
   glsl3DesktopExtra* = ""
   glsl3WebGLVersion* = "300 es"
-  glsl3WebGLExtra* = "precision highp float;\n"
+  glsl3WebGLExtra* = "precision highp float;\nprecision highp int;\n"
 
 proc glsl3NeedsHighp*(samplerType: string): bool =
   samplerType in [

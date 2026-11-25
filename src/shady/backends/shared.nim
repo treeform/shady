@@ -985,7 +985,8 @@ proc toCodeTopLevel(
           let typeNode = paramDefs[^2]
           for i in 0 ..< paramDefs.len - 2:
             let param = paramDefs[i]
-            if param.strVal in ["gl_FragColor", "gl_Position"]:
+            if param.strVal in glslGlobals or param.strVal == "gl_FragColor":
+              # Builtins retain the target's native declarations and origin.
               continue
             if typeNode.kind == nnkVarTy:
               if typeNode[0].repr == "seq":
@@ -1026,8 +1027,6 @@ proc toCodeTopLevel(
                 res.add "in "
                 res.add typeString(typeNode)
               else:
-                if shaderTarget != glslES3 and param.strVal == "gl_FragCoord":
-                  res.add "layout(origin_upper_left) "
                 if typeNode.strVal == "int":
                   res.add "flat "
                 if isVulkan():
@@ -1604,6 +1603,8 @@ type
 var
   ## GLSL globals.
   gl_Position*: Vec4
+  gl_FragCoord*: Vec4
+  gl_FragDepth*: float32
   gl_VertexID*: int32
   gl_InstanceID*: int32
   gl_FrontFacing*: bool
@@ -1744,6 +1745,10 @@ proc fmod*(x, y: Vec3): Vec3 =
 
 proc fmod*(x, y: Vec4): Vec4 =
   vec4(fmod(x.x, y.x), fmod(x.y, y.y), fmod(x.z, y.z), fmod(x.w, y.w))
+
+proc asin*(a: float32): float32 =
+  ## Evaluates the shader inverse sine builtin on the CPU.
+  arcsin(a)
 
 proc fract*(a: float32): float32 =
   a - floor(a)
