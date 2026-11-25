@@ -72,13 +72,14 @@
                  &quot;reflect&quot;, &quot;log2&quot;, &quot;texelFetch&quot;, &quot;imageStore&quot;, &quot;imageLoad&quot;,
                  &quot;texture&quot;, &quot;textureLod&quot;, &quot;textureSize&quot;, &quot;textureGrad&quot;,
                  &quot;normalize&quot;, &quot;floor&quot;, &quot;ceil&quot;, &quot;round&quot;, &quot;exp&quot;, &quot;inversesqrt&quot;,
-                 &quot;[]&quot;, &quot;[]=&quot;, &quot;inverse&quot;, &quot;sin&quot;, &quot;cos&quot;, &quot;tan&quot;, &quot;acos&quot;, &quot;atan&quot;,
-                 &quot;pow&quot;, &quot;fmod&quot;, &quot;lessThan&quot;, &quot;lessThanEqual&quot;, &quot;greaterThan&quot;,
-                 &quot;greaterThanEqual&quot;, &quot;equal&quot;, &quot;notEqual&quot;, &quot;dFdx&quot;, &quot;dFdy&quot;,
-                 &quot;fract&quot;, &quot;fwidth&quot;, &quot;step&quot;, &quot;smoothstep&quot;, &quot;inc&quot;, &quot;dec&quot;,
+                 &quot;[]&quot;, &quot;[]=&quot;, &quot;inverse&quot;, &quot;sin&quot;, &quot;cos&quot;, &quot;tan&quot;, &quot;asin&quot;, &quot;acos&quot;,
+                 &quot;atan&quot;, &quot;pow&quot;, &quot;fmod&quot;, &quot;lessThan&quot;, &quot;lessThanEqual&quot;,
+                 &quot;greaterThan&quot;, &quot;greaterThanEqual&quot;, &quot;equal&quot;, &quot;notEqual&quot;, &quot;dFdx&quot;,
+                 &quot;dFdy&quot;, &quot;fract&quot;, &quot;fwidth&quot;, &quot;step&quot;, &quot;smoothstep&quot;, &quot;inc&quot;, &quot;dec&quot;,
                  &quot;discardFragment&quot;]">glslFunctions</a></li>
-<li><a class="reference" href="#glslGlobals" title="glslGlobals = [&quot;gl_Position&quot;, &quot;gl_FragCoord&quot;, &quot;gl_GlobalInvocationID&quot;,
-               &quot;gl_VertexID&quot;, &quot;gl_InstanceID&quot;, &quot;gl_FrontFacing&quot;]">glslGlobals</a></li>
+<li><a class="reference" href="#glslGlobals" title="glslGlobals = [&quot;gl_Position&quot;, &quot;gl_FragCoord&quot;, &quot;gl_FragDepth&quot;,
+               &quot;gl_GlobalInvocationID&quot;, &quot;gl_VertexID&quot;, &quot;gl_InstanceID&quot;,
+               &quot;gl_FrontFacing&quot;]">glslGlobals</a></li>
 
     </ul>
   </details>
@@ -126,22 +127,23 @@
                  <span class="StringLit">&quot;reflect&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;log2&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;texelFetch&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;imageStore&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;imageLoad&quot;</span><span class="Other">,</span>
                  <span class="StringLit">&quot;texture&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;textureLod&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;textureSize&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;textureGrad&quot;</span><span class="Other">,</span>
                  <span class="StringLit">&quot;normalize&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;floor&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;ceil&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;round&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;exp&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;inversesqrt&quot;</span><span class="Other">,</span>
-                 <span class="StringLit">&quot;[]&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;[]=&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;inverse&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;sin&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;cos&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;tan&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;acos&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;atan&quot;</span><span class="Other">,</span>
-                 <span class="StringLit">&quot;pow&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;fmod&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;lessThan&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;lessThanEqual&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;greaterThan&quot;</span><span class="Other">,</span>
-                 <span class="StringLit">&quot;greaterThanEqual&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;equal&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;notEqual&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;dFdx&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;dFdy&quot;</span><span class="Other">,</span>
-                 <span class="StringLit">&quot;fract&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;fwidth&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;step&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;smoothstep&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;inc&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;dec&quot;</span><span class="Other">,</span>
+                 <span class="StringLit">&quot;[]&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;[]=&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;inverse&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;sin&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;cos&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;tan&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;asin&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;acos&quot;</span><span class="Other">,</span>
+                 <span class="StringLit">&quot;atan&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;pow&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;fmod&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;lessThan&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;lessThanEqual&quot;</span><span class="Other">,</span>
+                 <span class="StringLit">&quot;greaterThan&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;greaterThanEqual&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;equal&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;notEqual&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;dFdx&quot;</span><span class="Other">,</span>
+                 <span class="StringLit">&quot;dFdy&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;fract&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;fwidth&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;step&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;smoothstep&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;inc&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;dec&quot;</span><span class="Other">,</span>
                  <span class="StringLit">&quot;discardFragment&quot;</span><span class="Other">]</span></pre></dt>
   <dd>
     
     
-    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl.nim#L82" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
-<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl.nim#L82" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
+    <a href="https://github.com/treeform/shady/tree/master/src/shady/backends/glsl.nim#L87" class="link-seesrc" target="_blank">Source</a>&nbsp;&nbsp;
+<a href="https://github.com/treeform/shady/edit/devel/src/shady/backends/glsl.nim#L87" class="link-seesrc" target="_blank" >Edit</a>&nbsp;&nbsp;
 
   </dd>
 </div>
 <div id="glslGlobals">
-  <dt><pre><a href="#glslGlobals"><span class="Identifier">glslGlobals</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="StringLit">&quot;gl_Position&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_FragCoord&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_GlobalInvocationID&quot;</span><span class="Other">,</span>
-               <span class="StringLit">&quot;gl_VertexID&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_InstanceID&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_FrontFacing&quot;</span><span class="Other">]</span></pre></dt>
+  <dt><pre><a href="#glslGlobals"><span class="Identifier">glslGlobals</span></a> <span class="Other">=</span> <span class="Other">[</span><span class="StringLit">&quot;gl_Position&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_FragCoord&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_FragDepth&quot;</span><span class="Other">,</span>
+               <span class="StringLit">&quot;gl_GlobalInvocationID&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_VertexID&quot;</span><span class="Other">,</span> <span class="StringLit">&quot;gl_InstanceID&quot;</span><span class="Other">,</span>
+               <span class="StringLit">&quot;gl_FrontFacing&quot;</span><span class="Other">]</span></pre></dt>
   <dd>
     
     
@@ -205,7 +207,7 @@
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2026-11-15 22:09:59 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2026-11-25 18:21:22 UTC</small>
       </div>
     </div>
   </div>
