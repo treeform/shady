@@ -33,6 +33,8 @@ const
 var useResult {.compiletime.}: bool
 var shaderTarget* {.compiletime.}: ShaderTarget
 var shaderStage* {.compiletime.}: ShaderStage
+var metalMatrixConversions {.compiletime.}: Table[string, string]
+var metalInlineDeclarations {.compiletime.}: seq[string]
 
 const shaderSamplerTypes = [
   "Sampler2d", "SamplerCube", "Sampler2dShadow", "USampler2d",
@@ -103,9 +105,18 @@ proc typeString(n: NimNode): string =
     of "GVec2[float32]": typeRename("Vec2")
     of "GVec3[float32]": typeRename("Vec3")
     of "GVec4[float32]": typeRename("Vec4")
-    of "GMat2[float64]": (if isGlsl(): "dmat2" else: "double2x2")
-    of "GMat3[float64]": (if isGlsl(): "dmat3" else: "double3x3")
-    of "GMat4[float64]": (if isGlsl(): "dmat4" else: "double4x4")
+    of "GMat2[float64]":
+      if isMetal(): typeRename("DMat2")
+      elif isGlsl(): "dmat2"
+      else: "double2x2"
+    of "GMat3[float64]":
+      if isMetal(): typeRename("DMat3")
+      elif isGlsl(): "dmat3"
+      else: "double3x3"
+    of "GMat4[float64]":
+      if isMetal(): typeRename("DMat4")
+      elif isGlsl(): "dmat4"
+      else: "double4x4"
     of "GVec2[float64]": typeRename("DVec2")
     of "GVec3[float64]": typeRename("DVec3")
     of "GVec4[float64]": typeRename("DVec4")
@@ -327,6 +338,92 @@ proc isSamplerArrayExpr(n: NimNode): bool =
 proc codeExpr(n: NimNode): string =
   n.toCode(result)
 
+proc isMetalInlineValue(n: NimNode): bool =
+  ## Identifies values that can be repeated without evaluating any calls.
+  case n.kind
+  of nnkSym, nnkIdent, nnkCharLit .. nnkUInt64Lit,
+      nnkFloatLit .. nnkFloat128Lit:
+    true
+  of nnkDotExpr, nnkHiddenDeref, nnkHiddenAddr:
+    n[0].isMetalInlineValue()
+  of nnkHiddenStdConv, nnkHiddenSubConv, nnkConv, nnkCast:
+    n[^1].isMetalInlineValue()
+  else:
+    false
+
+proc metalInlineArguments(
+  n: NimNode,
+  firstArg: int,
+  args: var seq[string]
+): string =
+  ## Snapshots arguments at the expression site when expansion repeats values.
+  var needsTemporaries = false
+  for i in firstArg ..< n.len:
+    if not n[i].isMetalInlineValue():
+      needsTemporaries = true
+  if not needsTemporaries:
+    return
+  for i in firstArg ..< n.len:
+    # Nim identifiers cannot start with an underscore, avoiding user collisions.
+    let name = "_shadyValue" & $metalInlineDeclarations.len
+    var typ = n[i].getTypeInst()
+    if typ.kind == nnkVarTy:
+      typ = typ[0]
+    metalInlineDeclarations.add "  " & typeString(typ) & " " & name & ";\n"
+    result.add name & " = (" & args[i - 1] & "), "
+    args[i - 1] = name
+
+proc emitMetalModulo(n: NimNode, res: var string) =
+  ## Emits GLSL floor-based modulo without a shader helper function.
+  var args = @[n[1].codeExpr(), n[2].codeExpr()]
+  let prefix = metalInlineArguments(n, 1, args)
+  res.add "(" & prefix & "(" & args[0] & ") - (" & args[1] &
+    ") * floor((" & args[0] & ") / (" & args[1] & ")))"
+
+proc metalInlineBody(bodyCode: string): string =
+  ## Declares temporaries locally without hoisting expression evaluation.
+  for declaration in metalInlineDeclarations:
+    result.add declaration
+  result.add bodyCode
+  metalInlineDeclarations.setLen(0)
+
+proc metalMatrixSize(typ: string): int =
+  ## Returns the dimension of a native Metal matrix type.
+  case typ
+  of "float2x2": 2
+  of "float3x3": 3
+  of "float4x4": 4
+  else: 0
+
+proc emitMetalMatrixCast(n: NimNode, res: var string): bool =
+  ## Narrows matrices by columns while evaluating the source expression once.
+  if not isMetal() or n.len != 2:
+    return false
+  let
+    targetType = typeString(n.getTypeInst())
+    targetSize = metalMatrixSize(targetType)
+  if targetSize == 0:
+    return false
+  let
+    sourceType = typeString(n[1].getTypeInst())
+    sourceSize = metalMatrixSize(sourceType)
+  if sourceSize <= targetSize:
+    return false
+  let name = "shadyMat" & $targetSize & "FromMat" & $sourceSize
+  if name notin metalMatrixConversions:
+    var body = "inline " & targetType & " " & name & "(" & sourceType &
+      " value) {\n  return " & targetType & "("
+    for column in 0 ..< targetSize:
+      if column > 0:
+        body.add ", "
+      body.add "value[" & $column & "]." & "xyzw"[0 ..< targetSize]
+    body.add ");\n}\n"
+    metalMatrixConversions[name] = body
+  res.add name & "("
+  n[1].toCode(res)
+  res.add ")"
+  true
+
 proc emitBackendCall(n: NimNode, res: var string): bool =
   ## Builtin resource operations are where the shader languages differ most.
   if isGlsl() or n.kind notin {nnkCall, nnkCommand}:
@@ -341,6 +438,17 @@ proc emitBackendCall(n: NimNode, res: var string): bool =
   var args: seq[string]
   for i in 1 ..< n.len:
     args.add n[i].codeExpr()
+
+  var prefix = ""
+  if isMetal() and n.len > 2:
+    let repeatsArgument =
+      (n[1].isSamplerArrayExpr and name in [
+        "texture", "textureLod", "textureGrad", "texelFetch"
+      ]) or
+      (n[1].isShadowSamplerExpr and name == "texture") or
+      (name == "textureSize" and not n[1].isSamplerBufferExpr)
+    if repeatsArgument:
+      prefix = metalInlineArguments(n, 2, args)
 
   let call =
     if isHlsl():
@@ -360,7 +468,10 @@ proc emitBackendCall(n: NimNode, res: var string): bool =
       )
   if call.len == 0:
     return false
-  res.add call
+  if prefix.len > 0:
+    res.add "(" & prefix & call & ")"
+  else:
+    res.add call
   return true
 
 proc toCode(n: NimNode, res: var string, level = 0) =
@@ -377,6 +488,9 @@ proc toCode(n: NimNode, res: var string, level = 0) =
 
   of nnkInfix:
     if n[0].repr in ["mod"] and not isIntegerType(n[1].getType().repr):
+      if isMetal():
+        n.emitMetalModulo(res)
+        return
       # In Nim float mod and integer made are same thing.
       # In GLSL mod(float, float) is a function while % is for integers.
       if isGlsl():
@@ -459,6 +573,9 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     n[0].toCode(res)
 
   of nnkCall, nnkCommand:
+    if isMetal() and n[0].strVal == "fmod" and n.len == 3:
+      n.emitMetalModulo(res)
+      return
     if n[0].strVal == "discardFragment":
       # Special case for discarding the fragment.
       # Because both Nim discard and GLSL discard are keywords that do different things.
@@ -486,6 +603,9 @@ proc toCode(n: NimNode, res: var string, level = 0) =
     if n.emitBackendCall(res):
       return
     var procName = procRename(n[0].strVal)
+    if isMetal() and metalMatrixSize(procName) > 0 and
+        n.emitMetalMatrixCast(res):
+      return
     if isHlsl() and n.len == 2 and procName in [
         "float2", "float3", "float4", "int2", "int3", "int4", "uint2", "uint3", "uint4"] and
         not n[1].getTypeInst.repr.isVectorTypeName():
@@ -623,6 +743,8 @@ proc toCode(n: NimNode, res: var string, level = 0) =
   #   res.add ")"
 
   of nnkConv:
+    if n.emitMetalMatrixCast(res):
+      return
     res.add typeRename(n[0].strVal)
     res.add "("
     n[1].toCode(res)
@@ -880,6 +1002,9 @@ proc gatherEntryParams(formalParams: NimNode): seq[EntryParam] =
   for paramDefs in formalParams:
     if paramDefs.kind == nnkIdentDefs:
       let typeNode = paramDefs[^2]
+      if not isHlsl() and typeNode.kind == nnkBracketExpr and
+          typeNode[0].repr == "Uniform":
+        continue
       for i in 0 ..< paramDefs.len - 2:
         let param = paramDefs[i]
         if typeNode.kind == nnkVarTy:
@@ -920,7 +1045,10 @@ proc emitBackendEntry(
   var bodyCode = ""
   let oldUseResult = useResult
   useResult = false
+  metalInlineDeclarations.setLen(0)
   body.toCodeStmts(bodyCode, 1)
+  if isMetal():
+    bodyCode = metalInlineBody(bodyCode)
   useResult = oldUseResult
   let stage = resolvedStage(params).stageId()
   if isHlsl():
@@ -1065,6 +1193,7 @@ proc procDef(topLevelNode: NimNode): string =
   var procName = ""
   var paramsStr = ""
   var returnType = "void"
+  metalInlineDeclarations.setLen(0)
 
   assert topLevelNode.kind in {nnkFuncDef, nnkProcDef}
   for n in topLevelNode:
@@ -1115,7 +1244,14 @@ proc procDef(topLevelNode: NimNode): string =
         result.addIndent(1)
         result.add returnType
         result.add " result;"
-      n.toCodeStmts(result, 1)
+      if isMetal():
+        if useResult:
+          result.add "\n"
+        var bodyCode = ""
+        n.toCodeStmts(bodyCode, 1)
+        result.add metalInlineBody(bodyCode)
+      else:
+        n.toCodeStmts(result, 1)
       if useResult:
         if "return result" notin result[^20..^1]:
           result.addIndent(1)
@@ -1161,6 +1297,42 @@ proc gatherTypes(
             def.add "  " & typeString(fieldType) & " " & fieldName & ";\n"
       def.add "};"
       types[name] = def
+
+proc gatherMetalEntryUniforms(
+  topLevelNode: NimNode,
+  types: var Table[string, string],
+  uniforms: var seq[metal4.UniformParam],
+  uniformNames: var Table[string, bool],
+  textures: var seq[metal4.TextureParam],
+  textureNames: var Table[string, int]
+) =
+  ## Binds uniform entry parameters through the same resources as globals.
+  for n in topLevelNode:
+    if n.kind != nnkFormalParams:
+      continue
+    for paramDefs in n:
+      if paramDefs.kind != nnkIdentDefs:
+        continue
+      let typeNode = paramDefs[^2]
+      if typeNode.kind != nnkBracketExpr or typeNode[0].repr != "Uniform":
+        continue
+      gatherTypes(typeNode[1], types)
+      let (typ, arraySuffix) = splitArrayType(typeNode[1])
+      for i in 0 ..< paramDefs.len - 2:
+        let name = procRename(paramDefs[i].strVal)
+        if typeNode[1].repr in shaderSamplerTypes:
+          if name notin textureNames:
+            let binding = textures.len
+            textureNames[name] = binding
+            textures.add (
+              name: name,
+              typ: typ,
+              binding: binding,
+              samplerBinding: binding
+            )
+        elif name notin uniformNames:
+          uniformNames[name] = true
+          uniforms.add (name: name & arraySuffix, typ: typ)
 
 proc gatherFunction(
   topLevelNode: NimNode,
@@ -1374,6 +1546,7 @@ proc gatherFunction(
 proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
   var code: string
+  metalMatrixConversions.clear()
 
   # Add shader header stuff.
   if isGlsl():
@@ -1403,6 +1576,15 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
   var metalUniformNames: Table[string, bool]
   var metalTextures: seq[metal4.TextureParam]
   var metalTextureNames: Table[string, int]
+  if isMetal():
+    gatherMetalEntryUniforms(
+      n,
+      types,
+      metalUniforms,
+      metalUniformNames,
+      metalTextures,
+      metalTextureNames
+    )
   gatherFunction(
     n,
     functions,
@@ -1469,6 +1651,9 @@ proc toGLSLInner*(s: NimNode, version, extra: string): string =
 
   # Put functions definition (just name and types part).
   code.addGap()
+  for name, conversion in metalMatrixConversions:
+    code.add conversion
+    code.add "\n"
   for k, v in functions:
     var funCode = v.split(" {")[0]
     funCode = funCode
