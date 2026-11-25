@@ -35,3 +35,5 @@ jobs:
     - run: nim r tests/test_shady.nim
     - run: nim r tests/test_backends.nim
     - run: nim r tests/test_metal_resources.nim
+    - run: nim r tests/test_metal_parameters.nim
+    - run: nim r tests/test_metal_builtins.nim

@@ -424,8 +424,8 @@ block:
     hlsl = toHLSL(layerGradient, shaderFragment)
     msl = toMSL(layerGradient, shaderFragment)
   doAssert "layers.SampleGrad(layersSampler, uvw," in hlsl
-  doAssert "layers.sample(layersSampler, (uvw).xy, uint((uvw).z)," in msl
-  doAssert "metal::gradient2d(" in msl
+  doAssert "shadyArraySampleGrad(layers, layersSampler, uvw," in msl
+  doAssert "gradient2d(dx, dy)" in msl
 
 block:
   type ShapeData = object

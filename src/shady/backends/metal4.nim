@@ -5,9 +5,32 @@ type
   UniformParam* = tuple[name, typ: string]
   TextureParam* = tuple[name, typ: string, binding: int, samplerBinding: int]
 
-const metalHeader* = "#include <metal_stdlib>\nusing namespace metal;\n"
+const metalHeader* = """#include <metal_stdlib>
+using namespace metal;
+template<typename X, typename Y> X shadyMod(X x, Y y) {
+  return x - y * floor(x / y);
+}
+inline float4 shadyArraySample(texture2d_array<float> image,
+    sampler imageSampler, float3 coordinate) {
+  return image.sample(imageSampler, coordinate.xy, uint(coordinate.z));
+}
+inline float4 shadyArraySampleLod(texture2d_array<float> image,
+    sampler imageSampler, float3 coordinate, float lod) {
+  return image.sample(imageSampler, coordinate.xy, uint(coordinate.z), level(lod));
+}
+inline float4 shadyArraySampleGrad(texture2d_array<float> image,
+    sampler imageSampler, float3 coordinate, float2 dx, float2 dy) {
+  return image.sample(imageSampler, coordinate.xy, uint(coordinate.z),
+    gradient2d(dx, dy));
+}
+inline float4 shadyArrayRead(texture2d_array<float> image,
+    int3 coordinate, int lod) {
+  return image.read(uint2(coordinate.xy), uint(coordinate.z), uint(lod));
+}
+"""
 
 proc metalTypeRename*(t: string): string =
+  ## Maps shader types to Metal, which has no double precision support.
   case t
   of "Mat2": "float2x2"
   of "Mat3": "float3x3"
@@ -25,15 +48,18 @@ proc metalTypeRename*(t: string): string =
   of "UVec3": "uint3"
   of "UVec4": "uint4"
 
-  of "DVec2": "double2"
-  of "DVec3": "double3"
-  of "DVec4": "double4"
+  of "DVec2": "float2"
+  of "DVec3": "float3"
+  of "DVec4": "float4"
+  of "DMat2": "float2x2"
+  of "DMat3": "float3x3"
+  of "DMat4": "float4x4"
 
   of "int32": "int"
   of "uint32": "uint"
 
   of "float32": "float"
-  of "float64": "double"
+  of "float64": "float"
   of "ColorRGBX": "float4"
 
   of "SamplerBuffer": "texture_buffer<float>"
@@ -47,6 +73,7 @@ proc metalTypeRename*(t: string): string =
   else: t
 
 proc metalProcRename*(t: string): string =
+  ## Maps shader builtins to Metal equivalents.
   case t
   of "not": "!"
   of "and": "&&"
@@ -64,10 +91,11 @@ proc metalProcRename*(t: string): string =
   of "ivec3": "int3"
   of "ivec4": "int4"
   of "mix": "mix"
+  of "inversesqrt": "rsqrt"
   of "atan": "atan2"
   of "dFdx": "dfdx"
   of "dFdy": "-dfdy"
-  of "fmod": "fmod"
+  of "fmod": "shadyMod"
   of "mod": "%"
   of "div": "/"
   else: t.replace("`", "_")
@@ -95,11 +123,14 @@ proc metalTypeDefault*(t: string): string =
   else: ""
 
 proc metalAttribute*(name: string, index: int, isOutput: bool): string =
+  ## Returns the Metal attribute associated with a shader interface value.
   case name
   of "fragColor", "gl_FragColor":
     " [[color(0)]]"
-  of "gl_Position":
+  of "gl_Position", "gl_FragCoord":
     " [[position]]"
+  of "gl_FragDepth":
+    " [[depth(any)]]"
   of "gl_VertexID":
     " [[vertex_id]]"
   of "gl_InstanceID":
@@ -157,41 +188,57 @@ proc metalResourceCall*(
   firstArgIsShadowSampler: bool,
   firstArgIsSamplerArray = false
 ): string =
+  ## Translates texture operations while preserving GLSL coordinate conventions.
   case name
   of "texture":
     if args.len != 2: return ""
     if firstArgIsShadowSampler:
       args[0] & ".sample_compare(" & args[0] & "Sampler, " &
         args[1] & ".xy, " & args[1] & ".z)"
+    elif firstArgIsSamplerArray:
+      "shadyArraySample(" & args[0] & ", " & args[0] & "Sampler, " &
+        args[1] & ")"
     else:
       args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ")"
   of "textureLod":
     if args.len != 3: return ""
-    args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ", metal::level(" & args[2] & "))"
+    if firstArgIsSamplerArray:
+      "shadyArraySampleLod(" & args[0] & ", " & args[0] & "Sampler, " &
+        args[1] & ", " & args[2] & ")"
+    else:
+      args[0] & ".sample(" & args[0] & "Sampler, " & args[1] &
+        ", metal::level(" & args[2] & "))"
   of "textureGrad":
     if args.len != 4: return ""
-    let coordinates =
-      if firstArgIsSamplerArray:
-        "(" & args[1] & ").xy, uint((" & args[1] & ").z)"
-      else:
-        args[1]
-    args[0] & ".sample(" & args[0] & "Sampler, " & coordinates &
-      ", metal::gradient2d(" & args[2] & ", " & args[3] & "))"
+    if firstArgIsSamplerArray:
+      "shadyArraySampleGrad(" & args[0] & ", " & args[0] & "Sampler, " &
+        args[1] & ", " & args[2] & ", " & args[3] & ")"
+    else:
+      args[0] & ".sample(" & args[0] & "Sampler, " & args[1] &
+        ", metal::gradient2d(" & args[2] & ", " & args[3] & "))"
   of "textureSize":
     if args.len < 1: return ""
     if firstArgIsSamplerBuffer:
-      args[0] & ".get_width()"
+      "int(" & args[0] & ".get_width())"
     else:
       let level = if args.len >= 2: args[1] else: "0"
-      "int2(" & args[0] & ".get_width(" & level & "), " &
-        args[0] & ".get_height(" & level & "))"
+      if firstArgIsSamplerArray:
+        "int3(" & args[0] & ".get_width(" & level & "), " &
+          args[0] & ".get_height(" & level & "), " &
+          args[0] & ".get_array_size())"
+      else:
+        "int2(" & args[0] & ".get_width(" & level & "), " &
+          args[0] & ".get_height(" & level & "))"
   of "texelFetch":
     if args.len < 2: return ""
     if firstArgIsSamplerBuffer:
-      "float4(" & args[0] & ".read(uint(" & args[1] & ")), 0.0, 0.0, 0.0)"
+      args[0] & ".read(uint(" & args[1] & "))"
     else:
       let level = if args.len >= 3: args[2] else: "0"
-      args[0] & ".read(uint2(" & args[1] & "), uint(" & level & "))"
+      if firstArgIsSamplerArray:
+        "shadyArrayRead(" & args[0] & ", " & args[1] & ", " & level & ")"
+      else:
+        args[0] & ".read(uint2(" & args[1] & "), uint(" & level & "))"
   of "imageLoad":
     if args.len != 2: return ""
     args[0] & "[" & args[1] & "]"
@@ -213,7 +260,14 @@ proc hasParam(params: openArray[EntryParam], name: string): bool =
       return true
 
 proc isSpecialInput(p: EntryParam): bool =
-  p.name in ["gl_VertexID", "gl_InstanceID", "gl_FrontFacing"]
+  ## Identifies stage builtins passed separately from interpolated attributes.
+  p.name in [
+    "gl_VertexID", "gl_InstanceID", "gl_FrontFacing", "gl_FragCoord"
+  ]
+
+proc isIntegerType(typ: string): bool =
+  ## Identifies values that must not be interpolated between vertices.
+  typ in ["int", "int2", "int3", "int4", "uint", "uint2", "uint3", "uint4"]
 
 proc outputLocals(params: openArray[EntryParam], level: int): string =
   let indent = repeat("  ", level)
@@ -250,6 +304,8 @@ proc inputStruct(
     result.add p.name
     if stage == 1:
       result.add metalAttribute(p.name, i, false)
+    elif p.typ.isIntegerType():
+      result.add " [[flat]]"
     result.add ";\n"
   result.add "};\n"
 
@@ -305,13 +361,57 @@ proc resourceParams(
       texture.samplerBinding
     )
 
-proc emitMetalEntry*(
+proc specialInputParams(
   params: openArray[EntryParam],
+  bodyCode: string,
+  stage: int
+): seq[string] =
+  ## Includes explicit builtin parameters and builtin globals used by the body.
+  let builtins =
+    if stage == 1:
+      @[("gl_VertexID", "uint"), ("gl_InstanceID", "uint")]
+    else:
+      @[("gl_FragCoord", "float4"), ("gl_FrontFacing", "bool")]
+  for (name, typ) in builtins:
+    if params.hasParam(name) or name in bodyCode:
+      var inputName = name
+      for param in params:
+        if param.name == name and param.typ != typ:
+          inputName = "shady_" & name
+      result.add typ & " " & inputName & metalAttribute(name, 0, false)
+
+proc specialInputLocals(params: openArray[EntryParam]): string =
+  ## Converts Metal's unsigned vertex identifiers to explicit parameter types.
+  for param in params:
+    if param.name in ["gl_VertexID", "gl_InstanceID"] and param.typ != "uint":
+      result.add "  " & param.typ & " " & param.name & " = " &
+        param.typ & "(shady_" & param.name & ");\n"
+
+proc vertexReturn(outputs: openArray[EntryParam]): string =
+  ## Populates the stage output and converts OpenGL clip depth to Metal depth.
+  for param in outputs:
+    result.add "  output." & metalOutputFieldName(param.name) &
+      " = " & param.name & ";\n"
+    if param.name == "gl_Position":
+      result.add "  output.position.z = " &
+        "(output.position.z + output.position.w) * 0.5;\n"
+  result.add "  return output;\n"
+
+proc emitMetalEntry*(
+  entryParams: openArray[EntryParam],
   bodyCode: string,
   stage: int,
   uniforms: openArray[UniformParam] = [],
   textures: openArray[TextureParam] = []
 ): string =
+  ## Builds native entry points with correctly attributed inputs and outputs.
+  var params = @entryParams
+  if stage == 1 and not params.hasParam("gl_Position") and
+      "gl_Position" in bodyCode:
+    params.add ("gl_Position", "float4", true)
+  if stage == 2 and not params.hasParam("gl_FragDepth") and
+      "gl_FragDepth" in bodyCode:
+    params.add ("gl_FragDepth", "float", true)
   case stage
   of 1:
     var outputs: seq[EntryParam]
@@ -327,6 +427,8 @@ proc emitMetalEntry*(
       result.add " "
       result.add metalOutputFieldName(p.name)
       result.add metalAttribute(p.name, 0, true)
+      if p.typ.isIntegerType():
+        result.add " [[flat]]"
       result.add ";\n"
     result.add "};\n\n"
     result.add inputStruct("VertexIn", params, stage)
@@ -336,12 +438,9 @@ proc emitMetalEntry*(
     if params.inputParams().len > 0:
       result.addComma(first)
       result.add "  VertexIn input [[stage_in]]"
-    if not params.hasParam("gl_VertexID") and "gl_VertexID" in bodyCode:
+    for builtin in specialInputParams(params, bodyCode, stage):
       result.addComma(first)
-      result.add "  uint gl_VertexID [[vertex_id]]"
-    if not params.hasParam("gl_InstanceID") and "gl_InstanceID" in bodyCode:
-      result.addComma(first)
-      result.add "  uint gl_InstanceID [[instance_id]]"
+      result.add "  " & builtin
     for resource in resourceParams(uniforms, textures, stage):
       result.addComma(first)
       result.add "  "
@@ -351,19 +450,12 @@ proc emitMetalEntry*(
     result.add ") {\n"
     result.add "  VertexOut output;\n"
     result.add "  output.pointSize = 1.0;\n"
+    result.add specialInputLocals(params)
     result.add inputLocals(params, "input", 1)
     result.add outputLocals(params, 1)
-    result.add bodyCode
-    for p in outputs:
-      result.add "  output."
-      result.add metalOutputFieldName(p.name)
-      result.add " = "
-      result.add p.name
-      result.add ";\n"
-      if p.name == "gl_Position":
-        result.add "  output.position.z = "
-        result.add "(output.position.z + output.position.w) * 0.5;\n"
-    result.add "  return output;\n"
+    let epilogue = vertexReturn(outputs)
+    result.add bodyCode.replace("return;", "{\n" & epilogue & "  }")
+    result.add epilogue
     result.add "}\n"
 
   of 2:
@@ -382,9 +474,16 @@ proc emitMetalEntry*(
         "void"
     if outputs.len > 1:
       result.add "struct FragmentOut {\n"
-      for i, param in outputs:
-        result.add "  " & param.typ & " " & param.name &
-          " [[color(" & $i & ")]];\n"
+      var colorIndex = 0
+      for param in outputs:
+        let attribute =
+          if param.name == "gl_FragDepth":
+            metalAttribute(param.name, 0, true)
+          else:
+            " [[color(" & $colorIndex & ")]]"
+        result.add "  " & param.typ & " " & param.name & attribute & ";\n"
+        if param.name != "gl_FragDepth":
+          inc colorIndex
       result.add "};\n"
       var names: seq[string]
       for param in outputs:
@@ -400,16 +499,19 @@ proc emitMetalEntry*(
     if params.inputParams().len > 0:
       result.addComma(first)
       result.add "  FragmentIn input [[stage_in]]"
-    if not params.hasParam("gl_FrontFacing") and "gl_FrontFacing" in bodyCode:
+    for builtin in specialInputParams(params, bodyCode, stage):
       result.addComma(first)
-      result.add "  bool gl_FrontFacing [[front_facing]]"
+      result.add "  " & builtin
     for resource in resourceParams(uniforms, textures, stage):
       result.addComma(first)
       result.add "  "
       result.add resource
     if not first:
       result.add "\n"
-    result.add ") {\n"
+    result.add ")"
+    if outputs.len == 1 and outputs[0].name == "gl_FragDepth":
+      result.add " [[depth(any)]]"
+    result.add " {\n"
     result.add inputLocals(params, "input", 1)
     result.add outputLocals(params, 1)
     result.add bodyCode.replace("return;",
