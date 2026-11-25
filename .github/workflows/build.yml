@@ -37,3 +37,4 @@ jobs:
     - run: nim r tests/test_metal_resources.nim
     - run: nim r tests/test_metal_parameters.nim
     - run: nim r tests/test_metal_builtins.nim
+    - run: nim r tests/test_metal_inline.nim

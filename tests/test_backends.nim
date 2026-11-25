@@ -29,6 +29,8 @@ block:
   doAssert "fragment float4 fragmentMain()" in msl
   doAssert "float4 fragColor = float4(0.0, 0.0, 0.0, 0.0);" in msl
   doAssert "return fragColor;" in msl
+  doAssert "shadyMod" notin msl and "shadyArray" notin msl
+  doAssert "template<" notin msl
 
 block:
   proc fragmentDepth(
@@ -227,7 +229,7 @@ block:
 
   let msl = toMSL(sampledShadow, shaderFragment)
   doAssert "depth2d<float> shadowMap [[texture(0)]]" in msl
-  doAssert "shadowMap.sample_compare(shadowMapSampler, uvz.xy, uvz.z)" in msl
+  doAssert "sample_compare(shadowMapSampler, (uvz).xy, (uvz).z)" in msl
 
 block:
   var atlas: Uniform[Sampler2d]
@@ -424,8 +426,9 @@ block:
     hlsl = toHLSL(layerGradient, shaderFragment)
     msl = toMSL(layerGradient, shaderFragment)
   doAssert "layers.SampleGrad(layersSampler, uvw," in hlsl
-  doAssert "shadyArraySampleGrad(layers, layersSampler, uvw," in msl
-  doAssert "gradient2d(dx, dy)" in msl
+  doAssert "layers.sample(layersSampler," in msl
+  doAssert "metal::gradient2d(" in msl
+  doAssert "shadyArray" notin msl
 
 block:
   type ShapeData = object

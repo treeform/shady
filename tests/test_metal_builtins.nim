@@ -82,8 +82,12 @@ for source in [Fragment, GlobalFragment]:
   doAssert "[[color(1)]]" notin source
 doAssert "bool gl_FrontFacing [[front_facing]]" in Fragment
 doAssert "double" notin Fragment
-doAssert "shadyMod(" in Fragment and "rsqrt(" in Fragment
-doAssert "shadyArraySample(layers, layersSampler, uvw)" in Sampled
+doAssert "floor(" in Fragment and "rsqrt(" in Fragment
+doAssert "layers.sample(layersSampler," in Sampled
+doAssert "layers.read(uint2(" in Sampled
+for source in [Vertex, Fragment, GlobalFragment, Sampled]:
+  doAssert "shadyMod" notin source
+  doAssert "shadyArray" notin source
 doAssert "get_array_size()" in Sampled
 doAssert "data.read(uint(0))" in Sampled
 

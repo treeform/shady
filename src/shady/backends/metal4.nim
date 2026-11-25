@@ -7,26 +7,6 @@ type
 
 const metalHeader* = """#include <metal_stdlib>
 using namespace metal;
-template<typename X, typename Y> X shadyMod(X x, Y y) {
-  return x - y * floor(x / y);
-}
-inline float4 shadyArraySample(texture2d_array<float> image,
-    sampler imageSampler, float3 coordinate) {
-  return image.sample(imageSampler, coordinate.xy, uint(coordinate.z));
-}
-inline float4 shadyArraySampleLod(texture2d_array<float> image,
-    sampler imageSampler, float3 coordinate, float lod) {
-  return image.sample(imageSampler, coordinate.xy, uint(coordinate.z), level(lod));
-}
-inline float4 shadyArraySampleGrad(texture2d_array<float> image,
-    sampler imageSampler, float3 coordinate, float2 dx, float2 dy) {
-  return image.sample(imageSampler, coordinate.xy, uint(coordinate.z),
-    gradient2d(dx, dy));
-}
-inline float4 shadyArrayRead(texture2d_array<float> image,
-    int3 coordinate, int lod) {
-  return image.read(uint2(coordinate.xy), uint(coordinate.z), uint(lod));
-}
 """
 
 proc metalTypeRename*(t: string): string =
@@ -95,7 +75,6 @@ proc metalProcRename*(t: string): string =
   of "atan": "atan2"
   of "dFdx": "dfdx"
   of "dFdy": "-dfdy"
-  of "fmod": "shadyMod"
   of "mod": "%"
   of "div": "/"
   else: t.replace("`", "_")
@@ -194,25 +173,26 @@ proc metalResourceCall*(
     if args.len != 2: return ""
     if firstArgIsShadowSampler:
       args[0] & ".sample_compare(" & args[0] & "Sampler, " &
-        args[1] & ".xy, " & args[1] & ".z)"
+        "(" & args[1] & ").xy, (" & args[1] & ").z)"
     elif firstArgIsSamplerArray:
-      "shadyArraySample(" & args[0] & ", " & args[0] & "Sampler, " &
-        args[1] & ")"
+      args[0] & ".sample(" & args[0] & "Sampler, (" & args[1] &
+        ").xy, uint((" & args[1] & ").z))"
     else:
       args[0] & ".sample(" & args[0] & "Sampler, " & args[1] & ")"
   of "textureLod":
     if args.len != 3: return ""
     if firstArgIsSamplerArray:
-      "shadyArraySampleLod(" & args[0] & ", " & args[0] & "Sampler, " &
-        args[1] & ", " & args[2] & ")"
+      args[0] & ".sample(" & args[0] & "Sampler, (" & args[1] &
+        ").xy, uint((" & args[1] & ").z), metal::level(" & args[2] & "))"
     else:
       args[0] & ".sample(" & args[0] & "Sampler, " & args[1] &
         ", metal::level(" & args[2] & "))"
   of "textureGrad":
     if args.len != 4: return ""
     if firstArgIsSamplerArray:
-      "shadyArraySampleGrad(" & args[0] & ", " & args[0] & "Sampler, " &
-        args[1] & ", " & args[2] & ", " & args[3] & ")"
+      args[0] & ".sample(" & args[0] & "Sampler, (" & args[1] &
+        ").xy, uint((" & args[1] & ").z), metal::gradient2d(" &
+        args[2] & ", " & args[3] & "))"
     else:
       args[0] & ".sample(" & args[0] & "Sampler, " & args[1] &
         ", metal::gradient2d(" & args[2] & ", " & args[3] & "))"
@@ -236,7 +216,8 @@ proc metalResourceCall*(
     else:
       let level = if args.len >= 3: args[2] else: "0"
       if firstArgIsSamplerArray:
-        "shadyArrayRead(" & args[0] & ", " & args[1] & ", " & level & ")"
+        args[0] & ".read(uint2((" & args[1] & ").xy), uint((" &
+          args[1] & ").z), uint(" & level & "))"
       else:
         args[0] & ".read(uint2(" & args[1] & "), uint(" & level & "))"
   of "imageLoad":
