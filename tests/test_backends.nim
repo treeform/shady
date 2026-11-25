@@ -31,6 +31,90 @@ block:
   doAssert "return fragColor;" in msl
 
 block:
+  proc fragmentDepth(
+    gl_FragCoord: Vec4,
+    gl_FragDepth: var float32,
+    fragColor: var Vec4
+  ) =
+    ## Preserves native pixel coordinates while writing an adjusted depth.
+    gl_FragDepth = clamp(gl_FragCoord.z - 0.01'f, 0.0'f, 1.0'f)
+    fragColor = gl_FragCoord
+
+  for source in [
+    toShader(fragmentDepth, glsl4Desktop, shaderFragment),
+    toShader(fragmentDepth, glsl3WebGL, shaderFragment),
+    toShader(fragmentDepth, vulkanGlsl450, shaderFragment)
+  ]:
+    doAssert "origin_upper_left" notin source
+    doAssert "in vec4 gl_FragCoord" notin source
+    doAssert "out float gl_FragDepth" notin source
+    doAssert "gl_FragDepth = clamp(gl_FragCoord.z - " in source
+    doAssert "fragColor = gl_FragCoord;" in source
+
+  var depth: float32
+  var color: Vec4
+  fragmentDepth(vec4(8.5'f, 16.5'f, 0.5'f, 1.0'f), depth, color)
+  doAssert depth == 0.49'f
+  doAssert color == vec4(8.5'f, 16.5'f, 0.5'f, 1.0'f)
+
+  proc globalDepth(fragColor: var Vec4) =
+    ## Supports builtin globals when helpers share fragment state.
+    gl_FragDepth = gl_FragCoord.z
+    fragColor = vec4(gl_FragCoord.xy, vec2(gl_FragDepth, 1.0'f))
+
+  for source in [
+    toShader(globalDepth, glsl4Desktop, shaderFragment),
+    toShader(globalDepth, glsl3WebGL, shaderFragment)
+  ]:
+    doAssert "float gl_FragDepth" notin source
+    doAssert "vec4 gl_FragCoord" notin source
+    doAssert "gl_FragDepth = gl_FragCoord.z;" in source
+
+block:
+  proc integerVertex(
+    gl_VertexID: int32,
+    count: Uniform[int],
+    index: var int,
+    gl_Position: var Vec4
+  ) =
+    ## Exercises builtin identifiers with integer values shared across stages.
+    index = count
+    gl_Position = vec4(float32(gl_VertexID), 0.0'f, 0.0'f, 1.0'f)
+
+  proc integerFragment(
+    count: Uniform[int],
+    index: int,
+    fragColor: var Vec4
+  ) =
+    ## Requires the same integer precision as the vertex shader.
+    fragColor = vec4(float32(count + index))
+
+  let
+    vertex = toShader(integerVertex, glsl3WebGL, shaderVertex)
+    fragment = toShader(integerFragment, glsl3WebGL, shaderFragment)
+  doAssert "precision highp int;" in vertex
+  doAssert "precision highp int;" in fragment
+  doAssert "in int gl_VertexID" notin vertex
+  doAssert "uniform int count;" in vertex
+  doAssert "uniform int count;" in fragment
+  doAssert "flat out int index;" in vertex
+  doAssert "flat in int index;" in fragment
+
+block:
+  proc inverseSine(uv: Vec2, fragColor: var Vec4) =
+    ## Uses inverse sine directly rather than emitting a CPU wrapper.
+    fragColor = vec4(asin(uv.x))
+
+  for source in [
+    toShader(inverseSine, glsl4Desktop, shaderFragment),
+    toShader(inverseSine, glsl3WebGL, shaderFragment)
+  ]:
+    doAssert "asin(uv.x)" in source
+    doAssert "arcsin" notin source
+    doAssert "float asin(" notin source
+  doAssert asin(0.0'f) == 0.0'f
+
+block:
   proc vertexPass(
     vPos: Vec3,
     vCol: Vec3,

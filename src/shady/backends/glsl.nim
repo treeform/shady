@@ -75,7 +75,7 @@ proc glslTypeDefault*(t: string): string =
   else: ""
 
 const glslGlobals* = [
-  "gl_Position", "gl_FragCoord", "gl_GlobalInvocationID",
+  "gl_Position", "gl_FragCoord", "gl_FragDepth", "gl_GlobalInvocationID",
   "gl_VertexID", "gl_InstanceID", "gl_FrontFacing",
 ]
 
@@ -97,7 +97,7 @@ const glslFunctions* = [
   "floor", "ceil", "round", "exp", "inversesqrt",
   "[]", "[]=",
   "inverse",
-  "sin", "cos", "tan", "acos", "atan", "pow",
+  "sin", "cos", "tan", "asin", "acos", "atan", "pow",
   "fmod",
   "lessThan", "lessThanEqual", "greaterThan", "greaterThanEqual",
   "equal", "notEqual",
